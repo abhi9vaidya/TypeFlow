@@ -18,13 +18,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<TypingTest />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-screen flex flex-col">
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<TypingTest />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border">
+            Created by Abhinav Vaidya
+          </footer>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
