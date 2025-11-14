@@ -83,12 +83,12 @@ export const useSettingsStore = create<SettingsState>()(
       setBlurUnusedWords: (blur) => set({ blurUnusedWords: blur }),
 
       // Visual Effects
-      showStreakCounter: true,
-      showSpeedZone: true,
-      showParticleEffects: true,
-      showCircularProgress: true,
-      showPerfectGlow: true,
-      showCharacterGlow: true,
+      showStreakCounter: false,
+      showSpeedZone: false,
+      showParticleEffects: false,
+      showCircularProgress: false,
+      showPerfectGlow: false,
+      showCharacterGlow: false,
       setShowStreakCounter: (show) => set({ showStreakCounter: show }),
       setShowSpeedZone: (show) => set({ showSpeedZone: show }),
       setShowParticleEffects: (show) => set({ showParticleEffects: show }),
