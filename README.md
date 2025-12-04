@@ -28,7 +28,7 @@ A beautiful, minimalist typing speed test application built with modern web tech
 git clone <YOUR_GIT_URL>
 
 # Step 2: Navigate to the project directory
-cd glow-key-dash
+cd typeflow
 
 # Step 3: Install dependencies
 npm install
