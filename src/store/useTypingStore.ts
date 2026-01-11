@@ -2,9 +2,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TestResult, LiveSample, CharStats } from '@/utils/metrics';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from './useAuthStore';
 
 interface TypingState {
-  // Test config
+  // ... existing config and state
   mode: 'time' | 'words' | 'quote' | 'zen';
   testMode: 'time' | 'words' | 'quote' | 'zen';
   duration: 15 | 30 | 60 | 120;
@@ -48,8 +50,10 @@ interface TypingState {
   deleteChar: () => void;
   nextWord: () => void;
   addSample: (sample: LiveSample) => void;
-  finishTest: (result: TestResult) => void;
+  finishTest: (result: TestResult) => Promise<void>;
+  loadHistory: () => Promise<void>;
   clearHistory: () => void;
+  syncHistory: () => Promise<void>;
 }
 
 export const useTypingStore = create<TypingState>()(
@@ -220,8 +224,9 @@ export const useTypingStore = create<TypingState>()(
         lastSampleTime: Date.now(),
       })),
       
-      finishTest: (result) => {
+      finishTest: async (result) => {
         const state = get();
+        const { user } = useAuthStore.getState();
         
         // Check if it's a personal best
         const existingPBs = state.history
@@ -229,7 +234,6 @@ export const useTypingStore = create<TypingState>()(
           .sort((a, b) => b.wpm - a.wpm);
         
         const isPB = existingPBs.length === 0 || result.wpm > existingPBs[0].wpm;
-        
         const finalResult = { ...result, isPB };
         
         set({
@@ -239,9 +243,119 @@ export const useTypingStore = create<TypingState>()(
           currentResult: finalResult,
           history: [finalResult, ...state.history],
         });
+
+        // Sync with Supabase if user is logged in
+        if (user) {
+          try {
+            await supabase.from('test_results').insert({
+              user_id: user.id,
+              user_email: user.email, // Adding email for the leaderboard
+              wpm: finalResult.wpm,
+              raw_wpm: finalResult.rawWpm,
+              accuracy: finalResult.accuracy,
+              consistency: finalResult.consistency,
+              mode: finalResult.mode,
+              duration: finalResult.duration,
+              chars: finalResult.chars,
+              samples: finalResult.samples,
+              timestamp: finalResult.timestamp,
+            });
+          } catch (error) {
+            console.error('Error saving test result to Supabase:', error);
+          }
+        }
+      },
+
+      loadHistory: async () => {
+        const { user } = useAuthStore.getState();
+        if (!user) return;
+
+        try {
+          const { data, error } = await supabase
+            .from('test_results')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('timestamp', { ascending: false });
+
+          if (error) throw error;
+
+          if (data) {
+            const history: TestResult[] = data.map(row => ({
+              id: row.id,
+              mode: row.mode,
+              duration: row.duration,
+              timestamp: row.timestamp,
+              wpm: row.wpm,
+              rawWpm: row.raw_wpm,
+              accuracy: row.accuracy,
+              consistency: row.consistency,
+              chars: row.chars,
+              samples: row.samples,
+              isPB: false, // We'll recalculate PBs on the fly if needed
+            }));
+
+            set({ history });
+          }
+        } catch (error) {
+          console.error('Error loading history from Supabase:', error);
+        }
       },
       
-      clearHistory: () => set({ history: [] }),
+      clearHistory: async () => {
+        const { user } = useAuthStore.getState();
+        if (user) {
+          await supabase.from('test_results').delete().eq('user_id', user.id);
+        }
+        set({ history: [] });
+      },
+
+      syncHistory: async () => {
+        const { user } = useAuthStore.getState();
+        const { history } = get();
+        if (!user || history.length === 0) return;
+
+        try {
+          // 1. Get existing timestamps from Supabase to avoid duplicates
+          const { data: existingData } = await supabase
+            .from('test_results')
+            .select('timestamp')
+            .eq('user_id', user.id);
+
+          const existingTimestamps = new Set(existingData?.map(d => d.timestamp) || []);
+
+          // 2. Filter local history for items NOT in Supabase
+          const toSync = history.filter(item => !existingTimestamps.has(item.timestamp));
+
+          if (toSync.length > 0) {
+            console.log(`Syncing ${toSync.length} items to Supabase...`);
+            
+            const insertData = toSync.map(item => ({
+              user_id: user.id,
+              user_email: user.email,
+              wpm: item.wpm,
+              raw_wpm: item.rawWpm,
+              accuracy: item.accuracy,
+              consistency: item.consistency,
+              mode: item.mode,
+              duration: item.duration,
+              chars: item.chars,
+              samples: item.samples,
+              timestamp: item.timestamp,
+            }));
+
+            const { error: insertError } = await supabase
+              .from('test_results')
+              .insert(insertData);
+
+            if (insertError) throw insertError;
+          }
+
+          // 3. Reload everything from Supabase to get the authoritative copy (with DB IDs)
+          await get().loadHistory();
+        } catch (error) {
+          console.error('Error syncing history:', error);
+        }
+      },
     }),
     {
       name: 'typing-storage',

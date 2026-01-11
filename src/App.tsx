@@ -8,34 +8,63 @@ import TypingTest from "./pages/TypingTest";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/useAuthStore";
+import { useTypingStore } from "./store/useTypingStore";
+import { supabase } from "./lib/supabase";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="min-h-screen flex flex-col">
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<TypingTest />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/statistics" element={<Statistics />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border">
-            Created by Abhinav Vaidya
-          </footer>
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const setUser = useAuthStore((state) => state.setUser);
+  const syncHistory = useTypingStore((state) => state.syncHistory);
+
+  useEffect(() => {
+    // Listen for auth changes
+    // This will handle the initial session AND any changes (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null;
+      setUser(user);
+      
+      // If user just logged in, sync their local history
+      if (user) {
+        syncHistory();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setUser]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<TypingTest />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/statistics" element={<Statistics />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border">
+              Created by Abhinav Vaidya :)
+            </footer>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
 

@@ -1,13 +1,22 @@
 // Build: 20251114
 import { Header } from "@/components/Header";
 import { useTypingStore } from "@/store/useTypingStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Trophy, Calendar, Clock, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function History() {
-  const { history, clearHistory } = useTypingStore();
+  const { history, clearHistory, loadHistory } = useTypingStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      loadHistory();
+    }
+  }, [user, loadHistory]);
 
   if (history.length === 0) {
     return (

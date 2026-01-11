@@ -1,6 +1,7 @@
 // Build: 20251114
 import { Header } from "@/components/Header";
 import { useTypingStore } from "@/store/useTypingStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useHeatmapStore } from "@/store/useHeatmapStore";
 import { GoalsPanel } from "@/components/GoalsPanel";
 import { AchievementsPanel } from "@/components/AchievementsPanel";
@@ -9,10 +10,18 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { TrendingUp, TrendingDown, Target, Zap, Activity, Keyboard, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 export default function Statistics() {
-  const { history } = useTypingStore();
+  const { history, loadHistory } = useTypingStore();
+  const { user } = useAuthStore();
   const { getMostUsedKeys, getLeastAccurateKeys, totalPresses, getKeyAccuracy } = useHeatmapStore();
+
+  useEffect(() => {
+    if (user) {
+      loadHistory();
+    }
+  }, [user, loadHistory]);
 
   // Calculate overall stats
   const totalTests = history.length;
