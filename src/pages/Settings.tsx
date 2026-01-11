@@ -236,7 +236,7 @@ export default function Settings() {
                               <Check className="h-4 w-4 text-primary" />
                             )}
                           </div>
-                          <p className={`text-2xl ${font.value} leading-tight`}>
+                          <p className={`text-2xl font-${font.value} leading-tight`}>
                             {font.value === 'vt323' ? 'INSERT COIN TO START' : 
                              font.value === 'space-mono' ? 'hello_world.exe' :
                              font.value === 'lexend' ? 'Focus on the flow.' :

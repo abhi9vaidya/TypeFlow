@@ -289,7 +289,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           : "border-border/40 bg-muted/20 hover:border-primary/40 text-muted-foreground"
                       )}
                     >
-                      <span className={font.id}>{font.name}</span>
+                      <span className={`font-${font.id}`}>{font.name}</span>
                       {fontFamily === font.id && <Check className="h-3 w-3" />}
                     </button>
                   ))}

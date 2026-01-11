@@ -53,7 +53,7 @@ export function WordStream() {
       style={{ fontSize: `${fontSize}px` }}
       className={cn(
         "relative max-w-5xl mx-auto p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
-        fontFamily
+        `font-${fontFamily}`
       )}
     >
       {/* Enhanced Caret with different styles */}
