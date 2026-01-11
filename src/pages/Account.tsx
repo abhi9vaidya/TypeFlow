@@ -49,12 +49,12 @@ export default function Account() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: user.id,
           nickname,
           bio,
           updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
+        });
 
       if (error) {
         if (error.code === '23505') {
@@ -65,6 +65,11 @@ export default function Account() {
 
       await fetchProfile(user.id);
       toast.success("Profile updated successfully!");
+      
+      // Redirect back to main page after a short delay so they see the toast
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -47,8 +47,20 @@ export default function Leaderboard() {
 
       const { data, error } = await query;
 
-      if (error) throw error;
-      setEntries((data as any) || []);
+      if (error) {
+        console.error('Database join error, falling back to basic query:', error);
+        // Fallback: Fetch results without profiles if join fails
+        const { data: simpleData, error: simpleError } = await supabase
+          .from('test_results')
+          .select('id, wpm, accuracy, mode, duration, timestamp')
+          .order('wpm', { ascending: false })
+          .limit(50);
+        
+        if (simpleError) throw simpleError;
+        setEntries((simpleData as any) || []);
+      } else {
+        setEntries((data as any) || []);
+      }
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     } finally {
