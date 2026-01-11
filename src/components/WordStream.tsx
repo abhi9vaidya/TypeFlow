@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
 
 export function WordStream() {
   const { words, currentWordIndex, currentCharIndex, typedChars } = useTypingStore();
-  const { caretStyle, blurUnusedWords, showCharacterGlow } = useSettingsStore();
+  const { 
+    caretStyle, 
+    blurUnusedWords, 
+    showCharacterGlow, 
+    fontFamily, 
+    fontSize 
+  } = useSettingsStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const caretRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +50,11 @@ export function WordStream() {
   return (
     <div
       ref={containerRef}
-      className="relative max-w-5xl mx-auto p-8 typing-text text-2xl md:text-3xl leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300"
+      style={{ fontSize: `${fontSize}px` }}
+      className={cn(
+        "relative max-w-5xl mx-auto p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
+        fontFamily
+      )}
     >
       {/* Enhanced Caret with different styles */}
       <div

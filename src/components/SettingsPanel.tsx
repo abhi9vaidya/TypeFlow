@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { X, Palette } from "lucide-react";
-import { useSettingsStore, Theme, CaretStyle } from "@/store/useSettingsStore";
+import { X, Palette, Type, Check } from "lucide-react";
+import { useSettingsStore, Theme, CaretStyle, FontFamily } from "@/store/useSettingsStore";
 import { useEffect } from "react";
 import { applyTheme } from "@/utils/themes";
 import { CustomThemeEditor } from "./CustomThemeEditor";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -58,6 +59,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     setIncludeNumbers,
     caretStyle,
     setCaretStyle,
+    fontFamily,
+    setFontFamily,
+    fontSize,
+    setFontSize,
   } = useSettingsStore();
 
   useEffect(() => {
@@ -229,6 +234,59 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   {style.charAt(0).toUpperCase() + style.slice(1)}
                 </Button>
               ))}
+            </div>
+          </section>
+
+          <Separator className="bg-border/20" />
+
+          {/* Typography Settings */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-6 w-1 bg-gradient-to-b from-primary to-accent rounded-full" />
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/90">Typography</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Font Family</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: "font-mono", name: "Default Mono" },
+                    { id: "jetbrains", name: "JetBrains" },
+                    { id: "roboto-mono", name: "Roboto" },
+                    { id: "fira-code", name: "Fira Code" },
+                  ].map((font) => (
+                    <button
+                      key={font.id}
+                      onClick={() => setFontFamily(font.id as FontFamily)}
+                      className={cn(
+                        "px-3 py-2 rounded-lg border text-left transition-all text-xs font-medium flex items-center justify-between",
+                        fontFamily === font.id
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/40 bg-muted/20 hover:border-primary/40 text-muted-foreground"
+                      )}
+                    >
+                      <span className={font.id}>{font.name}</span>
+                      {fontFamily === font.id && <Check className="h-3 w-3" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Font Size</Label>
+                  <span className="text-xs font-mono text-primary font-bold">{fontSize}px</span>
+                </div>
+                <Slider 
+                  value={[fontSize]} 
+                  min={16} 
+                  max={48} 
+                  step={1} 
+                  onValueChange={([val]) => setFontSize(val)}
+                  className="py-2"
+                />
+              </div>
             </div>
           </section>
 

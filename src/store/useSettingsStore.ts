@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 
 export type Theme = "purple-glow" | "cyber-blue" | "matrix" | "sunset" | "fire" | "dark" | "custom";
 export type CaretStyle = "line" | "block" | "underline";
+export type FontFamily = "font-mono" | "font-sans" | "font-serif" | "jetbrains" | "roboto-mono" | "fira-code";
 
 export interface CustomColors {
   primary: string;
@@ -54,6 +55,12 @@ interface SettingsState {
   // Caret
   caretStyle: CaretStyle;
   setCaretStyle: (style: CaretStyle) => void;
+
+  // Typography
+  fontFamily: FontFamily;
+  setFontFamily: (font: FontFamily) => void;
+  fontSize: number;
+  setFontSize: (size: number) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -105,6 +112,12 @@ export const useSettingsStore = create<SettingsState>()(
       // Caret
       caretStyle: "line",
       setCaretStyle: (style) => set({ caretStyle: style }),
+
+      // Typography
+      fontFamily: "font-mono",
+      setFontFamily: (font) => set({ fontFamily: font }),
+      fontSize: 24,
+      setFontSize: (size) => set({ fontSize: size }),
     }),
     {
       name: "typeflow-settings",

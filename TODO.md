@@ -5,6 +5,13 @@
 - [x] Implement user profile page and nicknames.
 - [ ] Add account settings for avatar customization.
 
+## Typography & Themes
+- [x] Add custom font selector (JetBrains Mono, Roboto Mono, etc).
+- [x] Add font size slider.
+- [x] Implement caret style customization.
+- [ ] Add "Themes Market" with community themes.
+- [ ] Save custom themes to user profile.
+
 ## Tailwind Configuration (`tailwind.config.ts`)
 - [ ] Choose a color palette.
 - [ ] Update typography.
