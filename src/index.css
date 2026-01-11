@@ -10,6 +10,15 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer utilities {
+  .font-jetbrains { font-family: 'JetBrains Mono', monospace !important; }
+  .font-roboto-mono { font-family: 'Roboto Mono', monospace !important; }
+  .font-fira-code { font-family: 'Fira Code', monospace !important; }
+  .font-space-mono { font-family: 'Space Mono', monospace !important; }
+  .font-vt323 { font-family: 'VT323', monospace !important; }
+  .font-lexend { font-family: 'Lexend', sans-serif !important; }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
