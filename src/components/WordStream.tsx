@@ -61,30 +61,33 @@ export function WordStream() {
         ref={caretRef}
         className={cn(
           "absolute transition-transform duration-150 cubic-bezier-smooth animate-caret-pulse",
-          caretStyle === "line" && "w-1 h-9 bg-gradient-to-b from-primary via-primary to-primary/60 rounded-full",
-          caretStyle === "block" && "w-6 h-9 bg-primary/40 border-2 border-primary rounded-sm",
-          caretStyle === "underline" && "w-6 h-1 bg-primary rounded-full"
+          caretStyle === "line" && "bg-gradient-to-b from-primary via-primary to-primary/60 rounded-full",
+          caretStyle === "block" && "bg-primary/40 border-2 border-primary rounded-sm",
+          caretStyle === "underline" && "bg-primary rounded-full"
         )}
-        style={
-          caretStyle === "line" 
+        style={{
+          ...(caretStyle === "line" 
             ? { 
+                width: '3px',
+                height: '1.2em',
                 boxShadow: '0 0 12px hsl(var(--primary) / 0.8), 0 0 24px hsl(var(--primary) / 0.4)',
                 filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))',
-                willChange: 'transform',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
               }
             : caretStyle === "block"
             ? {
+                width: '0.6em',
+                height: '1.2em',
                 boxShadow: '0 0 8px hsl(var(--primary) / 0.6)',
-                willChange: 'transform',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
               }
             : {
+                width: '0.6em',
+                height: '0.15em',
+                marginTop: '1.1em',
                 boxShadow: '0 0 8px hsl(var(--primary) / 0.8)',
-                willChange: 'transform',
-                transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
-              }
-        }
+              }),
+          willChange: 'transform',
+          transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
+        }}
       />
 
       {/* Words with improved wrapping and performance */}
