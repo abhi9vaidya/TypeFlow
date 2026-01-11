@@ -9,6 +9,7 @@ import History from "./pages/History";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
 import Leaderboard from "./pages/Leaderboard";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/statistics" element={<Statistics />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/account" element={<Account />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

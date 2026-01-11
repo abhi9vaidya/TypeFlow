@@ -23,7 +23,7 @@ export function Header({ onSettingsClick }: HeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const isTypingPage = location.pathname === "/";
-  const { user, signOut, isLoading } = useAuthStore();
+  const { user, profile, signOut, isLoading } = useAuthStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
@@ -106,7 +106,7 @@ export function Header({ onSettingsClick }: HeaderProps) {
                   <Avatar className="h-9 w-9 border border-primary/20 transition-transform hover:scale-105">
                     <AvatarImage src={user.user_metadata?.avatar_url} />
                     <AvatarFallback className="bg-primary/10 text-primary uppercase font-bold text-xs">
-                      {user.email?.charAt(0) || "U"}
+                      {(profile?.nickname || user.email)?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -114,13 +114,19 @@ export function Header({ onSettingsClick }: HeaderProps) {
               <DropdownMenuContent className="w-56 glass-lg border-primary/20" align="end">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Account</p>
+                    <p className="text-sm font-medium leading-none truncate">
+                      {profile?.nickname || "Typist"}
+                    </p>
                     <p className="text-xs leading-none text-muted-foreground truncate">
                       {user.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/account")}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Account Settings</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/statistics")}>
                   <LineChart className="mr-2 h-4 w-4" />
                   <span>Your Progress</span>

@@ -2,8 +2,8 @@
 - [x] Integrate Supabase for data persistence.
 - [x] Implement Google and GitHub OAuth.
 - [x] Create Global Leaderboard.
-- [ ] Implement user profile page.
-- [ ] Add account settings for nickname customization.
+- [x] Implement user profile page and nicknames.
+- [ ] Add account settings for avatar customization.
 
 ## Tailwind Configuration (`tailwind.config.ts`)
 - [ ] Choose a color palette.

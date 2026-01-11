@@ -14,7 +14,10 @@ interface LeaderboardEntry {
   mode: string;
   duration: number;
   timestamp: string;
-  user_email?: string; // We'll add this to the query if we update the schema
+  profiles?: {
+    nickname: string;
+    avatar_url: string | null;
+  };
 }
 
 export default function Leaderboard() {
@@ -31,7 +34,10 @@ export default function Leaderboard() {
     try {
       let query = supabase
         .from('test_results')
-        .select('*')
+        .select(`
+          id, wpm, accuracy, mode, duration, timestamp,
+          profiles (nickname, avatar_url)
+        `)
         .order('wpm', { ascending: false })
         .limit(50);
 
@@ -42,7 +48,7 @@ export default function Leaderboard() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setEntries(data || []);
+      setEntries((data as any) || []);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     } finally {
@@ -123,7 +129,7 @@ export default function Leaderboard() {
                                   <User className="h-4 w-4 text-primary" />
                                 </div>
                                 <span className="font-medium">
-                                  {entry.user_email ? entry.user_email.split('@')[0] : `Typist_${entry.id.slice(0, 4)}`}
+                                  {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
                                 </span>
                               </div>
                             </td>
