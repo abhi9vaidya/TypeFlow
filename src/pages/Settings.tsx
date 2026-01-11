@@ -28,6 +28,15 @@ const FONTS: { label: string; value: FontFamily }[] = [
   { label: "Speed Reader", value: "lexend" },
 ];
 
+const FONT_CLASSES: Record<FontFamily, string> = {
+  "jetbrains": "font-jetbrains",
+  "roboto-mono": "font-roboto-mono",
+  "fira-code": "font-fira-code",
+  "space-mono": "font-space-mono",
+  "vt323": "font-vt323",
+  "lexend": "font-lexend",
+};
+
 const CARET_STYLES: { label: string; value: CaretStyle }[] = [
   { label: "Line", value: "line" },
   { label: "Block", value: "block" },
@@ -236,7 +245,7 @@ export default function Settings() {
                               <Check className="h-4 w-4 text-primary" />
                             )}
                           </div>
-                          <p className={`text-2xl font-${font.value} leading-tight`}>
+                          <p className={`text-2xl ${FONT_CLASSES[font.value]} leading-tight`}>
                             {font.value === 'vt323' ? 'INSERT COIN TO START' : 
                              font.value === 'space-mono' ? 'hello_world.exe' :
                              font.value === 'lexend' ? 'Focus on the flow.' :

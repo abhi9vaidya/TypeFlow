@@ -13,6 +13,15 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
 
+const FONT_CLASSES: Record<FontFamily, string> = {
+  "jetbrains": "font-jetbrains",
+  "roboto-mono": "font-roboto-mono",
+  "fira-code": "font-fira-code",
+  "space-mono": "font-space-mono",
+  "vt323": "font-vt323",
+  "lexend": "font-lexend",
+};
+
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -289,7 +298,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           : "border-border/40 bg-muted/20 hover:border-primary/40 text-muted-foreground"
                       )}
                     >
-                      <span className={`font-${font.id}`}>{font.name}</span>
+                      <span className={FONT_CLASSES[font.id as FontFamily]}>{font.name}</span>
                       {fontFamily === font.id && <Check className="h-3 w-3" />}
                     </button>
                   ))}

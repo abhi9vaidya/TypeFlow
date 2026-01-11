@@ -1,8 +1,17 @@
 // Build: 20251114
 import { useEffect, useRef } from "react";
 import { useTypingStore } from "@/store/useTypingStore";
-import { useSettingsStore } from "@/store/useSettingsStore";
+import { useSettingsStore, FontFamily } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
+
+const FONT_CLASSES: Record<FontFamily, string> = {
+  "jetbrains": "font-jetbrains",
+  "roboto-mono": "font-roboto-mono",
+  "fira-code": "font-fira-code",
+  "space-mono": "font-space-mono",
+  "vt323": "font-vt323",
+  "lexend": "font-lexend",
+};
 
 export function WordStream() {
   const { words, currentWordIndex, currentCharIndex, typedChars } = useTypingStore();
@@ -53,7 +62,7 @@ export function WordStream() {
       style={{ fontSize: `${fontSize}px` }}
       className={cn(
         "relative max-w-5xl mx-auto p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
-        `font-${fontFamily}`
+        FONT_CLASSES[fontFamily]
       )}
     >
       {/* Enhanced Caret with different styles */}

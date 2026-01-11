@@ -4,6 +4,14 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  safelist: [
+    "font-jetbrains",
+    "font-roboto-mono",
+    "font-fira-code",
+    "font-space-mono",
+    "font-vt323",
+    "font-lexend",
+  ],
   prefix: "",
   theme: {
     container: {
