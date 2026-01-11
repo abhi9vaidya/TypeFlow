@@ -15,14 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface HeaderProps {
-  onSettingsClick?: () => void;
-}
-
-export function Header({ onSettingsClick }: HeaderProps) {
+export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isTypingPage = location.pathname === "/";
   const { user, profile, signOut, isLoading } = useAuthStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -81,13 +76,7 @@ export function Header({ onSettingsClick }: HeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              if (isTypingPage && onSettingsClick) {
-                onSettingsClick();
-              } else {
-                navigate("/settings");
-              }
-            }}
+            onClick={() => navigate("/settings")}
             className="relative h-10 w-10 rounded-lg text-muted-foreground hover:text-accent hover:bg-accent/5 transition-all duration-200 group"
             title="Settings"
           >

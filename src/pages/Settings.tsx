@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect } from "react";
 
 const FONTS: { label: string; value: FontFamily }[] = [
   { label: "Default Mono", value: "font-mono" },
@@ -36,6 +37,17 @@ const CARET_STYLES: { label: string; value: CaretStyle }[] = [
 export default function Settings() {
   const navigate = useNavigate();
   const settings = useSettingsStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate("/");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

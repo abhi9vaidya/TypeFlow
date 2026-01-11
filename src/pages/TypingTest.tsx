@@ -326,7 +326,7 @@ export default function TypingTest() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      <Header onSettingsClick={() => setIsSettingsOpen(true)} />
+      <Header />
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       
       {/* Floating indicators */}
