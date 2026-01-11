@@ -76,6 +76,9 @@ export default {
         jetbrains: ['JetBrains Mono', 'monospace'],
         'roboto-mono': ['Roboto Mono', 'monospace'],
         'fira-code': ['Fira Code', 'monospace'],
+        'space-mono': ['Space Mono', 'monospace'],
+        'vt323': ['VT323', 'monospace'],
+        'lexend': ['Lexend', 'sans-serif'],
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1rem' }],

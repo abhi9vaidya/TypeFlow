@@ -272,10 +272,12 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <Label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Font Family</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { id: "font-mono", name: "Default Mono" },
-                    { id: "jetbrains", name: "JetBrains" },
-                    { id: "roboto-mono", name: "Roboto" },
-                    { id: "fira-code", name: "Fira Code" },
+                    { id: "jetbrains", name: "Modern" },
+                    { id: "roboto-mono", name: "Classic" },
+                    { id: "fira-code", name: "Coding" },
+                    { id: "space-mono", name: "Geometric" },
+                    { id: "vt323", name: "Retro" },
+                    { id: "lexend", name: "Speed" },
                   ].map((font) => (
                     <button
                       key={font.id}

@@ -20,12 +20,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect } from "react";
 
 const FONTS: { label: string; value: FontFamily }[] = [
-  { label: "Default Mono", value: "font-mono" },
-  { label: "Modern Sans", value: "font-sans" },
-  { label: "Classic Serif", value: "font-serif" },
-  { label: "JetBrains Mono", value: "jetbrains" },
-  { label: "Roboto Mono", value: "roboto-mono" },
-  { label: "Fira Code", value: "fira-code" },
+  { label: "Modern Mono", value: "jetbrains" },
+  { label: "Classic Mono", value: "roboto-mono" },
+  { label: "Coding Mono", value: "fira-code" },
+  { label: "Geometric", value: "space-mono" },
+  { label: "8-bit Retro", value: "vt323" },
+  { label: "Speed Reader", value: "lexend" },
 ];
 
 const CARET_STYLES: { label: string; value: CaretStyle }[] = [
@@ -236,7 +236,12 @@ export default function Settings() {
                               <Check className="h-4 w-4 text-primary" />
                             )}
                           </div>
-                          <p className={`text-xl ${font.value}`}>The quick brown fox</p>
+                          <p className={`text-2xl ${font.value} leading-tight`}>
+                            {font.value === 'vt323' ? 'INSERT COIN TO START' : 
+                             font.value === 'space-mono' ? 'hello_world.exe' :
+                             font.value === 'lexend' ? 'Focus on the flow.' :
+                             'The quick brown fox'}
+                          </p>
                         </button>
                       ))}
                     </div>
