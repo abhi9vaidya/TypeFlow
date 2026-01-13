@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useMultiplayerStore, Participant } from "@/store/useMultiplayerStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTypingStore } from "@/store/useTypingStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RaceProgress } from "@/components/RaceProgress";
@@ -15,6 +16,7 @@ import { Play, Copy, Check, LogOut, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateWPM } from "@/utils/metrics";
+import { soundPlayer } from "@/utils/sounds";
 
 export default function RaceRoom() {
   const { code } = useParams<{ code: string }>();
@@ -45,7 +47,15 @@ export default function RaceRoom() {
     currentWordIndex,
     currentCharIndex,
     correctChars,
+    typeChar,
+    deleteChar,
+    nextWord,
   } = useTypingStore();
+
+  const {
+    keySoundEnabled,
+    errorSoundEnabled,
+  } = useSettingsStore();
 
   const [countdown, setCountdown] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -75,12 +85,13 @@ export default function RaceRoom() {
     if (room?.id) {
       subscribeToRoom(room.id);
       
-      // Initialize typing store with room text
+      // Initialize typing store with room text and reset previous state
       if (room.target_text) {
         setWords(room.target_text.split(" "));
+        resetTest();
       }
     }
-  }, [room?.id, room?.target_text, setWords, subscribeToRoom]);
+  }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom]);
 
   // Handle countdown
   useEffect(() => {
@@ -127,6 +138,55 @@ export default function RaceRoom() {
       }
     }
   }, [currentWordIndex, room?.status, isRunning, startTime, words.length, correctChars, updateProgress, finishRace]);
+
+  // Keyboard handler for the race
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isRunning || isFinished || room?.status !== 'racing') return;
+
+      // Backspace
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        deleteChar();
+        return;
+      }
+
+      // Space for next word
+      if (e.key === " ") {
+        e.preventDefault();
+        if (currentWordIndex < words.length - 1) {
+          nextWord();
+        }
+        return;
+      }
+
+      // Type character
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        
+        const expectedChar = words[currentWordIndex]?.[currentCharIndex];
+        const isCorrect = e.key === expectedChar;
+        
+        typeChar(e.key);
+        
+        // Play sounds
+        if (keySoundEnabled) {
+          soundPlayer.playKeyClick();
+        }
+        if (!isCorrect && errorSoundEnabled) {
+          soundPlayer.playErrorSound();
+        }
+      }
+    },
+    [isRunning, isFinished, room?.status, currentWordIndex, words, typeChar, deleteChar, nextWord, keySoundEnabled, errorSoundEnabled, currentCharIndex]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   const copyRoomCode = () => {
     navigator.clipboard.writeText(window.location.href);
