@@ -71,13 +71,17 @@ export default function RaceRoom() {
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [finishTime, setFinishTime] = useState<number | null>(null);
   const [storedResult, setStoredResult] = useState<{ wpm: number; accuracy: number; finishTime: number } | null>(null);
+  const [cachedStandings, setCachedStandings] = useState<Participant[]>([]);
   
   // Track which room we've initialized to prevent resets on tab switch
   const initializedRoomId = useRef<string | null>(null);
 
-  const persistRaceResult = useCallback((roomId: string, data: { wpm: number; accuracy: number; finishTime: number }) => {
+  const persistRaceResult = useCallback((roomId: string, data: { wpm: number; accuracy: number; finishTime: number }, standings?: Participant[]) => {
     try {
       sessionStorage.setItem(`race-result-${roomId}`, JSON.stringify(data));
+      if (standings && standings.length > 0) {
+        sessionStorage.setItem(`race-standings-${roomId}`, JSON.stringify(standings));
+      }
       setStoredResult(data);
     } catch {
       // Ignore sessionStorage errors
@@ -107,6 +111,17 @@ export default function RaceRoom() {
       setFinalWpm(stored.wpm);
       setFinalAccuracy(stored.accuracy);
       setFinishTime(stored.finishTime);
+      
+      // Also restore cached standings
+      try {
+        const standingsRaw = sessionStorage.getItem(`race-standings-${id}`);
+        if (standingsRaw) {
+          const standings = JSON.parse(standingsRaw) as Participant[];
+          setCachedStandings(standings);
+        }
+      } catch {
+        // Ignore errors
+      }
     }
   }, [room?.id, loadRaceResult]);
 
@@ -276,14 +291,19 @@ export default function RaceRoom() {
     setFinalWpm(Math.round(wpm));
     setFinalAccuracy(accuracy);
     setFinishTime(elapsedSeconds);
-    if (room?.id) {
-      persistRaceResult(room.id, { wpm: Math.round(wpm), accuracy, finishTime: elapsedSeconds });
-    }
     
     // Update progress to 100% in the database
     updateProgress(100, Math.round(wpm));
     finishRace();
-  }, [raceFinished, startTime, correctChars, incorrectChars, extraChars, updateProgress, finishRace, persistRaceResult, room?.id]);
+    
+    // Save result and standings snapshot after state updates
+    if (room?.id) {
+      setTimeout(() => {
+        persistRaceResult(room.id!, { wpm: Math.round(wpm), accuracy, finishTime: elapsedSeconds }, participants);
+        setCachedStandings([...participants]);
+      }, 100);
+    }
+  }, [raceFinished, startTime, correctChars, incorrectChars, extraChars, updateProgress, finishRace, persistRaceResult, room?.id, participants]);
 
   // Sync progress to DB
   useEffect(() => {
@@ -504,9 +524,17 @@ export default function RaceRoom() {
                            {/* Leaderboard */}
                            <h3 className="text-lg font-semibold mb-4">Race Standings</h3>
                            <div className="space-y-3">
-                             {[...participants]
-                               .sort((a, b) => (b.finished_at ? 1 : 0) - (a.finished_at ? 1 : 0) || b.progress - a.progress || b.wpm - a.wpm)
-                               .map((p, idx) => (
+                             {(() => {
+                               // Use live participants if available and valid, otherwise fall back to cached
+                               const displayParticipants = participants.length > 0 && participants.some(p => p.wpm > 0 || p.progress > 0)
+                                 ? participants
+                                 : cachedStandings.length > 0
+                                   ? cachedStandings
+                                   : participants;
+                               
+                               return [...displayParticipants]
+                                 .sort((a, b) => (b.finished_at ? 1 : 0) - (a.finished_at ? 1 : 0) || b.progress - a.progress || b.wpm - a.wpm)
+                                 .map((p, idx) => (
                                  <div 
                                    key={p.user_id} 
                                    className={`flex items-center justify-between p-3 rounded-lg transition-all ${
@@ -534,7 +562,8 @@ export default function RaceRoom() {
                                      </span>
                                    </div>
                                  </div>
-                               ))}
+                               ));
+                             })()}
                            </div>
                          </CardContent>
                        </Card>
