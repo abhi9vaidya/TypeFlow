@@ -60,6 +60,38 @@ export default function RaceRoom() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [localWpm, setLocalWpm] = useState(0);
+  const [inputValue, setInputValue] = useState("");
+
+  // Auto-focus input for mobile accessibility
+  useEffect(() => {
+    const focusInput = () => {
+      if (!isFinished && room?.status === 'racing') {
+        document.getElementById("race-mobile-input")?.focus();
+      }
+    };
+    
+    focusInput();
+    window.addEventListener("click", focusInput);
+    return () => window.removeEventListener("click", focusInput);
+  }, [isFinished, room?.status]);
+
+  // Reusable typing logic
+  const handleTyping = useCallback((char: string) => {
+    if (isFinished || room?.status !== 'racing') return;
+
+    const expectedChar = words[currentWordIndex]?.[currentCharIndex];
+    const isCorrect = char === expectedChar;
+    
+    typeChar(char);
+    
+    // Play sounds
+    if (keySoundEnabled) {
+      soundPlayer.playKeyClick();
+    }
+    if (!isCorrect && errorSoundEnabled) {
+      soundPlayer.playErrorSound();
+    }
+  }, [isFinished, room?.status, words, currentWordIndex, currentCharIndex, typeChar, keySoundEnabled, errorSoundEnabled]);
 
   // Join and subscribe
   useEffect(() => {
@@ -163,22 +195,10 @@ export default function RaceRoom() {
       // Type character
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        
-        const expectedChar = words[currentWordIndex]?.[currentCharIndex];
-        const isCorrect = e.key === expectedChar;
-        
-        typeChar(e.key);
-        
-        // Play sounds
-        if (keySoundEnabled) {
-          soundPlayer.playKeyClick();
-        }
-        if (!isCorrect && errorSoundEnabled) {
-          soundPlayer.playErrorSound();
-        }
+        handleTyping(e.key);
       }
     },
-    [isRunning, isFinished, room?.status, currentWordIndex, words, typeChar, deleteChar, nextWord, keySoundEnabled, errorSoundEnabled, currentCharIndex]
+    [isRunning, isFinished, room?.status, currentWordIndex, words, deleteChar, nextWord, handleTyping]
   );
 
   useEffect(() => {
@@ -284,7 +304,45 @@ export default function RaceRoom() {
                 <div className="space-y-12">
                    <RaceProgress participants={participants} />
                    
-                   <div className="relative">
+                   <div 
+                     className="relative cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
+                     onClick={() => document.getElementById("race-mobile-input")?.focus()}
+                   >
+                     {/* Hidden input for mobile keyboard support */}
+                     <input
+                        id="race-mobile-input"
+                        type="text"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        spellCheck="false"
+                        className="absolute opacity-0 pointer-events-none left-0 top-0 h-full w-full"
+                        value={inputValue}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          
+                          // Handle space for next word
+                          if (val.endsWith(" ")) {
+                            if (currentWordIndex < words.length - 1) {
+                              nextWord();
+                              setInputValue("");
+                            }
+                            return;
+                          }
+
+                          // Detect backspace
+                          if (val.length < inputValue.length) {
+                            deleteChar();
+                          } else {
+                            const lastChar = val.slice(-1);
+                            if (lastChar) {
+                              handleTyping(lastChar);
+                            }
+                          }
+                          
+                          setInputValue(val);
+                        }}
+                      />
                      <WordStream />
                      {room.status === 'finished' && (
                        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center rounded-xl z-10">

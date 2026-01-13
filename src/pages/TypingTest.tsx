@@ -69,6 +69,47 @@ export default function TypingTest() {
   const { recordKeyPress, recordRealtimeKeyPress } = useHeatmapStore();
   const { goals, updateGoalProgress, unlockAchievement, updateStreak, achievements } = useGoalsStore();
 
+  const [inputValue, setInputValue] = useState("");
+
+  // Auto-focus input for mobile accessibility
+  useEffect(() => {
+    const focusInput = () => {
+      if (!isFinished) {
+        document.getElementById("mobile-input")?.focus();
+      }
+    };
+    
+    focusInput();
+    window.addEventListener("click", focusInput);
+    return () => window.removeEventListener("click", focusInput);
+  }, [isFinished]);
+
+  // Reusable typing logic for both physical and virtual keyboards
+  const handleTyping = useCallback((char: string) => {
+    if (isFinished) return;
+    
+    if (!isRunning) {
+      startTest();
+    }
+
+    const expectedChar = words[currentWordIndex]?.[currentCharIndex];
+    const isCorrect = char === expectedChar;
+    
+    typeChar(char);
+    
+    // Record key press for heatmap with accuracy
+    recordRealtimeKeyPress(char);
+    recordKeyPress(char, isCorrect);
+    
+    // Play sounds
+    if (keySoundEnabled) {
+      soundPlayer.playKeyClick();
+    }
+    if (!isCorrect && errorSoundEnabled) {
+      soundPlayer.playErrorSound();
+    }
+  }, [isRunning, isFinished, words, currentWordIndex, currentCharIndex, startTest, typeChar, recordRealtimeKeyPress, recordKeyPress, keySoundEnabled, errorSoundEnabled]);
+
   // Helper to check if achievement exists
   const hasAchievement = (title: string) => {
     return achievements.some(a => a.title === title);
@@ -276,26 +317,10 @@ export default function TypingTest() {
       // Type character (including first character when starting)
       if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        
-        const expectedChar = words[currentWordIndex]?.[currentCharIndex];
-        const isCorrect = e.key === expectedChar;
-        
-        typeChar(e.key);
-        
-        // Record key press for heatmap with accuracy
-        recordRealtimeKeyPress(e.key);
-        recordKeyPress(e.key, isCorrect);
-        
-        // Play sounds
-        if (keySoundEnabled) {
-          soundPlayer.playKeyClick();
-        }
-        if (!isCorrect && errorSoundEnabled) {
-          soundPlayer.playErrorSound();
-        }
+        handleTyping(e.key);
       }
     },
-    [isRunning, isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, typeChar, deleteChar, nextWord, keySoundEnabled, errorSoundEnabled, currentCharIndex, recordKeyPress, recordRealtimeKeyPress]
+    [isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning]
   );
 
   useEffect(() => {
@@ -345,7 +370,45 @@ export default function TypingTest() {
             
             {isRunning && testMode !== "zen" && <LiveMetrics />}
             
-            <div className="max-w-5xl mx-auto mt-12 relative group">
+            <div 
+              className="max-w-5xl mx-auto mt-12 relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
+              onClick={() => document.getElementById("mobile-input")?.focus()}
+            >
+              {/* Hidden input for mobile keyboard support */}
+              <input
+                id="mobile-input"
+                type="text"
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck="false"
+                className="absolute opacity-0 pointer-events-none left-0 top-0 h-full w-full"
+                value={inputValue}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  
+                  // Handle space for next word
+                  if (val.endsWith(" ")) {
+                    if (currentWordIndex < words.length - 1) {
+                      nextWord();
+                      setInputValue("");
+                    }
+                    return;
+                  }
+
+                  // Detect backspace (on some mobile browsers keydown doesn't work for backspace)
+                  if (val.length < inputValue.length) {
+                    deleteChar();
+                  } else {
+                    const lastChar = val.slice(-1);
+                    if (lastChar) {
+                      handleTyping(lastChar);
+                    }
+                  }
+                  
+                  setInputValue(val);
+                }}
+              />
               <WordStream />
               
               {/* Ambient glow effect when typing perfectly */}

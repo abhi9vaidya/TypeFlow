@@ -59,9 +59,9 @@ export function WordStream() {
   return (
     <div
       ref={containerRef}
-      style={{ fontSize: `${fontSize}px` }}
+      style={{ fontSize: `${window.innerWidth < 640 ? Math.min(fontSize, 20) : fontSize}px` }}
       className={cn(
-        "relative max-w-5xl mx-auto p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
+        "relative max-w-5xl mx-auto p-4 md:p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
         FONT_CLASSES[fontFamily]
       )}
     >
