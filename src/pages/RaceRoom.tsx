@@ -74,6 +74,22 @@ export default function RaceRoom() {
   // Track which room we've initialized to prevent resets on tab switch
   const initializedRoomId = useRef<string | null>(null);
 
+  const persistRaceResult = useCallback((roomId: string, data: { wpm: number; accuracy: number; finishTime: number }) => {
+    try {
+      sessionStorage.setItem(`race-result-${roomId}`, JSON.stringify(data));
+    } catch {}
+  }, []);
+
+  const loadRaceResult = useCallback((roomId: string) => {
+    try {
+      const raw = sessionStorage.getItem(`race-result-${roomId}`);
+      if (!raw) return null;
+      return JSON.parse(raw) as { wpm: number; accuracy: number; finishTime: number };
+    } catch {
+      return null;
+    }
+  }, []);
+
   // Auto-focus input for mobile accessibility and handle tab visibility
   useEffect(() => {
     const focusInput = () => {
@@ -141,6 +157,19 @@ export default function RaceRoom() {
     };
   }, [code, user, navigate, joinRoom, unsubscribeFromRoom]);
 
+  // If we re-focus or re-render and our participant is already finished, restore finished state
+  useEffect(() => {
+    if (!room?.id || !user) return;
+    const me = participants.find(p => p.user_id === user.id);
+    if (me?.progress === 100) {
+      const stored = loadRaceResult(room.id);
+      setRaceFinished(true);
+      setFinalWpm(stored?.wpm ?? me.wpm ?? finalWpm);
+      setFinalAccuracy(stored?.accuracy ?? finalAccuracy);
+      setFinishTime(stored?.finishTime ?? finishTime);
+    }
+  }, [participants, room?.id, user, loadRaceResult, finalWpm, finalAccuracy, finishTime]);
+
   // Handle room ID change to subscribe
   useEffect(() => {
     if (room?.id) {
@@ -153,9 +182,17 @@ export default function RaceRoom() {
         setWords(room.target_text.split(" "));
         resetTest();
         setRaceFinished(false);
+
+        const stored = loadRaceResult(room.id);
+        if (stored) {
+          setRaceFinished(true);
+          setFinalWpm(stored.wpm);
+          setFinalAccuracy(stored.accuracy);
+          setFinishTime(stored.finishTime);
+        }
       }
     }
-  }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom, setMode]);
+  }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom, setMode, loadRaceResult]);
 
   // Handle countdown
   useEffect(() => {
@@ -204,11 +241,14 @@ export default function RaceRoom() {
     setFinalWpm(Math.round(wpm));
     setFinalAccuracy(accuracy);
     setFinishTime(elapsedSeconds);
+    if (room?.id) {
+      persistRaceResult(room.id, { wpm: Math.round(wpm), accuracy, finishTime: elapsedSeconds });
+    }
     
     // Update progress to 100% in the database
     updateProgress(100, Math.round(wpm));
     finishRace();
-  }, [raceFinished, startTime, correctChars, incorrectChars, extraChars, updateProgress, finishRace]);
+  }, [raceFinished, startTime, correctChars, incorrectChars, extraChars, updateProgress, finishRace, persistRaceResult, room?.id]);
 
   // Sync progress to DB
   useEffect(() => {
