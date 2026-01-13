@@ -65,10 +65,9 @@ export default function RaceRoom() {
     init();
 
     return () => {
-      leaveRoom();
       unsubscribeFromRoom();
     };
-  }, [code, user, navigate, joinRoom, leaveRoom, unsubscribeFromRoom]);
+  }, [code, user, navigate, joinRoom, unsubscribeFromRoom]);
 
   // Handle room ID change to subscribe
   useEffect(() => {
@@ -170,10 +169,10 @@ export default function RaceRoom() {
                 <Button 
                   onClick={startRace} 
                   disabled={!everyoneReady || participants.length < 2}
-                  className="gap-2 shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                  className="gap-2 shadow-[0_0_15px_rgba(var(--primary),0.3)] min-w-[140px]"
                 >
                   <Play className="w-4 h-4" />
-                  Start Race
+                  {participants.length < 2 ? "Waiting for players" : "Start Race"}
                 </Button>
               )}
               {!isHost && room.status === 'lobby' && (

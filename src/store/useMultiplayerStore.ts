@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from './useAuthStore';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { generateWords } from '@/utils/words';
 
 export interface Room {
   id: string;
@@ -63,9 +64,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     // Generate a random 6-character room code
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     
-    // Get text for the race (borrowing from words.ts via useTypingStore)
-    // For now, we'll just use a placeholder text or trigger a text generation
-    const targetText = "The quick brown fox jumps over the lazy dog"; // Placeholder logic
+    // Get text for the race
+    const targetText = generateWords(25).join(" "); 
 
     try {
       const { data: room, error: roomError } = await supabase
@@ -115,14 +115,26 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
         .single();
 
       if (roomError) throw new Error('Room not found');
-      if (room.status !== 'lobby') throw new Error('Race already in progress');
+      if (room.status !== 'lobby' && room.status !== 'countdown') {
+        // Allow joining if race just started but not finished?
+        // For now, strict lobby only
+        if (room.status !== 'racing') throw new Error('Race already in progress');
+      }
+
+      // Check if already a participant to preserve state
+      const { data: existing } = await supabase
+        .from('room_participants')
+        .select('is_ready')
+        .eq('room_id', room.id)
+        .eq('user_id', user.id)
+        .single();
 
       const { error: partError } = await supabase
         .from('room_participants')
         .upsert({
           room_id: room.id,
           user_id: user.id,
-          is_ready: false,
+          is_ready: existing?.is_ready ?? (room.host_id === user.id),
           progress: 0,
           wpm: 0
         });
@@ -239,7 +251,8 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
         'postgres_changes',
         { event: '*', schema: 'public', table: 'room_participants', filter: `room_id=eq.${roomId}` },
         () => {
-          fetchParticipants();
+          // Add a small delay to ensure DB consistency before refetching
+          setTimeout(fetchParticipants, 100);
         }
       )
       .subscribe();
