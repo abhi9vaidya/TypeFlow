@@ -10,6 +10,8 @@ import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
 import Leaderboard from "./pages/Leaderboard";
 import Account from "./pages/Account";
+import Multiplayer from "./pages/Multiplayer";
+import RaceRoom from "./pages/RaceRoom";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
@@ -55,6 +57,8 @@ const App = () => {
                 <Route path="/statistics" element={<Statistics />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/multiplayer" element={<Multiplayer />} />
+                <Route path="/race/:code" element={<RaceRoom />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

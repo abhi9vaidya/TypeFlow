@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User, AtSign, FileText, Save, Loader2 } from "lucide-react";
+import { User, AtSign, FileText, Save, Loader2, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FriendsPanel } from "@/components/FriendsPanel";
 
 export default function Account() {
   const { user, profile, fetchProfile } = useAuthStore();
@@ -88,83 +90,102 @@ export default function Account() {
           <div className="space-y-2 text-center md:text-left">
             <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
             <p className="text-muted-foreground">
-              Manage your profile and how you appear on the leaderboard.
+              Manage your profile and stay connected with other typists.
             </p>
           </div>
 
-          <Card className="glass-lg border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-primary" />
-                Public Profile
-              </CardTitle>
-              <CardDescription>
-                This information will be visible to other typists on the leaderboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <AtSign className="h-4 w-4 text-muted-foreground" />
-                  Email Address
-                </Label>
-                <Input 
-                  id="email" 
-                  value={user.email} 
-                  disabled 
-                  className="bg-muted/50 border-primary/10 cursor-not-allowed"
-                />
-                <p className="text-[10px] text-muted-foreground italic">
-                  Email is private and will never be shared.
-                </p>
-              </div>
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="bg-panel/50 border-border/50">
+              <TabsTrigger value="profile" className="gap-2">
+                <User className="h-4 w-4" />
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="friends" className="gap-2">
+                <Users className="h-4 w-4" />
+                Friends
+              </TabsTrigger>
+            </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="nickname" className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Display Nickname
-                </Label>
-                <Input 
-                  id="nickname" 
-                  placeholder="CoolSpeed77"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="bg-background/50 border-primary/20 focus:border-primary"
-                />
-                <p className="text-[10px] text-muted-foreground">
-                  Your nickname on the leaderboard. Minimum 3 characters.
-                </p>
-              </div>
+            <TabsContent value="profile" className="space-y-6">
+              <Card className="glass-lg border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-primary" />
+                    Public Profile
+                  </CardTitle>
+                  <CardDescription>
+                    This information will be visible to other typists on the leaderboard.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <AtSign className="h-4 w-4 text-muted-foreground" />
+                      Email Address
+                    </Label>
+                    <Input 
+                      id="email" 
+                      value={user.email} 
+                      disabled 
+                      className="bg-muted/50 border-primary/10 cursor-not-allowed"
+                    />
+                    <p className="text-[10px] text-muted-foreground italic">
+                      Email is private and will never be shared.
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  Bio
-                </Label>
-                <Input 
-                  id="bio" 
-                  placeholder="Fastest typist in the solar system..."
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="bg-background/50 border-primary/20 focus:border-primary"
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end border-t border-primary/10 pt-6">
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
-                Save Changes
-              </Button>
-            </CardFooter>
-          </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="nickname" className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      Display Nickname
+                    </Label>
+                    <Input 
+                      id="nickname" 
+                      placeholder="CoolSpeed77"
+                      value={nickname}
+                      onChange={(e) => setNickname(e.target.value)}
+                      className="bg-background/50 border-primary/20 focus:border-primary"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Your nickname on the leaderboard. Minimum 3 characters.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      Bio
+                    </Label>
+                    <Input 
+                      id="bio" 
+                      placeholder="Fastest typist in the solar system..."
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      className="bg-background/50 border-primary/20 focus:border-primary"
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end border-t border-primary/10 pt-6">
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={isSaving}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    Save Changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="friends">
+              <FriendsPanel />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

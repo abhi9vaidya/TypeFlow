@@ -3,6 +3,9 @@
 - [x] Implement Google and GitHub OAuth.
 - [x] Create Global Leaderboard.
 - [x] Implement user profile page and nicknames.
+- [x] Add real-time typing races with Supabase Presence/Broadcast.
+- [x] Implement friend system (Following/Followers).
+- [x] Create personal activity feed for friends.
 - [ ] Add account settings for avatar customization.
 
 ## Typography & Themes

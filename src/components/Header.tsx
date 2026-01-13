@@ -1,5 +1,5 @@
 // Build: 20251114
-import { Settings, BarChart3, Keyboard, LineChart, LogIn, LogOut, User, Trophy } from "lucide-react";
+import { Settings, BarChart3, Keyboard, LineChart, LogIn, LogOut, User, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -60,6 +60,17 @@ export function Header() {
           >
             <Trophy className="h-5 w-5 transition-transform group-hover:scale-110 duration-200" />
             <span className="absolute inset-0 rounded-lg bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors duration-200" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/multiplayer")}
+            className="relative h-10 w-10 rounded-lg text-muted-foreground hover:text-cyan-500 hover:bg-cyan-500/5 transition-all duration-200 group"
+            title="Multiplayer"
+          >
+            <Users className="h-5 w-5 transition-transform group-hover:scale-110 duration-200" />
+            <span className="absolute inset-0 rounded-lg bg-cyan-500/0 group-hover:bg-cyan-500/5 transition-colors duration-200" />
           </Button>
           
           <Button

@@ -1,11 +1,17 @@
 import { Header } from "@/components/Header";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import { Trophy, Medal, Crown, Timer, Target, User } from "lucide-react";
+import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useFriendsStore } from "@/store/useFriendsStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useMultiplayerStore } from "@/store/useMultiplayerStore";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface LeaderboardEntry {
   id: string;
@@ -24,10 +30,28 @@ export default function Leaderboard() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  
+  const { user } = useAuthStore();
+  const { following, fetchFollowing, followUser, unfollowUser, isFollowing } = useFriendsStore();
+  const { createRoom } = useMultiplayerStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [activeTab]);
+    if (user) fetchFollowing();
+  }, [activeTab, user]);
+
+  const handleChallenge = async (profileId: string) => {
+    if (!user) {
+      toast.error("Sign in to challenge others!");
+      return;
+    }
+    const code = await createRoom(true); // Private room
+    if (code) {
+      toast.success("Room created! Send the link to your friend.");
+      navigate(`/race/${code}`);
+    }
+  };
 
   const fetchLeaderboard = async () => {
     setIsLoading(true);
@@ -36,7 +60,7 @@ export default function Leaderboard() {
         .from('test_results')
         .select(`
           id, wpm, accuracy, mode, duration, timestamp,
-          profiles (nickname, avatar_url)
+          profiles (id, nickname, avatar_url)
         `)
         .order('wpm', { ascending: false })
         .limit(50);
@@ -114,6 +138,7 @@ export default function Leaderboard() {
                         <th className="px-6 py-4 text-right text-sm font-semibold">Accuracy</th>
                         <th className="px-6 py-4 text-right text-sm font-semibold">Mode</th>
                         <th className="px-6 py-4 text-right text-sm font-semibold">Date</th>
+                        <th className="px-6 py-4 text-right text-sm font-semibold">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -159,11 +184,39 @@ export default function Leaderboard() {
                             <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
                               {new Date(entry.timestamp).toLocaleDateString()}
                             </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {entry.profiles?.id !== user?.id && entry.profiles?.id && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => isFollowing(entry.profiles!.id) 
+                                        ? unfollowUser(entry.profiles!.id) 
+                                        : followUser(entry.profiles!.id)}
+                                      title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
+                                    >
+                                      {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-primary"
+                                      onClick={() => handleChallenge(entry.profiles!.id)}
+                                      title="Challenge"
+                                    >
+                                      <Sword className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                             No records found yet. Be the first to top the leaderboard!
                           </td>
                         </tr>
