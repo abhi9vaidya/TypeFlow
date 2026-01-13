@@ -70,6 +70,7 @@ export default function RaceRoom() {
   const [finalWpm, setFinalWpm] = useState(0);
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [finishTime, setFinishTime] = useState<number | null>(null);
+  const [storedResult, setStoredResult] = useState<{ wpm: number; accuracy: number; finishTime: number } | null>(null);
   
   // Track which room we've initialized to prevent resets on tab switch
   const initializedRoomId = useRef<string | null>(null);
@@ -77,6 +78,7 @@ export default function RaceRoom() {
   const persistRaceResult = useCallback((roomId: string, data: { wpm: number; accuracy: number; finishTime: number }) => {
     try {
       sessionStorage.setItem(`race-result-${roomId}`, JSON.stringify(data));
+      setStoredResult(data);
     } catch {
       // Ignore sessionStorage errors
     }
@@ -92,6 +94,21 @@ export default function RaceRoom() {
       return null;
     }
   }, []);
+
+  // When we re-mount or lose room data temporarily (e.g., tab switch), restore any stored result
+  useEffect(() => {
+    const id = room?.id ?? initializedRoomId.current;
+    if (!id) return;
+
+    const stored = loadRaceResult(id);
+    if (stored) {
+      setStoredResult(stored);
+      setRaceFinished(true);
+      setFinalWpm(stored.wpm);
+      setFinalAccuracy(stored.accuracy);
+      setFinishTime(stored.finishTime);
+    }
+  }, [room?.id, loadRaceResult]);
 
   // Auto-focus input for mobile accessibility and handle tab visibility
   useEffect(() => {
@@ -334,6 +351,46 @@ export default function RaceRoom() {
     toast.success("Room link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (!room && raceFinished && storedResult) {
+    // Show cached result even if the live room snapshot is unavailable after a tab switch
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 pt-24 pb-12">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="space-y-6 animate-fade-in-up">
+              <Card className="bg-panel/40 border-border/50 backdrop-blur-sm overflow-hidden">
+                <div className="bg-gradient-to-r from-primary/20 to-transparent p-6 border-b border-border/30">
+                  <h2 className="text-2xl font-bold flex items-center gap-2">🏁 Race Complete!</h2>
+                  <p className="text-muted-foreground mt-1">Your time: {storedResult.finishTime.toFixed(1)}s</p>
+                </div>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div className="text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
+                      <div className="text-4xl font-bold text-primary">{storedResult.wpm}</div>
+                      <div className="text-sm text-muted-foreground uppercase tracking-wider">WPM</div>
+                    </div>
+                    <div className="text-center p-4 rounded-lg bg-success/10 border border-success/20">
+                      <div className="text-4xl font-bold text-success">{storedResult.accuracy}%</div>
+                      <div className="text-sm text-muted-foreground uppercase tracking-wider">Accuracy</div>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground text-sm">Live room data is unavailable; showing your saved result.</p>
+                </CardContent>
+              </Card>
+              <div className="flex justify-center">
+                <Button variant="outline" onClick={() => navigate("/multiplayer")} className="gap-2">
+                  <LogOut className="w-4 h-4" />
+                  Back to Lobby
+                </Button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (!room) {
     return (
