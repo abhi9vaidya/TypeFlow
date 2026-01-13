@@ -18,7 +18,7 @@ export function FriendsPanel() {
   useEffect(() => {
     fetchFollowing();
     fetchActivityFeed();
-  }, []);
+  }, [fetchFollowing, fetchActivityFeed]);
 
   const handleChallenge = async (userId: string) => {
     const code = await createRoom(true);
@@ -60,7 +60,9 @@ export function FriendsPanel() {
         {activeTab === 'activity' ? (
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
             {activityFeed.length > 0 ? (
-              activityFeed.map((activity) => (
+              activityFeed.map((activity) => {
+                const activityData = activity.data as { mode?: string; wpm?: number; accuracy?: number };
+                return (
                 <div key={activity.id} className="flex gap-4 p-3 rounded-lg bg-muted/10 border border-border/20">
                   <Avatar className="h-10 w-10 border border-primary/20">
                     <AvatarImage src={activity.profile?.avatar_url} />
@@ -77,21 +79,22 @@ export function FriendsPanel() {
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center gap-2">
                        <Activity className="w-3 h-3" />
-                       Completed a {activity.data.mode} test
+                       Completed a {activityData.mode || 'typing'} test
                     </p>
                     <div className="flex gap-2 mt-2">
                        <Badge variant="outline" className="text-[10px] font-mono h-5 gap-1 bg-primary/5">
                          <Zap className="w-3 h-3 text-primary" />
-                         {activity.data.wpm} WPM
+                         {activityData.wpm || 0} WPM
                        </Badge>
                        <Badge variant="outline" className="text-[10px] font-mono h-5 gap-1 bg-secondary/5">
                          <Clock className="w-3 h-3 text-secondary" />
-                         {activity.data.accuracy}%
+                         {activityData.accuracy || 0}%
                        </Badge>
                     </div>
                   </div>
                 </div>
-              ))
+              );
+              })
             ) : (
               <p className="text-center text-muted-foreground py-8">No recent activity from people you follow.</p>
             )}
@@ -109,7 +112,7 @@ export function FriendsPanel() {
                     <div>
                        <div className="font-medium">{friend.nickname || "Typist"}</div>
                        <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                         Best: <span className="text-primary font-mono">{friend.wpm_best || 0} WPM</span>
+                         Best: <span className="text-primary font-mono">{(friend as { wpm_best?: number }).wpm_best || 0} WPM</span>
                        </div>
                     </div>
                   </div>

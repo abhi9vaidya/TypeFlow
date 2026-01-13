@@ -40,7 +40,7 @@ const App = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser]);
+  }, [setUser, syncHistory]);
 
   return (
     <QueryClientProvider client={queryClient}>

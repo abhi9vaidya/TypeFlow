@@ -1,6 +1,6 @@
 import { Header } from "@/components/Header";
 import { supabase } from "@/lib/supabase";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +21,7 @@ interface LeaderboardEntry {
   duration: number;
   timestamp: string;
   profiles?: {
+    id: string;
     nickname: string;
     avatar_url: string | null;
   };
@@ -36,24 +37,7 @@ export default function Leaderboard() {
   const { createRoom } = useMultiplayerStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchLeaderboard();
-    if (user) fetchFollowing();
-  }, [activeTab, user]);
-
-  const handleChallenge = async (profileId: string) => {
-    if (!user) {
-      toast.error("Sign in to challenge others!");
-      return;
-    }
-    const code = await createRoom(true); // Private room
-    if (code) {
-      toast.success("Room created! Send the link to your friend.");
-      navigate(`/race/${code}`);
-    }
-  };
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
     try {
       let query = supabase
@@ -81,14 +65,31 @@ export default function Leaderboard() {
           .limit(50);
         
         if (simpleError) throw simpleError;
-        setEntries((simpleData as any) || []);
+        setEntries(simpleData as unknown as LeaderboardEntry[]);
       } else {
-        setEntries((data as any) || []);
+        setEntries(data as unknown as LeaderboardEntry[]);
       }
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     } finally {
       setIsLoading(false);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchLeaderboard();
+    if (user) fetchFollowing();
+  }, [activeTab, user, fetchFollowing, fetchLeaderboard]);
+
+  const handleChallenge = async (profileId: string) => {
+    if (!user) {
+      toast.error("Sign in to challenge others!");
+      return;
+    }
+    const code = await createRoom(true); // Private room
+    if (code) {
+      toast.success("Room created! Send the link to your friend.");
+      navigate(`/race/${code}`);
     }
   };
 

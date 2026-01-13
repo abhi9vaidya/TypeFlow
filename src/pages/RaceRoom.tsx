@@ -77,7 +77,9 @@ export default function RaceRoom() {
   const persistRaceResult = useCallback((roomId: string, data: { wpm: number; accuracy: number; finishTime: number }) => {
     try {
       sessionStorage.setItem(`race-result-${roomId}`, JSON.stringify(data));
-    } catch {}
+    } catch {
+      // Ignore sessionStorage errors
+    }
   }, []);
 
   const loadRaceResult = useCallback((roomId: string) => {
@@ -86,6 +88,7 @@ export default function RaceRoom() {
       if (!raw) return null;
       return JSON.parse(raw) as { wpm: number; accuracy: number; finishTime: number };
     } catch {
+      // Return null if parsing fails
       return null;
     }
   }, []);

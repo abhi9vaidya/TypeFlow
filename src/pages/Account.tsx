@@ -72,8 +72,8 @@ export default function Account() {
       setTimeout(() => {
         navigate("/");
       }, 1500);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save profile');
     } finally {
       setIsSaving(false);
     }

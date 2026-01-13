@@ -111,9 +111,9 @@ export default function TypingTest() {
   }, [isRunning, isFinished, words, currentWordIndex, currentCharIndex, startTest, typeChar, recordRealtimeKeyPress, recordKeyPress, keySoundEnabled, errorSoundEnabled]);
 
   // Helper to check if achievement exists
-  const hasAchievement = (title: string) => {
+  const hasAchievement = useCallback((title: string) => {
     return achievements.some(a => a.title === title);
-  };
+  }, [achievements]);
 
   // Apply theme on mount
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function TypingTest() {
       }
       setWords(newWords);
     }
-  }, [includePunctuation, includeNumbers]);
+  }, [includePunctuation, includeNumbers, testMode, wordCount, words.length, setWords]);
 
   // Handle test timer and sampling
   useEffect(() => {
@@ -241,7 +241,7 @@ export default function TypingTest() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isRunning, startTime, duration, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements]);
+  }, [isRunning, startTime, duration, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest]);
 
   // Keyboard handler
   const handleKeyDown = useCallback(
@@ -280,11 +280,6 @@ export default function TypingTest() {
       // Escape to toggle settings
       if (e.key === "Escape") {
         e.preventDefault();
-        // Debug log to help diagnose why Escape may not be opening the panel
-        try {
-          // eslint-disable-next-line no-console
-          console.log("handleKeyDown: Escape pressed — toggling settings (bubbling)", { isSettingsOpen });
-        } catch {}
         setIsSettingsOpen(prev => !prev);
         return;
       }
@@ -320,7 +315,7 @@ export default function TypingTest() {
         handleTyping(e.key);
       }
     },
-    [isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning]
+    [isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest]
   );
 
   useEffect(() => {
