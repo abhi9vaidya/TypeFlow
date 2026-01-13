@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateWPM } from "@/utils/metrics";
 import { soundPlayer } from "@/utils/sounds";
 
+import { ResultsCard } from "@/components/ResultsCard";
+
 export default function RaceRoom() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
@@ -41,12 +43,16 @@ export default function RaceRoom() {
     isRunning,
     isFinished,
     startTime,
+    currentResult,
     setWords,
     startTest,
     resetTest,
+    finishTest,
     currentWordIndex,
     currentCharIndex,
     correctChars,
+    incorrectChars,
+    typedChars,
     typeChar,
     deleteChar,
     nextWord,
@@ -62,26 +68,43 @@ export default function RaceRoom() {
   const [localWpm, setLocalWpm] = useState(0);
   const [inputValue, setInputValue] = useState("");
 
-  // Auto-focus input for mobile accessibility
+  // Auto-focus input for mobile accessibility and handle tab visibility
   useEffect(() => {
     const focusInput = () => {
-      if (!isFinished && room?.status === 'racing') {
+      const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
+      if (!isFinished && isRacing) {
         document.getElementById("race-mobile-input")?.focus();
       }
     };
     
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        focusInput();
+      }
+    };
+
     focusInput();
     window.addEventListener("click", focusInput);
-    return () => window.removeEventListener("click", focusInput);
-  }, [isFinished, room?.status]);
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("click", focusInput);
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isFinished, room?.status, countdown]);
 
   // Reusable typing logic
   const handleTyping = useCallback((char: string) => {
-    if (isFinished || room?.status !== 'racing') return;
+    const isReadyToRace = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
+    if (isFinished || !isReadyToRace) return;
 
     const expectedChar = words[currentWordIndex]?.[currentCharIndex];
     const isCorrect = char === expectedChar;
     
+    // Safety check: if test hasn't started locally but status is racing, start it
+    if (!isRunning && !isFinished) {
+      startTest();
+    }
+
     typeChar(char);
     
     // Play sounds
@@ -91,7 +114,7 @@ export default function RaceRoom() {
     if (!isCorrect && errorSoundEnabled) {
       soundPlayer.playErrorSound();
     }
-  }, [isFinished, room?.status, words, currentWordIndex, currentCharIndex, typeChar, keySoundEnabled, errorSoundEnabled]);
+  }, [isFinished, room?.status, countdown, words, currentWordIndex, currentCharIndex, typeChar, isRunning, startTest, keySoundEnabled, errorSoundEnabled]);
 
   // Join and subscribe
   useEffect(() => {
@@ -128,53 +151,87 @@ export default function RaceRoom() {
   // Handle countdown
   useEffect(() => {
     if (room?.status === 'countdown' && room.starts_at) {
-      const interval = setInterval(() => {
-        const remaining = Math.max(0, Math.ceil((new Date(room.starts_at!).getTime() - Date.now()) / 1000));
+      const startTime = new Date(room.starts_at).getTime();
+      
+      const updateCountdown = () => {
+        const now = Date.now();
+        const diff = startTime - now;
+        const remaining = Math.max(0, Math.ceil(diff / 1000));
+        
         setCountdown(remaining);
         
         if (remaining === 0) {
-          clearInterval(interval);
+          // Start test exactly when countdown reaches 0
+          if (!isRunning && !isFinished) {
+            startTest();
+          }
           
-          // Small delay to ensure all clients have reached 0
-          setTimeout(() => {
-            if (room.status === 'countdown') {
-              startTest();
-              if (room.host_id === user?.id) {
-                updateRoomStatus('racing');
-              }
-            }
-          }, 500);
+          if (room.host_id === user?.id && room.status === 'countdown') {
+            // Host ensures the room status is racing
+            updateRoomStatus('racing');
+          }
         }
-      }, 100);
+      };
+
+      // Initial check
+      updateCountdown();
+      
+      const interval = setInterval(updateCountdown, 250);
       return () => clearInterval(interval);
     } else {
       setCountdown(null);
     }
-  }, [room?.status, room?.starts_at, room?.host_id, user?.id, startTest, updateRoomStatus]);
+  }, [room?.status, room?.starts_at, room?.host_id, user?.id, isRunning, isFinished, startTest, updateRoomStatus]);
 
   // Sync progress to DB
   useEffect(() => {
-    if (room?.status === 'racing' && isRunning && startTime) {
+    const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
+    if (isRacing && isRunning && startTime) {
       const totalWords = words.length;
       if (totalWords === 0) return;
       
       const elapsedSeconds = (Date.now() - startTime) / 1000;
+      if (elapsedSeconds <= 0) return;
+
       const currentWpm = calculateWPM(correctChars, elapsedSeconds);
       setLocalWpm(currentWpm);
 
       const progress = Math.round((currentWordIndex / totalWords) * 100);
       updateProgress(progress, Math.round(currentWpm));
 
-      if (currentWordIndex >= totalWords) {
+      if (currentWordIndex >= totalWords && totalWords > 0 && !isFinished) {
+          // Finish the race locally and globally
           finishRace();
+          
+          const accuracy = Math.round((correctChars / (correctChars + incorrectChars)) * 100) || 0;
+          finishTest({
+            wpm: Math.round(currentWpm),
+            accuracy,
+            mode: room.mode as any,
+            duration: 0, // Words mode doesn't have a fixed duration
+            timestamp: new Date().toISOString(),
+            rawWpm: Math.round(currentWpm),
+            characters: {
+              correct: correctChars,
+              incorrect: incorrectChars,
+              extra: 0,
+              missed: 0
+            }
+          });
+
+          // Check if host should mark room as finished (maybe when host finishes)
+          if (room.host_id === user?.id) {
+            // Keep room 'racing' for a bit or update based on players
+          }
       }
     }
-  }, [currentWordIndex, room?.status, isRunning, startTime, words.length, correctChars, updateProgress, finishRace]);
+  }, [currentWordIndex, room?.status, countdown, isRunning, isFinished, startTime, words.length, correctChars, incorrectChars, updateProgress, finishRace, finishTest]);
 
   // Keyboard handler for the race
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isRunning || isFinished || room?.status !== 'racing') return;
+      const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
+      if (!isRacing || isFinished) return;
 
       // Backspace
       if (e.key === "Backspace") {
@@ -198,7 +255,7 @@ export default function RaceRoom() {
         handleTyping(e.key);
       }
     },
-    [isRunning, isFinished, room?.status, currentWordIndex, words, deleteChar, nextWord, handleTyping]
+    [isFinished, room?.status, countdown, currentWordIndex, words, deleteChar, nextWord, handleTyping]
   );
 
   useEffect(() => {
@@ -300,58 +357,76 @@ export default function RaceRoom() {
                 </div>
               )}
 
-              {(room.status === 'racing' || room.status === 'finished') && (
+              {(room.status === 'racing' || room.status === 'finished' || isFinished) && (
                 <div className="space-y-12">
-                   <RaceProgress participants={participants} />
-                   
-                   <div 
-                     className="relative cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
-                     onClick={() => document.getElementById("race-mobile-input")?.focus()}
-                   >
-                     {/* Hidden input for mobile keyboard support */}
-                     <input
-                        id="race-mobile-input"
-                        type="text"
-                        autoComplete="off"
-                        autoCapitalize="off"
-                        autoCorrect="off"
-                        spellCheck="false"
-                        className="absolute opacity-0 pointer-events-none left-0 top-0 h-full w-full"
-                        value={inputValue}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          
-                          // Handle space for next word
-                          if (val.endsWith(" ")) {
-                            if (currentWordIndex < words.length - 1) {
-                              nextWord();
-                              setInputValue("");
-                            }
-                            return;
-                          }
-
-                          // Detect backspace
-                          if (val.length < inputValue.length) {
-                            deleteChar();
-                          } else {
-                            const lastChar = val.slice(-1);
-                            if (lastChar) {
-                              handleTyping(lastChar);
-                            }
-                          }
-                          
-                          setInputValue(val);
-                        }}
-                      />
-                     <WordStream />
-                     {room.status === 'finished' && (
-                       <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center rounded-xl z-10">
-                          <h2 className="text-4xl font-bold text-primary">Race Finished!</h2>
+                   {isFinished && currentResult ? (
+                     <div className="animate-fade-in-up">
+                       <ResultsCard result={currentResult} />
+                       <div className="flex justify-center mt-8">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => navigate("/multiplayer")}
+                            className="gap-2"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            Back to Lobby
+                          </Button>
                        </div>
-                     )}
-                   </div>
+                     </div>
+                   ) : (
+                     <div className="space-y-12">
+                        <RaceProgress participants={participants} />
+                        
+                        <div 
+                          className="relative cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
+                          onClick={() => document.getElementById("race-mobile-input")?.focus()}
+                        >
+                          {/* Hidden input for mobile keyboard support */}
+                          <input
+                            id="race-mobile-input"
+                            type="text"
+                            autoComplete="off"
+                            autoCapitalize="off"
+                            autoCorrect="off"
+                            spellCheck="false"
+                            className="absolute opacity-0 pointer-events-none left-0 top-0 h-full w-full"
+                            value={inputValue}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              
+                              // Handle space for next word
+                              if (val.endsWith(" ")) {
+                                if (currentWordIndex < words.length - 1) {
+                                  nextWord();
+                                  setInputValue("");
+                                }
+                                return;
+                              }
 
-                   <LiveMetrics />
+                              // Detect backspace
+                              if (val.length < inputValue.length) {
+                                deleteChar();
+                              } else {
+                                const lastChar = val.slice(-1);
+                                if (lastChar) {
+                                  handleTyping(lastChar);
+                                }
+                              }
+                              
+                              setInputValue(val);
+                            }}
+                          />
+                          <WordStream />
+                          {room.status === 'finished' && (
+                            <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center rounded-xl z-10">
+                              <h2 className="text-4xl font-bold text-primary">Race Finished!</h2>
+                            </div>
+                          )}
+                        </div>
+
+                        <LiveMetrics />
+                     </div>
+                   )}
                 </div>
               )}
             </div>
