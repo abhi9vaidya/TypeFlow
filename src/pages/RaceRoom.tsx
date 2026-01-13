@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Play, Copy, Check, LogOut, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { calculateWPM } from "@/utils/metrics";
+import { calculateWPM, calculateAccuracy } from "@/utils/metrics";
 import { soundPlayer } from "@/utils/sounds";
 
 import { ResultsCard } from "@/components/ResultsCard";
@@ -54,6 +54,7 @@ export default function RaceRoom() {
     currentCharIndex,
     correctChars,
     incorrectChars,
+    extraChars,
     typedChars,
     typeChar,
     deleteChar,
@@ -216,20 +217,25 @@ export default function RaceRoom() {
           // Finish the race locally and globally
           finishRace();
           
-          const accuracy = Math.round((correctChars / (correctChars + incorrectChars)) * 100) || 0;
+          const accuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
+          
           finishTest({
+            id: Math.random().toString(36).substring(2, 9),
             wpm: Math.round(currentWpm),
             accuracy,
             mode: 'words',
             duration: 0,
             timestamp: new Date().toISOString(),
             rawWpm: Math.round(currentWpm),
-            characters: {
+            consistency: 100,
+            chars: {
               correct: correctChars,
               incorrect: incorrectChars,
-              extra: 0,
-              missed: 0
-            }
+              extra: extraChars,
+              fixed: 0
+            },
+            samples: [], // Multi-player doesn't track live samples yet
+            isPB: false
           });
 
           // If host finishes, eventually we could auto-finish the room
