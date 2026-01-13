@@ -41,15 +41,11 @@ export default function RaceRoom() {
   const {
     words,
     isRunning,
-    isFinished,
     startTime,
-    currentResult,
     setMode,
-    setDuration,
     setWords,
     startTest,
     resetTest,
-    finishTest,
     currentWordIndex,
     currentCharIndex,
     correctChars,
@@ -70,12 +66,16 @@ export default function RaceRoom() {
   const [copied, setCopied] = useState(false);
   const [localWpm, setLocalWpm] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  const [raceFinished, setRaceFinished] = useState(false);
+  const [finalWpm, setFinalWpm] = useState(0);
+  const [finalAccuracy, setFinalAccuracy] = useState(0);
+  const [finishTime, setFinishTime] = useState<number | null>(null);
 
   // Auto-focus input for mobile accessibility and handle tab visibility
   useEffect(() => {
     const focusInput = () => {
       const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
-      if (!isFinished && isRacing) {
+      if (!raceFinished && isRacing) {
         document.getElementById("race-mobile-input")?.focus();
       }
     };
@@ -93,18 +93,18 @@ export default function RaceRoom() {
       window.removeEventListener("click", focusInput);
       window.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [isFinished, room?.status, countdown]);
+  }, [raceFinished, room?.status, countdown]);
 
   // Reusable typing logic
   const handleTyping = useCallback((char: string) => {
     const isReadyToRace = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
-    if (isFinished || !isReadyToRace) return;
+    if (raceFinished || !isReadyToRace) return;
 
     const expectedChar = words[currentWordIndex]?.[currentCharIndex];
     const isCorrect = char === expectedChar;
     
     // Safety check: if test hasn't started locally but status is racing, start it
-    if (!isRunning && !isFinished) {
+    if (!isRunning && !raceFinished) {
       startTest();
     }
 
@@ -117,7 +117,7 @@ export default function RaceRoom() {
     if (!isCorrect && errorSoundEnabled) {
       soundPlayer.playErrorSound();
     }
-  }, [isFinished, room?.status, countdown, words, currentWordIndex, currentCharIndex, typeChar, isRunning, startTest, keySoundEnabled, errorSoundEnabled]);
+  }, [raceFinished, room?.status, countdown, words, currentWordIndex, currentCharIndex, typeChar, isRunning, startTest, keySoundEnabled, errorSoundEnabled]);
 
   // Join and subscribe
   useEffect(() => {
@@ -146,9 +146,9 @@ export default function RaceRoom() {
       // Initialize typing store with room text and reset previous state
       if (room.target_text) {
         setMode('words');
-        setDuration(0); // Ensure timer counts up for races
         setWords(room.target_text.split(" "));
         resetTest();
+        setRaceFinished(false);
       }
     }
   }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom, setMode]);
@@ -167,7 +167,7 @@ export default function RaceRoom() {
         
         if (remaining === 0) {
           // Start test exactly when countdown reaches 0
-          if (!isRunning && !isFinished) {
+          if (!isRunning && !raceFinished) {
             startTest();
           }
           
@@ -186,12 +186,30 @@ export default function RaceRoom() {
     } else {
       setCountdown(null);
     }
-  }, [room?.status, room?.starts_at, room?.host_id, user?.id, isRunning, isFinished, startTest, updateRoomStatus]);
+  }, [room?.status, room?.starts_at, room?.host_id, user?.id, isRunning, raceFinished, startTest, updateRoomStatus]);
+
+  // Helper to finish the race
+  const completeRace = useCallback(() => {
+    if (raceFinished || !startTime) return;
+    
+    const elapsedSeconds = (Date.now() - startTime) / 1000;
+    const wpm = calculateWPM(correctChars, elapsedSeconds);
+    const accuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
+    
+    setRaceFinished(true);
+    setFinalWpm(Math.round(wpm));
+    setFinalAccuracy(accuracy);
+    setFinishTime(elapsedSeconds);
+    
+    // Update progress to 100% in the database
+    updateProgress(100, Math.round(wpm));
+    finishRace();
+  }, [raceFinished, startTime, correctChars, incorrectChars, extraChars, updateProgress, finishRace]);
 
   // Sync progress to DB
   useEffect(() => {
     const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
-    if (isRacing && isRunning && startTime) {
+    if (isRacing && isRunning && startTime && !raceFinished) {
       const totalWords = words.length;
       if (totalWords === 0) return;
       
@@ -201,56 +219,17 @@ export default function RaceRoom() {
       const currentWpm = calculateWPM(correctChars, elapsedSeconds);
       setLocalWpm(currentWpm);
 
-      // Check for finish: Last word and all characters in that word are correct
-      const isOnLastWord = currentWordIndex === totalWords - 1;
-      const lastWord = words[currentWordIndex];
-      const typedLastWord = typedChars[currentWordIndex]?.join('') || '';
-      const isLastWordFinished = typedLastWord === lastWord;
-
-      const progress = (isOnLastWord && isLastWordFinished) 
-        ? 100 
-        : Math.min(99, Math.round((currentWordIndex / totalWords) * 100));
-      
+      // Progress is based on word index (not character matching)
+      const progress = Math.min(99, Math.round((currentWordIndex / totalWords) * 100));
       updateProgress(progress, Math.round(currentWpm));
-
-      if (progress === 100 && !isFinished) {
-          // Finish the race locally and globally
-          finishRace();
-          
-          const accuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
-          
-          finishTest({
-            id: Math.random().toString(36).substring(2, 9),
-            wpm: Math.round(currentWpm),
-            accuracy,
-            mode: 'words',
-            duration: 0,
-            timestamp: new Date().toISOString(),
-            rawWpm: Math.round(currentWpm),
-            consistency: 100,
-            chars: {
-              correct: correctChars,
-              incorrect: incorrectChars,
-              extra: extraChars,
-              fixed: 0
-            },
-            samples: [], // Multi-player doesn't track live samples yet
-            isPB: false
-          });
-
-          // If host finishes, eventually we could auto-finish the room
-          if (room.host_id === user?.id) {
-            // updateRoomStatus('finished'); // Maybe wait for others
-          }
-      }
     }
-  }, [currentWordIndex, room?.status, countdown, isRunning, isFinished, startTime, words, correctChars, incorrectChars, typedChars, updateProgress, finishRace, finishTest]);
+  }, [currentWordIndex, room?.status, countdown, isRunning, raceFinished, startTime, words.length, correctChars, updateProgress]);
 
   // Keyboard handler for the race
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const isRacing = room?.status === 'racing' || (room?.status === 'countdown' && countdown === 0);
-      if (!isRacing || isFinished) return;
+      if (!isRacing || raceFinished) return;
 
       // Backspace
       if (e.key === "Backspace") {
@@ -259,11 +238,14 @@ export default function RaceRoom() {
         return;
       }
 
-      // Space for next word
+      // Space for next word or finish race
       if (e.key === " ") {
         e.preventDefault();
         if (currentWordIndex < words.length - 1) {
           nextWord();
+        } else {
+          // Last word - finish the race!
+          completeRace();
         }
         return;
       }
@@ -274,7 +256,7 @@ export default function RaceRoom() {
         handleTyping(e.key);
       }
     },
-    [isFinished, room?.status, countdown, currentWordIndex, words, deleteChar, nextWord, handleTyping]
+    [raceFinished, room?.status, countdown, currentWordIndex, words, deleteChar, nextWord, handleTyping, completeRace]
   );
 
   useEffect(() => {
@@ -376,12 +358,69 @@ export default function RaceRoom() {
                 </div>
               )}
 
-              {(room.status === 'racing' || room.status === 'finished' || isFinished) && (
+              {(room.status === 'racing' || room.status === 'finished' || raceFinished) && (
                 <div className="space-y-12">
-                   {isFinished && currentResult ? (
-                     <div className="animate-fade-in-up">
-                       <ResultsCard result={currentResult} />
-                       <div className="flex justify-center mt-8">
+                   {raceFinished ? (
+                     <div className="animate-fade-in-up space-y-6">
+                       {/* Race Results */}
+                       <Card className="bg-panel/40 border-border/50 backdrop-blur-sm overflow-hidden">
+                         <div className="bg-gradient-to-r from-primary/20 to-transparent p-6 border-b border-border/30">
+                           <h2 className="text-2xl font-bold flex items-center gap-2">
+                             🏁 Race Complete!
+                           </h2>
+                           <p className="text-muted-foreground mt-1">Your time: {finishTime?.toFixed(1)}s</p>
+                         </div>
+                         <CardContent className="p-6">
+                           <div className="grid grid-cols-2 gap-6 mb-8">
+                             <div className="text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
+                               <div className="text-4xl font-bold text-primary">{finalWpm}</div>
+                               <div className="text-sm text-muted-foreground uppercase tracking-wider">WPM</div>
+                             </div>
+                             <div className="text-center p-4 rounded-lg bg-success/10 border border-success/20">
+                               <div className="text-4xl font-bold text-success">{finalAccuracy}%</div>
+                               <div className="text-sm text-muted-foreground uppercase tracking-wider">Accuracy</div>
+                             </div>
+                           </div>
+                           
+                           {/* Leaderboard */}
+                           <h3 className="text-lg font-semibold mb-4">Race Standings</h3>
+                           <div className="space-y-3">
+                             {[...participants]
+                               .sort((a, b) => (b.finished_at ? 1 : 0) - (a.finished_at ? 1 : 0) || b.progress - a.progress || b.wpm - a.wpm)
+                               .map((p, idx) => (
+                                 <div 
+                                   key={p.user_id} 
+                                   className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                                     p.user_id === user?.id 
+                                       ? 'bg-primary/20 border border-primary/30' 
+                                       : 'bg-panel/30 border border-border/20'
+                                   }`}
+                                 >
+                                   <div className="flex items-center gap-3">
+                                     <span className={`text-xl font-bold w-8 ${
+                                       idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-amber-600' : 'text-muted-foreground'
+                                     }`}>
+                                       {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
+                                     </span>
+                                     <Avatar className="h-8 w-8 border border-primary/20">
+                                       <AvatarImage src={p.profile?.avatar_url} />
+                                       <AvatarFallback>{p.profile?.nickname?.charAt(0) || "?"}</AvatarFallback>
+                                     </Avatar>
+                                     <span className="font-medium">{p.profile?.nickname || "Guest"}</span>
+                                   </div>
+                                   <div className="flex items-center gap-4 text-sm">
+                                     <span className="font-mono">{p.wpm} WPM</span>
+                                     <span className={`font-mono ${p.progress === 100 ? 'text-success' : 'text-muted-foreground'}`}>
+                                       {p.progress === 100 ? '✓ Finished' : `${p.progress}%`}
+                                     </span>
+                                   </div>
+                                 </div>
+                               ))}
+                           </div>
+                         </CardContent>
+                       </Card>
+                       
+                       <div className="flex justify-center">
                           <Button 
                             variant="outline" 
                             onClick={() => navigate("/multiplayer")}
@@ -413,10 +452,14 @@ export default function RaceRoom() {
                             onChange={(e) => {
                               const val = e.target.value;
                               
-                              // Handle space for next word
+                              // Handle space for next word or finish
                               if (val.endsWith(" ")) {
                                 if (currentWordIndex < words.length - 1) {
                                   nextWord();
+                                  setInputValue("");
+                                } else {
+                                  // Last word - finish the race!
+                                  completeRace();
                                   setInputValue("");
                                 }
                                 return;
