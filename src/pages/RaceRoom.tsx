@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useMultiplayerStore, Participant } from "@/store/useMultiplayerStore";
@@ -70,6 +70,9 @@ export default function RaceRoom() {
   const [finalWpm, setFinalWpm] = useState(0);
   const [finalAccuracy, setFinalAccuracy] = useState(0);
   const [finishTime, setFinishTime] = useState<number | null>(null);
+  
+  // Track which room we've initialized to prevent resets on tab switch
+  const initializedRoomId = useRef<string | null>(null);
 
   // Auto-focus input for mobile accessibility and handle tab visibility
   useEffect(() => {
@@ -143,8 +146,9 @@ export default function RaceRoom() {
     if (room?.id) {
       subscribeToRoom(room.id);
       
-      // Initialize typing store with room text and reset previous state
-      if (room.target_text) {
+      // Only initialize if this is a new room (prevents reset on tab switch)
+      if (room.target_text && initializedRoomId.current !== room.id) {
+        initializedRoomId.current = room.id;
         setMode('words');
         setWords(room.target_text.split(" "));
         resetTest();
