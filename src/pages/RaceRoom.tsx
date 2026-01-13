@@ -44,6 +44,8 @@ export default function RaceRoom() {
     isFinished,
     startTime,
     currentResult,
+    setMode,
+    setDuration,
     setWords,
     startTest,
     resetTest,
@@ -142,11 +144,13 @@ export default function RaceRoom() {
       
       // Initialize typing store with room text and reset previous state
       if (room.target_text) {
+        setMode('words');
+        setDuration(0); // Ensure timer counts up for races
         setWords(room.target_text.split(" "));
         resetTest();
       }
     }
-  }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom]);
+  }, [room?.id, room?.target_text, setWords, resetTest, subscribeToRoom, setMode]);
 
   // Handle countdown
   useEffect(() => {
@@ -196,10 +200,19 @@ export default function RaceRoom() {
       const currentWpm = calculateWPM(correctChars, elapsedSeconds);
       setLocalWpm(currentWpm);
 
-      const progress = Math.round((currentWordIndex / totalWords) * 100);
+      // Check for finish: Last word and all characters in that word are correct
+      const isOnLastWord = currentWordIndex === totalWords - 1;
+      const lastWord = words[currentWordIndex];
+      const typedLastWord = typedChars[currentWordIndex]?.join('') || '';
+      const isLastWordFinished = typedLastWord === lastWord;
+
+      const progress = (isOnLastWord && isLastWordFinished) 
+        ? 100 
+        : Math.min(99, Math.round((currentWordIndex / totalWords) * 100));
+      
       updateProgress(progress, Math.round(currentWpm));
 
-      if (currentWordIndex >= totalWords && totalWords > 0 && !isFinished) {
+      if (progress === 100 && !isFinished) {
           // Finish the race locally and globally
           finishRace();
           
@@ -207,8 +220,8 @@ export default function RaceRoom() {
           finishTest({
             wpm: Math.round(currentWpm),
             accuracy,
-            mode: room.mode as any,
-            duration: 0, // Words mode doesn't have a fixed duration
+            mode: 'words',
+            duration: 0,
             timestamp: new Date().toISOString(),
             rawWpm: Math.round(currentWpm),
             characters: {
@@ -219,13 +232,13 @@ export default function RaceRoom() {
             }
           });
 
-          // Check if host should mark room as finished (maybe when host finishes)
+          // If host finishes, eventually we could auto-finish the room
           if (room.host_id === user?.id) {
-            // Keep room 'racing' for a bit or update based on players
+            // updateRoomStatus('finished'); // Maybe wait for others
           }
       }
     }
-  }, [currentWordIndex, room?.status, countdown, isRunning, isFinished, startTime, words.length, correctChars, incorrectChars, updateProgress, finishRace, finishTest]);
+  }, [currentWordIndex, room?.status, countdown, isRunning, isFinished, startTime, words, correctChars, incorrectChars, typedChars, updateProgress, finishRace, finishTest]);
 
   // Keyboard handler for the race
   const handleKeyDown = useCallback(
