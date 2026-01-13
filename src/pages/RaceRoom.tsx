@@ -159,16 +159,25 @@ export default function RaceRoom() {
 
   // If we re-focus or re-render and our participant is already finished, restore finished state
   useEffect(() => {
-    if (!room?.id || !user) return;
+    if (!room?.id || !user || raceFinished) return;
+    
     const me = participants.find(p => p.user_id === user.id);
-    if (me?.progress === 100) {
+    if (me?.progress === 100 && me.finished_at) {
       const stored = loadRaceResult(room.id);
-      setRaceFinished(true);
-      setFinalWpm(stored?.wpm ?? me.wpm ?? finalWpm);
-      setFinalAccuracy(stored?.accuracy ?? finalAccuracy);
-      setFinishTime(stored?.finishTime ?? finishTime);
+      if (stored) {
+        setRaceFinished(true);
+        setFinalWpm(stored.wpm);
+        setFinalAccuracy(stored.accuracy);
+        setFinishTime(stored.finishTime);
+      } else if (me.wpm > 0) {
+        // Fallback to participant data if no stored result
+        setRaceFinished(true);
+        setFinalWpm(me.wpm);
+        setFinalAccuracy(100); // Default accuracy
+        setFinishTime(0);
+      }
     }
-  }, [participants, room?.id, user, loadRaceResult, finalWpm, finalAccuracy, finishTime]);
+  }, [participants, room?.id, user, raceFinished, loadRaceResult]);
 
   // Handle room ID change to subscribe
   useEffect(() => {
@@ -178,17 +187,23 @@ export default function RaceRoom() {
       // Only initialize if this is a new room (prevents reset on tab switch)
       if (room.target_text && initializedRoomId.current !== room.id) {
         initializedRoomId.current = room.id;
+        
+        // Check for stored result FIRST before resetting
+        const stored = loadRaceResult(room.id);
+        
         setMode('words');
         setWords(room.target_text.split(" "));
-        resetTest();
-        setRaceFinished(false);
-
-        const stored = loadRaceResult(room.id);
+        
         if (stored) {
+          // Restore finished state
           setRaceFinished(true);
           setFinalWpm(stored.wpm);
           setFinalAccuracy(stored.accuracy);
           setFinishTime(stored.finishTime);
+        } else {
+          // Fresh race - reset everything
+          resetTest();
+          setRaceFinished(false);
         }
       }
     }
