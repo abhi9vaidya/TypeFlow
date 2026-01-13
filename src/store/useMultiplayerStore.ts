@@ -44,6 +44,7 @@ interface MultiplayerState {
   updateProgress: (progress: number, wpm: number) => Promise<void>;
   startRace: () => Promise<void>;
   finishRace: () => Promise<void>;
+  updateRoomStatus: (status: Room['status']) => Promise<void>;
   subscribeToRoom: (roomId: string) => void;
   unsubscribeFromRoom: () => void;
 }
@@ -85,10 +86,12 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       // Join the room as host
       const { error: partError } = await supabase
         .from('room_participants')
-        .insert({
+        .upsert({
           room_id: room.id,
           user_id: user.id,
-          is_ready: true
+          is_ready: true,
+          progress: 0,
+          wpm: 0
         });
 
       if (partError) throw partError;
@@ -127,7 +130,7 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
         .select('is_ready')
         .eq('room_id', room.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const { error: partError } = await supabase
         .from('room_participants')
@@ -220,6 +223,17 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       })
       .eq('room_id', room.id)
       .eq('user_id', user.id);
+  },
+
+  updateRoomStatus: async (status: Room['status']) => {
+    const { room } = get();
+    const { user } = useAuthStore.getState();
+    if (!room || room.host_id !== user?.id) return;
+
+    await supabase
+      .from('rooms')
+      .update({ status })
+      .eq('id', room.id);
   },
 
   subscribeToRoom: (roomId: string) => {

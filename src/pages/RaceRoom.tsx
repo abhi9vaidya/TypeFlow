@@ -30,7 +30,8 @@ export default function RaceRoom() {
     setReady,
     startRace,
     updateProgress,
-    finishRace
+    finishRace,
+    updateRoomStatus
   } = useMultiplayerStore();
   
   const {
@@ -90,14 +91,23 @@ export default function RaceRoom() {
         
         if (remaining === 0) {
           clearInterval(interval);
-          startTest(); // Start local typing test
+          
+          // Small delay to ensure all clients have reached 0
+          setTimeout(() => {
+            if (room.status === 'countdown') {
+              startTest();
+              if (room.host_id === user?.id) {
+                updateRoomStatus('racing');
+              }
+            }
+          }, 500);
         }
       }, 100);
       return () => clearInterval(interval);
     } else {
       setCountdown(null);
     }
-  }, [room?.status, room?.starts_at, startTest]);
+  }, [room?.status, room?.starts_at, room?.host_id, user?.id, startTest, updateRoomStatus]);
 
   // Sync progress to DB
   useEffect(() => {
