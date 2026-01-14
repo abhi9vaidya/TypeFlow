@@ -62,37 +62,37 @@ export default function Settings() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
-        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
+        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 sm:px-0">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">Settings</h1>
-              <p className="text-muted-foreground mt-1">Configure your typing experience and visual preferences.</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Settings</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">Configure your typing experience and visual preferences.</p>
             </div>
             <Button 
               onClick={() => navigate("/")}
-              className="glow-primary self-start"
+              className="glow-primary self-start touch-manipulation h-10 sm:h-11"
             >
               Back to Test
             </Button>
           </div>
 
           <Tabs defaultValue="typing" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 glass-sm mb-8">
-              <TabsTrigger value="typing" className="gap-2">
-                <Keyboard className="h-4 w-4" />
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 glass-sm mb-6 sm:mb-8">
+              <TabsTrigger value="typing" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
+                <Keyboard className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>Typing</span>
               </TabsTrigger>
-              <TabsTrigger value="visuals" className="gap-2">
-                <Palette className="h-4 w-4" />
+              <TabsTrigger value="visuals" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
+                <Palette className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>Visuals</span>
               </TabsTrigger>
-              <TabsTrigger value="typography" className="gap-2">
-                <Type className="h-4 w-4" />
-                <span>Typography</span>
+              <TabsTrigger value="typography" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
+                <Type className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Typography</span><span className="xs:hidden">Type</span>
               </TabsTrigger>
-              <TabsTrigger value="sound" className="gap-2">
-                <Volume2 className="h-4 w-4" />
+              <TabsTrigger value="sound" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
+                <Volume2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>Sound</span>
               </TabsTrigger>
             </TabsList>

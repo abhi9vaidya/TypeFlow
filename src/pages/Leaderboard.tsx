@@ -109,27 +109,77 @@ export default function Leaderboard() {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
               Global Leaderboard
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground px-4">
               See how you stack up against the fastest typists in the world.
             </p>
           </div>
 
           <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6 px-2">
               <TabsList className="grid w-full max-w-md grid-cols-4 bg-primary/5 border-primary/10">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="time">Time</TabsTrigger>
-                <TabsTrigger value="words">Words</TabsTrigger>
-                <TabsTrigger value="quote">Quote</TabsTrigger>
+                <TabsTrigger value="all" className="text-xs sm:text-sm touch-manipulation">All</TabsTrigger>
+                <TabsTrigger value="time" className="text-xs sm:text-sm touch-manipulation">Time</TabsTrigger>
+                <TabsTrigger value="words" className="text-xs sm:text-sm touch-manipulation">Words</TabsTrigger>
+                <TabsTrigger value="quote" className="text-xs sm:text-sm touch-manipulation">Quote</TabsTrigger>
               </TabsList>
             </div>
 
             <Card className="glass-lg border-primary/20">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
+                {/* Mobile Card Layout */}
+                <div className="block md:hidden">
+                  {isLoading ? (
+                    Array.from({ length: 10 }).map((_, i) => (
+                      <div key={i} className="p-4 border-b border-primary/5">
+                        <Skeleton className="h-20 w-full" />
+                      </div>
+                    ))
+                  ) : entries.length > 0 ? (
+                    entries.map((entry, index) => (
+                      <div
+                        key={entry.id}
+                        className="p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="flex-shrink-0 w-8">{getRankIcon(index)}</div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <User className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="font-medium truncate">
+                              {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">WPM:</span>
+                            <span className="ml-2 font-bold text-primary">{entry.wpm}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Accuracy:</span>
+                            <span className="ml-2">{entry.accuracy}%</span>
+                          </div>
+                          <div className="col-span-2">
+                            <Badge variant="outline" className="capitalize text-[10px] h-5">
+                              {entry.mode} {entry.duration}s
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-12 text-center text-muted-foreground">
+                      No records found yet. Be the first to top the leaderboard!
+                    </div>
+                  )}
+                </div>
+                
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-primary/10 bg-primary/5">

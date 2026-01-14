@@ -420,23 +420,23 @@ export default function TypingTest() {
             </div>
 
             {!isRunning && (
-              <div className="text-center mt-20 space-y-6 animate-fade-in-up">
+              <div className="text-center mt-12 sm:mt-20 space-y-4 sm:space-y-6 animate-fade-in-up px-4">
                 <div className="space-y-2">
-                  <p className="text-lg font-medium text-foreground/90">
+                  <p className="text-base sm:text-lg font-medium text-foreground/90">
                     Ready to type?
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Press any key to begin your test
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-panel/50 border border-border/30">
-                    <kbd className="px-2 py-1 rounded bg-background border border-border/50 font-mono text-xs font-semibold">Tab</kbd>
-                    <span>Restart</span>
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs text-muted-foreground pt-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-panel/50 border border-border/30">
+                    <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-background border border-border/50 font-mono text-xs font-semibold">Tab</kbd>
+                    <span className="text-[10px] sm:text-xs">Restart</span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-panel/50 border border-border/30">
-                    <kbd className="px-2 py-1 rounded bg-background border border-border/50 font-mono text-xs font-semibold">Esc</kbd>
-                    <span>Settings</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-panel/50 border border-border/30">
+                    <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-background border border-border/50 font-mono text-xs font-semibold">Esc</kbd>
+                    <span className="text-[10px] sm:text-xs">Settings</span>
                   </div>
                 </div>
               </div>

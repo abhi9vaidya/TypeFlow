@@ -52,42 +52,42 @@ export default function Statistics() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
+          <div className="space-y-2 px-2 sm:px-0">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent">
               Statistics Dashboard
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Detailed insights into your typing performance and patterns
             </p>
           </div>
 
           {/* Goals and Achievements Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <GoalsPanel />
             <AchievementsPanel />
           </div>
 
           {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Card className="bg-gradient-to-br from-panel/50 to-panel/30 border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Activity className="w-4 h-4" />
-                  Total Tests
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                  <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Total</span> Tests
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-primary">{totalTests}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-primary">{totalTests}</div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-panel/50 to-panel/30 border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
                   Average WPM
                 </CardTitle>
               </CardHeader>

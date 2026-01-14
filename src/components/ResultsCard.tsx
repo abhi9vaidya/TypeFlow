@@ -57,22 +57,22 @@ export function ResultsCard({ result }: ResultsCardProps) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 md:p-8 space-y-8 animate-scale-in">
+    <div className="w-full max-w-6xl mx-auto p-3 sm:p-4 md:p-8 space-y-6 sm:space-y-8 animate-scale-in">
       {/* Header with PB badge and achievements */}
       {(result.isPB || earnedAchievements.length > 0) && (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-4 sm:gap-6">
           {result.isPB && (
             <div className="relative group animate-scale-in">
-              <div className="absolute inset-0 bg-gradient-to-r from-gold via-gold/80 to-gold blur-xl opacity-60 group-hover:opacity-80 transition-opacity rounded-3xl" />
-              <div className="relative flex items-center gap-4 px-10 py-5 bg-gradient-to-r from-gold/30 via-gold/20 to-gold/10 backdrop-blur-md border-2 border-gold/60 rounded-3xl">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gold/20 border border-gold/40">
-                  <Trophy className="h-6 w-6 text-gold drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-gold via-gold/80 to-gold blur-xl opacity-60 group-hover:opacity-80 transition-opacity rounded-2xl sm:rounded-3xl" />
+              <div className="relative flex items-center gap-3 sm:gap-4 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-gold/30 via-gold/20 to-gold/10 backdrop-blur-md border-2 border-gold/60 rounded-2xl sm:rounded-3xl">
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gold/20 border border-gold/40">
+                  <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-gold drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-gold font-bold text-2xl tracking-tight drop-shadow-[0_2px_8px_rgba(250,204,21,0.4)]">
+                  <span className="text-gold font-bold text-xl sm:text-2xl tracking-tight drop-shadow-[0_2px_8px_rgba(250,204,21,0.4)]">
                     Personal Best!
                   </span>
-                  <span className="text-gold/80 text-xs font-medium">
+                  <span className="text-gold/80 text-[10px] sm:text-xs font-medium">
                     New record achieved
                   </span>
                 </div>
@@ -111,36 +111,36 @@ export function ResultsCard({ result }: ResultsCardProps) {
       )}
 
       {/* Main stats showcase */}
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* Left: Primary metrics */}
-        <div className="flex flex-col items-center justify-center space-y-12 p-8 rounded-3xl bg-gradient-to-br from-panel/80 to-panel/40 backdrop-blur-sm border border-border/50">
-          <div className="text-center space-y-3">
-            <div className="text-xs text-muted-foreground uppercase tracking-widest font-semibold">
+        <div className="flex flex-col items-center justify-center space-y-8 sm:space-y-12 p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-panel/80 to-panel/40 backdrop-blur-sm border border-border/50">
+          <div className="text-center space-y-2 sm:space-y-3">
+            <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-widest font-semibold">
               Words per minute
             </div>
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full scale-150" />
-              <div className="relative text-8xl md:text-9xl font-bold text-primary tabular-nums tracking-tighter">
+              <div className="relative text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-primary tabular-nums tracking-tighter">
                 {result.wpm}
               </div>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-8 w-full">
-            <div className="text-center space-y-2">
-              <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 w-full">
+            <div className="text-center space-y-1 sm:space-y-2">
+              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-medium">
                 Accuracy
               </div>
-              <div className="text-4xl font-bold text-secondary tabular-nums">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-secondary tabular-nums">
                 {result.accuracy}%
               </div>
             </div>
             
-            <div className="text-center space-y-2">
-              <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+            <div className="text-center space-y-1 sm:space-y-2">
+              <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-medium">
                 Consistency
               </div>
-              <div className="text-4xl font-bold text-gold tabular-nums">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-gold tabular-nums">
                 {result.consistency}%
               </div>
             </div>
@@ -148,15 +148,15 @@ export function ResultsCard({ result }: ResultsCardProps) {
         </div>
 
         {/* Right: Chart */}
-        <div className="flex items-center justify-center p-8 rounded-3xl bg-gradient-to-br from-panel/80 to-panel/40 backdrop-blur-sm border border-border/50">
+        <div className="flex items-center justify-center p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-panel/80 to-panel/40 backdrop-blur-sm border border-border/50">
           <ResultsChart samples={result.samples} isPB={result.isPB} />
         </div>
       </div>
 
       {/* Detailed stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="p-5 rounded-2xl bg-panel/60 backdrop-blur-sm border border-border/40 text-center">
-          <div className="text-xs text-muted-foreground uppercase tracking-wide mb-2 font-medium">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-panel/60 backdrop-blur-sm border border-border/40 text-center">
+          <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide mb-1 sm:mb-2 font-medium">
             Test Type
           </div>
           <div className="text-sm font-semibold capitalize">
@@ -211,31 +211,31 @@ export function ResultsCard({ result }: ResultsCardProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4">
         <Button
           variant="outline"
           size="lg"
           onClick={() => navigate("/history")}
-          className="gap-2"
+          className="gap-2 h-11 sm:h-12 touch-manipulation"
         >
           <RotateCcw className="h-4 w-4" />
-          View History
+          <span className="hidden xs:inline">View</span> History
         </Button>
         
         <Button
           variant="outline"
           size="lg"
           onClick={handleCopyStats}
-          className="gap-2"
+          className="gap-2 h-11 sm:h-12 touch-manipulation"
         >
           <Copy className="h-4 w-4" />
-          Copy Stats
+          <span className="hidden xs:inline">Copy</span> Stats
         </Button>
         
         <Button
           size="lg"
           onClick={handleNextTest}
-          className="gap-2 bg-primary hover:bg-primary/90"
+          className="gap-2 bg-primary hover:bg-primary/90 h-11 sm:h-12 touch-manipulation"
         >
           <Sparkles className="h-4 w-4" />
           Next Test

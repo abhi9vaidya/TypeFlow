@@ -52,22 +52,22 @@ export function LiveMetrics() {
   const progress = duration > 0 ? ((duration - remaining) / duration) * 100 : 0;
 
   return (
-    <div className="flex items-center justify-center gap-8 md:gap-12 mb-12 animate-fade-in will-change-contents px-4">
+    <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 mb-8 sm:mb-12 animate-fade-in will-change-contents px-4">
       {/* WPM Metric */}
       <div className="relative text-center group flex-shrink-0">
         <div className="absolute inset-0 bg-primary/15 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         <div className="relative">
-          <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-primary tabular-nums tracking-tight drop-shadow-[0_0_16px_rgba(168,85,247,0.5)] will-change-auto">
+          <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-primary tabular-nums tracking-tight drop-shadow-[0_0_16px_rgba(168,85,247,0.5)] will-change-auto">
             {wpm}
           </div>
-          <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest mt-2 font-bold opacity-80">
+          <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground uppercase tracking-widest mt-1 sm:mt-2 font-bold opacity-80">
             WPM
           </div>
         </div>
       </div>
       
       {/* Vertical Separator */}
-      <div className="h-20 md:h-24 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent flex-shrink-0" />
+      <div className="h-16 sm:h-20 md:h-24 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent flex-shrink-0" />
       
       {/* Accuracy Metric */}
       <div className="relative text-center group flex-shrink-0">
