@@ -9,6 +9,9 @@ import { generateWords } from "@/utils/words";
 import { getRandomQuote, quoteToWords } from "@/utils/quotes";
 import { checkAchievements } from "@/utils/achievements";
 import { useToast } from "@/hooks/use-toast";
+import { triggerConfetti } from "@/utils/confetti";
+import { soundPlayer } from "@/utils/sounds";
+import { useEffect } from "react";
 
 interface ResultsCardProps {
   result: TestResult;
@@ -20,6 +23,14 @@ export function ResultsCard({ result }: ResultsCardProps) {
   const { setWords, resetTest, testMode, wordCount } = useTypingStore();
   
   const earnedAchievements = checkAchievements(result);
+
+  // Celebrate personal best with confetti and sound
+  useEffect(() => {
+    if (result.isPB) {
+      triggerConfetti();
+      soundPlayer.playSuccessSound();
+    }
+  }, [result.isPB]);
 
   const handleNextTest = () => {
     if (testMode === "quote") {

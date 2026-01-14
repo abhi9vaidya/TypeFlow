@@ -254,6 +254,11 @@ export default function RaceRoom() {
         const diff = startTime - now;
         const remaining = Math.max(0, Math.ceil(diff / 1000));
         
+        // Play beep sound on countdown change
+        if (remaining !== countdown && remaining > 0 && remaining <= 3) {
+          soundPlayer.playCountdownBeep(remaining === 1);
+        }
+        
         setCountdown(remaining);
         
         if (remaining === 0) {
@@ -277,7 +282,7 @@ export default function RaceRoom() {
     } else {
       setCountdown(null);
     }
-  }, [room?.status, room?.starts_at, room?.host_id, user?.id, isRunning, raceFinished, startTest, updateRoomStatus]);
+  }, [room?.status, room?.starts_at, room?.host_id, user?.id, isRunning, raceFinished, startTest, updateRoomStatus, countdown]);
 
   // Helper to finish the race
   const completeRace = useCallback(() => {

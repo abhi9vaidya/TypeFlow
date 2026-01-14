@@ -2,7 +2,7 @@
 import { Header } from "@/components/Header";
 import { useTypingStore } from "@/store/useTypingStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Trophy, Calendar, Clock, Target } from "lucide-react";
+import { Trophy, Calendar, Clock, Target, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -23,13 +23,26 @@ export default function History() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 pt-24 pb-12">
-          <div className="text-center max-w-md mx-auto animate-fade-in-up">
-            <h1 className="text-3xl font-bold mb-4">Test History</h1>
-            <p className="text-muted-foreground mb-8">
-              No tests completed yet. Start typing to see your progress!
-            </p>
-            <Button onClick={() => navigate("/")}>
-              Start First Test
+          <div className="text-center max-w-md mx-auto animate-fade-in-up space-y-6">
+            <div className="relative mx-auto w-24 h-24 mb-4">
+              <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
+              <div className="absolute inset-2 bg-primary/20 rounded-full" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Trophy className="w-12 h-12 text-primary/40" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold">No History Yet</h1>
+              <p className="text-muted-foreground">
+                Start typing to track your progress and see your improvement over time!
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate("/")} 
+              className="bg-primary hover:bg-primary/90 gap-2 shadow-lg"
+            >
+              <Keyboard className="w-4 h-4" />
+              Start Your First Test
             </Button>
           </div>
         </main>
