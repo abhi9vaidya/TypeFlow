@@ -9,8 +9,12 @@ export default function About() {
             <main className="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
                 {/* Hero Section */}
                 <div className="text-center mb-16 animate-spring-in">
-                    <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-6">
-                        <Keyboard className="h-12 w-12 text-primary" />
+                    <div className="inline-flex items-center justify-center p-4 mb-6 hover:scale-110 transition-transform duration-300">
+                        <img
+                            src="/logo.png"
+                            alt="TypeFlow Logo"
+                            className="h-40 w-40 object-contain drop-shadow-xl"
+                        />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black mb-4">
                         <span className="text-gradient">About TypeFlow</span>
