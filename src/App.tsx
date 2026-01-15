@@ -30,7 +30,7 @@ const App = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user ?? null;
       setUser(user);
-      
+
       // If user just logged in, sync their local history
       if (user) {
         syncHistory();
@@ -62,8 +62,10 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border">
-              Created by Abhinav Vaidya :)
+            <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border/20 bg-gradient-to-t from-background/80 to-transparent backdrop-blur-sm">
+              <span className="opacity-70 hover:opacity-100 transition-opacity duration-300">
+                Created by Abhinav Vaidya :)
+              </span>
             </footer>
           </div>
         </BrowserRouter>

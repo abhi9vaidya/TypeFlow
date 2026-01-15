@@ -22,18 +22,18 @@ export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-xl shadow-sm hover:shadow-md transition-shadow duration-300">
+    <header className="sticky top-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <button
           onClick={() => navigate("/")}
           className="flex items-center gap-1.5 sm:gap-2.5 text-lg sm:text-xl md:text-2xl font-bold tracking-tight transition-all duration-300 group"
         >
-          <div className="relative p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-300">
-            <Keyboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary group-hover:scale-110 transition-transform duration-300" />
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary via-primary/0 to-secondary opacity-0 group-hover:opacity-30 blur transition-opacity duration-300" />
+          <div className="relative p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20 group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-500 group-hover:scale-105">
+            <Keyboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-300" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary via-primary/0 to-secondary opacity-0 group-hover:opacity-40 blur-sm transition-all duration-500" />
           </div>
-          <span className="bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent group-hover:via-primary transition-all duration-300">
+          <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] bg-clip-text text-transparent group-hover:animate-gradient-shift transition-all duration-300">
             TypeFlow
           </span>
         </button>
@@ -44,58 +44,58 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={() => navigate("/statistics")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200 group touch-manipulation"
+            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-1"
             title="Statistics"
           >
-            <LineChart className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110 duration-200" />
-            <span className="absolute inset-0 rounded-lg bg-primary/0 group-hover:bg-primary/5 transition-colors duration-200" />
+            <LineChart className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] duration-300" />
+            <span className="absolute inset-0 rounded-xl bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/leaderboard")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/5 transition-all duration-200 group touch-manipulation"
+            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-2"
             title="Leaderboard"
           >
-            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110 duration-200" />
-            <span className="absolute inset-0 rounded-lg bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors duration-200" />
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.6)] duration-300" />
+            <span className="absolute inset-0 rounded-xl bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors duration-300" />
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/multiplayer")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-muted-foreground hover:text-cyan-500 hover:bg-cyan-500/5 transition-all duration-200 group touch-manipulation"
+            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-cyan-500 hover:bg-cyan-500/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-3"
             title="Multiplayer"
           >
-            <Users className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110 duration-200" />
-            <span className="absolute inset-0 rounded-lg bg-cyan-500/0 group-hover:bg-cyan-500/5 transition-colors duration-200" />
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] duration-300" />
+            <span className="absolute inset-0 rounded-xl bg-cyan-500/0 group-hover:bg-cyan-500/5 transition-colors duration-300" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/history")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-muted-foreground hover:text-secondary hover:bg-secondary/5 transition-all duration-200 group touch-manipulation"
+            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-secondary hover:bg-secondary/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-4"
             title="History"
           >
-            <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:scale-110 duration-200" />
-            <span className="absolute inset-0 rounded-lg bg-secondary/0 group-hover:bg-secondary/5 transition-colors duration-200" />
+            <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.6)] duration-300" />
+            <span className="absolute inset-0 rounded-xl bg-secondary/0 group-hover:bg-secondary/5 transition-colors duration-300" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/settings")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-muted-foreground hover:text-accent hover:bg-accent/5 transition-all duration-200 group touch-manipulation"
+            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-accent hover:bg-accent/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-5"
             title="Settings"
           >
-            <Settings className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:rotate-90 duration-300" />
-            <span className="absolute inset-0 rounded-lg bg-accent/0 group-hover:bg-accent/5 transition-colors duration-200" />
+            <Settings className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:rotate-90 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] duration-500" />
+            <span className="absolute inset-0 rounded-xl bg-accent/0 group-hover:bg-accent/5 transition-colors duration-300" />
           </Button>
 
-          <div className="w-px h-6 bg-border/50 mx-0.5 sm:mx-1 md:mx-2" />
+          <div className="w-px h-6 bg-gradient-to-b from-transparent via-border/50 to-transparent mx-0.5 sm:mx-1 md:mx-2" />
 
           {isLoading ? (
             <div className="h-9 w-9 rounded-full bg-primary/10 animate-pulse border border-primary/20" />

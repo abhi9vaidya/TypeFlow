@@ -38,18 +38,18 @@ const timeOptions = [15, 30, 60, 120];
 const wordOptions = [10, 25, 50, 100];
 
 export function ModeSelector() {
-  const { 
-    mode, 
-    duration, 
+  const {
+    mode,
+    duration,
     wordCount,
     testMode,
-    setMode, 
+    setMode,
     setDuration,
     setWordCount,
     setTestMode,
     setWords,
     resetTest,
-    isRunning 
+    isRunning
   } = useTypingStore();
 
   const {
@@ -59,15 +59,15 @@ export function ModeSelector() {
 
   const handleModeChange = (newMode: TestMode) => {
     if (isRunning) return;
-    
+
     console.log("Mode changing to:", newMode);
-    
+
     // Set both testMode and mode to keep them in sync
     setTestMode(newMode);
     setMode(newMode);
-    
+
     const wordOptions = { includePunctuation, includeNumbers };
-    
+
     // Generate appropriate words based on mode
     let newWords: string[];
     if (newMode === "time") {
@@ -82,7 +82,7 @@ export function ModeSelector() {
     } else { // zen
       newWords = generateWords(200, wordOptions);
     }
-    
+
     setWords(newWords);
     resetTest();
   };
@@ -108,69 +108,79 @@ export function ModeSelector() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 sm:gap-4 animate-fade-in-down px-2">
+    <div className="flex flex-col items-center gap-3 sm:gap-4 animate-spring-in px-2">
       {/* Mode Selector */}
-      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-panel/50 backdrop-blur-lg rounded-xl border border-border/40 shadow-lg">
-        {modes.map((m) => (
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 glass-premium rounded-2xl shadow-lg shadow-primary/5">
+        {modes.map((m, index) => (
           <button
             key={m.id}
             onClick={() => handleModeChange(m.id)}
             disabled={isRunning}
             className={cn(
-              "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 group touch-manipulation min-h-[44px]",
-              "hover:bg-muted/30 disabled:opacity-50 disabled:cursor-not-allowed",
+              "relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group touch-manipulation min-h-[44px] overflow-hidden",
+              "hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed",
               testMode === m.id
-                ? "bg-gradient-to-r from-primary/90 to-primary/70 text-primary-foreground shadow-lg shadow-primary/20 scale-100"
-                : "text-muted-foreground hover:text-foreground/80"
+                ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30"
+                : "text-muted-foreground hover:text-foreground/90 hover:bg-white/5"
             )}
+            style={{ animationDelay: `${index * 0.05}s` }}
           >
+            {testMode === m.id && (
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-shift opacity-20" />
+            )}
             <m.icon className={cn(
-              "h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-200",
-              testMode === m.id && "group-hover:scale-110"
+              "h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300 relative z-10",
+              testMode === m.id && "drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]"
             )} />
-            <span className="hidden sm:inline">{m.label}</span>
+            <span className="hidden sm:inline relative z-10">{m.label}</span>
           </button>
         ))}
       </div>
 
       {/* Options Selector */}
       {testMode === "time" && (
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-panel/50 backdrop-blur-lg rounded-xl border border-border/40 shadow-lg animate-scale-in">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 glass-premium rounded-2xl shadow-lg shadow-secondary/5 animate-spring-in">
           {timeOptions.map((t) => (
             <button
               key={t}
               onClick={() => handleTimeChange(t)}
               disabled={isRunning}
               className={cn(
-                "px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 min-w-[48px] sm:min-w-[56px] min-h-[44px] touch-manipulation",
-                "hover:bg-muted/30 disabled:opacity-50 disabled:cursor-not-allowed",
+                "relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-w-[48px] sm:min-w-[56px] min-h-[44px] touch-manipulation overflow-hidden",
+                "hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed",
                 duration === t
-                  ? "bg-gradient-to-r from-secondary/90 to-secondary/70 text-secondary-foreground shadow-lg shadow-secondary/20"
-                  : "text-muted-foreground hover:text-foreground/80 hover:bg-muted/20"
+                  ? "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground shadow-lg shadow-secondary/30"
+                  : "text-muted-foreground hover:text-foreground/90 hover:bg-white/5"
               )}
             >
-              {t}s
+              {duration === t && (
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary via-primary to-secondary bg-[length:200%_auto] animate-gradient-shift opacity-20" />
+              )}
+              <span className="relative z-10">{t}s</span>
             </button>
           ))}
         </div>
       )}
 
       {testMode === "words" && (
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-panel/50 backdrop-blur-lg rounded-xl border border-border/40 shadow-lg animate-scale-in">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 glass-premium rounded-2xl shadow-lg shadow-secondary/5 animate-spring-in">
           {wordOptions.map((w) => (
             <button
               key={w}
               onClick={() => handleWordCountChange(w)}
               disabled={isRunning}
               className={cn(
-                "px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 min-w-[48px] sm:min-w-[56px] min-h-[44px] touch-manipulation",
-                "hover:bg-muted/30 disabled:opacity-50 disabled:cursor-not-allowed",
+                "relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-w-[48px] sm:min-w-[56px] min-h-[44px] touch-manipulation overflow-hidden",
+                "hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed",
                 wordCount === w
-                  ? "bg-gradient-to-r from-secondary/90 to-secondary/70 text-secondary-foreground shadow-lg shadow-secondary/20"
-                  : "text-muted-foreground hover:text-foreground/80 hover:bg-muted/20"
+                  ? "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground shadow-lg shadow-secondary/30"
+                  : "text-muted-foreground hover:text-foreground/90 hover:bg-white/5"
               )}
             >
-              {w}
+              {wordCount === w && (
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary via-primary to-secondary bg-[length:200%_auto] animate-gradient-shift opacity-20" />
+              )}
+              <span className="relative z-10">{w}</span>
             </button>
           ))}
         </div>

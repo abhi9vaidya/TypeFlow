@@ -2,16 +2,16 @@
 import { TestResult } from "@/utils/metrics";
 import { ResultsChart } from "./ResultsChart";
 import { Button } from "@/components/ui/button";
-import { 
-  Share2, 
-  Copy, 
-  RotateCcw, 
-  Trophy, 
-  Download, 
-  Sparkles, 
-  Target, 
-  Zap, 
-  Activity, 
+import {
+  Share2,
+  Copy,
+  RotateCcw,
+  Trophy,
+  Download,
+  Sparkles,
+  Target,
+  Zap,
+  Activity,
   Timer,
   CheckCircle2,
   AlertCircle,
@@ -36,7 +36,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { setWords, resetTest, testMode, wordCount } = useTypingStore();
-  
+
   const earnedAchievements = checkAchievements(result);
 
   // Celebrate personal best with confetti and sound
@@ -87,7 +87,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
               </div>
             </div>
           )}
-          
+
           {earnedAchievements.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-3">
               {earnedAchievements.map((achievement) => (
@@ -109,40 +109,40 @@ export function ResultsCard({ result }: ResultsCardProps) {
       {/* Main Hero Section */}
       <div className="grid lg:grid-cols-12 gap-6">
         {/* WPM Display */}
-        <div className="lg:col-span-4 flex flex-col items-center justify-center p-8 rounded-3xl bg-panel/30 border border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <div className="lg:col-span-4 flex flex-col items-center justify-center p-8 rounded-3xl glass-premium relative overflow-hidden group card-hover-lift">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity duration-500">
             <Zap className="h-24 w-24 text-primary" strokeWidth={1} />
           </div>
-          
+
           <div className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-2">
             Words Per Minute
           </div>
-          <div className="text-8xl md:text-9xl font-black text-primary tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+          <div className="text-8xl md:text-9xl font-black text-gradient-animated tracking-tighter tabular-nums">
             {result.wpm}
           </div>
-          
+
           <div className="flex gap-8 mt-8 w-full">
             <div className="flex-1 text-center">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Accuracy</div>
-              <div className="text-2xl font-bold text-secondary tabular-nums">{result.accuracy}%</div>
+              <div className="text-2xl font-bold text-secondary tabular-nums drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]">{result.accuracy}%</div>
             </div>
-            <div className="w-px h-10 bg-white/5 self-end" />
+            <div className="w-px h-10 bg-gradient-to-b from-transparent via-white/10 to-transparent self-end" />
             <div className="flex-1 text-center">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Consistency</div>
-              <div className="text-2xl font-bold text-gold tabular-nums">{result.consistency}%</div>
+              <div className="text-2xl font-bold text-gold tabular-nums drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]">{result.consistency}%</div>
             </div>
           </div>
         </div>
 
         {/* Chart Area */}
-        <div className="lg:col-span-8 p-6 md:p-8 rounded-3xl bg-panel/30 border border-white/5 flex flex-col justify-center">
+        <div className="lg:col-span-8 p-6 md:p-8 rounded-3xl glass-premium flex flex-col justify-center card-hover-lift">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
               <Activity className="h-3 w-3 text-primary" />
               Speed Over Time
             </div>
             <div className="text-[10px] text-muted-foreground/60 font-mono">
-              Peak: <span className="text-primary font-bold">{Math.max(...result.samples.map(s => s.wpm))} WPM</span>
+              Peak: <span className="text-primary font-bold drop-shadow-[0_0_6px_rgba(168,85,247,0.5)]">{Math.max(...result.samples.map(s => s.wpm))} WPM</span>
             </div>
           </div>
           <ResultsChart samples={result.samples} isPB={result.isPB} />
@@ -179,7 +179,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
             Copy Link
           </Button>
         </div>
-        
+
         <Button
           onClick={handleNextTest}
           className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 h-14 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] group"
@@ -194,8 +194,8 @@ export function ResultsCard({ result }: ResultsCardProps) {
 
 function StatBox({ label, value, icon, color = "text-foreground" }: { label: string, value: string | number, icon: React.ReactNode, color?: string }) {
   return (
-    <div className="group p-5 rounded-2xl bg-panel/30 border border-white/5 hover:border-white/10 transition-all text-center flex flex-col items-center space-y-2">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+    <div className="group p-5 rounded-2xl glass-premium card-hover-lift text-center flex flex-col items-center space-y-2">
+      <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity duration-300">
         {icon}
         {label}
       </div>

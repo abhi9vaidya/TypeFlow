@@ -17,12 +17,12 @@ const FONT_CLASSES: Record<FontFamily, string> = {
 
 export function WordStream() {
   const { words, currentWordIndex, currentCharIndex, typedChars } = useTypingStore();
-  const { 
-    caretStyle, 
-    blurUnusedWords, 
-    showCharacterGlow, 
-    fontFamily, 
-    fontSize 
+  const {
+    caretStyle,
+    blurUnusedWords,
+    showCharacterGlow,
+    fontFamily,
+    fontSize
   } = useSettingsStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const caretRef = useRef<HTMLDivElement>(null);
@@ -34,7 +34,7 @@ export function WordStream() {
     const wordElement = containerRef.current.querySelector(
       `[data-word-index="${currentWordIndex}"]`
     );
-    
+
     if (!wordElement) return;
 
     const charElement = wordElement.querySelector(
@@ -47,11 +47,11 @@ export function WordStream() {
       const computedStyle = window.getComputedStyle(containerRef.current);
       const paddingLeft = parseFloat(computedStyle.paddingLeft);
       const paddingTop = parseFloat(computedStyle.paddingTop);
-      
+
       // Calculate position relative to container's content area (after padding)
       const x = rect.left - containerRect.left - paddingLeft;
       const y = rect.top - containerRect.top - paddingTop;
-      
+
       // Apply full position transformation
       caretRef.current.style.transform = `translate(${x}px, ${y}px)`;
       caretRef.current.style.willChange = 'transform';
@@ -63,7 +63,10 @@ export function WordStream() {
       ref={containerRef}
       style={{ fontSize: `${window.innerWidth < 640 ? Math.min(fontSize, 20) : fontSize}px` }}
       className={cn(
-        "relative max-w-5xl mx-auto p-4 md:p-8 typing-text leading-relaxed select-none bg-gradient-subtle rounded-xl border border-border/30 shadow-lg transition-all duration-300",
+        "relative max-w-5xl mx-auto p-4 md:p-8 typing-text leading-relaxed select-none",
+        "glass-premium rounded-2xl shadow-xl shadow-primary/5",
+        "border-gradient animate-border-glow",
+        "transition-all duration-500",
         FONT_CLASSES[fontFamily]
       )}
     >
@@ -77,20 +80,20 @@ export function WordStream() {
           caretStyle === "underline" && "bg-primary rounded-full"
         )}
         style={{
-          ...(caretStyle === "line" 
-            ? { 
-                width: '3px',
-                height: '1.2em',
-                boxShadow: '0 0 12px hsl(var(--primary) / 0.8), 0 0 24px hsl(var(--primary) / 0.4)',
-                filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))',
-              }
-            : caretStyle === "block"
+          ...(caretStyle === "line"
             ? {
+              width: '3px',
+              height: '1.2em',
+              boxShadow: '0 0 12px hsl(var(--primary) / 0.8), 0 0 24px hsl(var(--primary) / 0.4)',
+              filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.6))',
+            }
+            : caretStyle === "block"
+              ? {
                 width: '0.6em',
                 height: '1.2em',
                 boxShadow: '0 0 8px hsl(var(--primary) / 0.6)',
               }
-            : {
+              : {
                 width: '0.6em',
                 height: '0.15em',
                 marginTop: '1.1em',
@@ -163,7 +166,7 @@ export function WordStream() {
                   </span>
                 );
               })}
-              
+
               {/* Extra characters */}
               {typed.length > word.length &&
                 typed.slice(word.length).map((char, idx) => (

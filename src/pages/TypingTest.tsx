@@ -28,7 +28,7 @@ import {
 
 export default function TypingTest() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  
+
   const {
     words,
     isRunning,
@@ -78,7 +78,7 @@ export default function TypingTest() {
         document.getElementById("mobile-input")?.focus();
       }
     };
-    
+
     focusInput();
     window.addEventListener("click", focusInput);
     return () => window.removeEventListener("click", focusInput);
@@ -87,20 +87,20 @@ export default function TypingTest() {
   // Reusable typing logic for both physical and virtual keyboards
   const handleTyping = useCallback((char: string) => {
     if (isFinished) return;
-    
+
     if (!isRunning) {
       startTest();
     }
 
     const expectedChar = words[currentWordIndex]?.[currentCharIndex];
     const isCorrect = char === expectedChar;
-    
+
     typeChar(char);
-    
+
     // Record key press for heatmap with accuracy
     recordRealtimeKeyPress(char);
     recordKeyPress(char, isCorrect);
-    
+
     // Play sounds
     if (keySoundEnabled) {
       soundPlayer.playKeyClick();
@@ -125,7 +125,7 @@ export default function TypingTest() {
     if (words.length === 0) {
       let newWords: string[];
       const wordOptions = { includePunctuation, includeNumbers };
-      
+
       if (testMode === "quote") {
         const quote = getRandomQuote();
         newWords = quoteToWords(quote);
@@ -152,7 +152,7 @@ export default function TypingTest() {
       if (currentSecond > samples.length) {
         const wpm = calculateWPM(correctChars, elapsed);
         const errorsThisSecond = 0;
-        
+
         addSample({
           t: currentSecond,
           wpm,
@@ -161,7 +161,7 @@ export default function TypingTest() {
       }
 
       // Check completion conditions
-      const shouldFinish = 
+      const shouldFinish =
         (testMode === "time" && elapsed >= duration) ||
         (testMode === "words" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
         (testMode === "quote" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
@@ -169,11 +169,11 @@ export default function TypingTest() {
 
       if (shouldFinish) {
         stopTest();
-        
+
         const totalChars = correctChars + incorrectChars + extraChars;
         const wpm = calculateWPM(correctChars, elapsed);
         const accuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
-        
+
         const result = {
           id: Date.now().toString(),
           mode,
@@ -192,12 +192,12 @@ export default function TypingTest() {
           samples,
           isPB: false,
         };
-        
+
         finishTest(result);
-        
+
         // Update streak
         updateStreak();
-        
+
         // Update goals and check achievements
         goals.forEach((goal) => {
           if (goal.period === "daily") {
@@ -208,11 +208,11 @@ export default function TypingTest() {
             } else if (goal.type === "tests") {
               updateGoalProgress(goal.id, goal.current + 1);
             }
-            
+
             // Check if goal just completed
-            if (!goal.completed && ((goal.type === "wpm" && wpm >= goal.target) || 
-                                   (goal.type === "accuracy" && accuracy >= goal.target) ||
-                                   (goal.type === "tests" && goal.current + 1 >= goal.target))) {
+            if (!goal.completed && ((goal.type === "wpm" && wpm >= goal.target) ||
+              (goal.type === "accuracy" && accuracy >= goal.target) ||
+              (goal.type === "tests" && goal.current + 1 >= goal.target))) {
               toast({
                 title: "🎯 Goal Achieved!",
                 description: `You've reached your ${goal.period} ${goal.type} goal!`,
@@ -220,7 +220,7 @@ export default function TypingTest() {
             }
           }
         });
-        
+
         // Check for achievements
         if (wpm >= 100 && !hasAchievement("Century Club")) {
           unlockAchievement("Century Club", "Reached 100 WPM", "💯");
@@ -229,7 +229,7 @@ export default function TypingTest() {
             description: "Century Club - Reached 100 WPM",
           });
         }
-        
+
         if (accuracy >= 100 && !hasAchievement("Perfect!")) {
           unlockAchievement("Perfect!", "100% accuracy on a test", "✨");
           toast({
@@ -249,9 +249,9 @@ export default function TypingTest() {
       // Tab to restart - regenerate words based on current mode
       if (e.key === "Tab") {
         e.preventDefault();
-        
+
         console.log("Tab pressed - Current testMode:", testMode, "wordCount:", wordCount, "duration:", duration);
-        
+
         const wordOptions = { includePunctuation, includeNumbers };
         let newWords: string[];
         if (testMode === "quote") {
@@ -269,7 +269,7 @@ export default function TypingTest() {
           newWords = generateWords(100, wordOptions);
           console.log("Generating 100 words for time mode");
         }
-        
+
         setWords(newWords);
         resetTest();
         return;
@@ -345,15 +345,15 @@ export default function TypingTest() {
   }, [isFinished]);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
       <Header />
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      
+
       {/* Floating indicators */}
       <StreakCounter />
       <SpeedZone />
       <WordCompletionEffect />
-      
+
       <main className="container mx-auto px-4 pt-24 pb-12">
         {!isFinished ? (
           <>
@@ -362,10 +362,10 @@ export default function TypingTest() {
                 <ModeSelector />
               </div>
             )}
-            
+
             {isRunning && testMode !== "zen" && <LiveMetrics />}
-            
-            <div 
+
+            <div
               className="max-w-5xl mx-auto mt-12 relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
               onClick={() => document.getElementById("mobile-input")?.focus()}
             >
@@ -381,7 +381,7 @@ export default function TypingTest() {
                 value={inputValue}
                 onChange={(e) => {
                   const val = e.target.value;
-                  
+
                   // Handle space for next word
                   if (val.endsWith(" ")) {
                     if (currentWordIndex < words.length - 1) {
@@ -400,15 +400,15 @@ export default function TypingTest() {
                       handleTyping(lastChar);
                     }
                   }
-                  
+
                   setInputValue(val);
                 }}
               />
               <WordStream />
-              
+
               {/* Ambient glow effect when typing perfectly */}
               {isRunning && showPerfectGlow && (
-                <div 
+                <div
                   className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg transition-opacity duration-1000"
                   style={{
                     opacity: correctChars > 20 && incorrectChars === 0 ? 0.4 : 0
