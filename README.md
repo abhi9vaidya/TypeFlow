@@ -4,6 +4,10 @@
 
 A beautiful, minimalist typing speed test application built with modern web technologies. Test and improve your typing speed with real-time metrics, performance graphs, and a stunning dark mode interface.
 
+## 🚀 Open Source
+
+TypeFlow is a fully open-source project! We believe in the power of community collaboration. Feel free to explore the code, contribute features, or report issues on our [GitHub Repository](https://github.com/abhi9vaidya/TypeFlow).
+
 ## Features
 
 - ⚡ **Real-time Typing Metrics** - WPM, accuracy, and consistency tracking
