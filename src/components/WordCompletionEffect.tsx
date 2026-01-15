@@ -1,91 +1,99 @@
-// Build: 20251114
-import { useEffect, useState } from "react";
+// Build: 20260115 - Particles spread throughout typing area
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { cn } from "@/lib/utils";
 
-interface ParticleType {
+interface Particle {
   id: number;
   x: number;
   y: number;
-  velocity: { x: number; y: number };
-  color: string;
   size: number;
+  opacity: number;
+  color: string;
+  delay: number;
 }
 
 export function WordCompletionEffect() {
   const { currentWordIndex, currentStreak } = useTypingStore();
   const { showParticleEffects } = useSettingsStore();
-  const [particles, setParticles] = useState<ParticleType[]>([]);
-  const [lastWordIndex, setLastWordIndex] = useState(0);
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const lastWordIndexRef = useRef(0);
+
+  const createParticles = useCallback(() => {
+    // Only trigger at 5+ streak
+    if (currentStreak < 5) return [];
+
+    // Spread particles throughout the screen (typing area region)
+    const particleCount = Math.min(4 + Math.floor(currentStreak / 5), 12);
+    const newParticles: Particle[] = [];
+
+    // Typing area is roughly in the center-bottom half of the screen
+    // Spread particles across different regions
+    const regions = [
+      { xMin: 15, xMax: 35, yMin: 35, yMax: 55 },   // Left side
+      { xMin: 35, xMax: 65, yMin: 30, yMax: 50 },   // Center
+      { xMin: 65, xMax: 85, yMin: 35, yMax: 55 },   // Right side
+      { xMin: 25, xMax: 75, yMin: 50, yMax: 70 },   // Lower area
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+      const region = regions[i % regions.length];
+      const x = region.xMin + Math.random() * (region.xMax - region.xMin);
+      const y = region.yMin + Math.random() * (region.yMax - region.yMin);
+
+      // Color based on streak level
+      let color;
+      if (currentStreak >= 20) {
+        color = `rgba(251, 191, 36, ${0.5 + Math.random() * 0.3})`; // Gold
+      } else if (currentStreak >= 10) {
+        color = `rgba(249, 115, 22, ${0.4 + Math.random() * 0.3})`; // Orange
+      } else {
+        color = `rgba(168, 85, 247, ${0.4 + Math.random() * 0.2})`; // Purple
+      }
+
+      newParticles.push({
+        id: Date.now() + i + Math.random(),
+        x,
+        y,
+        size: 3 + Math.random() * 4,
+        opacity: 1,
+        color,
+        delay: i * 0.03, // Staggered appearance
+      });
+    }
+
+    return newParticles;
+  }, [currentStreak]);
 
   useEffect(() => {
     if (!showParticleEffects) return;
-    
-    // Detect when a word is completed
-    if (currentWordIndex > lastWordIndex && currentStreak > 0) {
-      // Create particles based on streak
-      const particleCount = Math.min(currentStreak, 8);
-      const newParticles: ParticleType[] = [];
-      
-      const colors = currentStreak >= 10 
-        ? ["hsl(var(--gold))", "hsl(var(--destructive))"] 
-        : ["hsl(var(--primary))", "hsl(var(--secondary))"];
 
-      for (let i = 0; i < particleCount; i++) {
-        const angle = (Math.PI * 2 * i) / particleCount;
-        const speed = 2 + Math.random() * 2;
-        
-        newParticles.push({
-          id: Date.now() + i,
-          x: 50, // Center
-          y: 50,
-          velocity: {
-            x: Math.cos(angle) * speed,
-            y: Math.sin(angle) * speed,
-          },
-          color: colors[Math.floor(Math.random() * colors.length)],
-          size: 4 + Math.random() * 4,
-        });
+    if (currentWordIndex > lastWordIndexRef.current && currentStreak >= 5) {
+      const newParticles = createParticles();
+      if (newParticles.length > 0) {
+        setParticles(newParticles);
+        lastWordIndexRef.current = currentWordIndex;
+
+        // Clear after animation
+        const timeout = setTimeout(() => {
+          setParticles([]);
+        }, 800);
+
+        return () => clearTimeout(timeout);
       }
-
-      setParticles(newParticles);
-
-      // Animate and remove particles
-      const animationInterval = setInterval(() => {
-        setParticles(prev => 
-          prev
-            .map(p => ({
-              ...p,
-              x: p.x + p.velocity.x,
-              y: p.y + p.velocity.y,
-              velocity: {
-                x: p.velocity.x * 0.95,
-                y: p.velocity.y * 0.95 + 0.2, // Gravity
-              },
-              size: p.size * 0.95,
-            }))
-            .filter(p => p.size > 0.5)
-        );
-      }, 16);
-
-      setTimeout(() => {
-        clearInterval(animationInterval);
-        setParticles([]);
-      }, 1000);
-
-      setLastWordIndex(currentWordIndex);
     }
-  }, [currentWordIndex, currentStreak, lastWordIndex, showParticleEffects]);
+
+    lastWordIndexRef.current = currentWordIndex;
+  }, [currentWordIndex, currentStreak, showParticleEffects, createParticles]);
 
   if (particles.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
-      {particles.map(particle => (
+    <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
+      {particles.map((particle) => (
         <div
           key={particle.id}
-          className="absolute rounded-full blur-[1px]"
+          className="absolute rounded-full"
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
@@ -93,12 +101,30 @@ export function WordCompletionEffect() {
             height: `${particle.size}px`,
             backgroundColor: particle.color,
             boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-            transform: "translate(-50%, -50%)",
-            transition: "none",
+            animation: `particle-float 0.8s ease-out forwards`,
+            animationDelay: `${particle.delay}s`,
+            opacity: 0,
           }}
         />
       ))}
+
+      {/* Inline keyframes for the particle animation */}
+      <style>{`
+        @keyframes particle-float {
+          0% {
+            opacity: 0;
+            transform: translateY(0) scale(0.5);
+          }
+          30% {
+            opacity: 1;
+            transform: translateY(-10px) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.3);
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
