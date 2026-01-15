@@ -3,8 +3,7 @@ import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore, FontFamily } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
 import { motion, useSpring, useMotionValue } from "framer-motion";
-import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 const FONT_CLASSES: Record<FontFamily, string> = {
   "jetbrains": "font-jetbrains",
@@ -292,23 +291,7 @@ export function WordStream() {
         })}
       </div>
 
-      {/* Keyboard Shortcuts Tooltip */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors">
-              <Info className="w-4 h-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="bg-panel border-border/50">
-            <div className="text-xs space-y-1">
-              <p><kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground">Tab</kbd> - Restart test</p>
-              <p><kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground">Esc</kbd> - Settings</p>
-              <p><kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground">Space</kbd> - Next word</p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+
     </div>
   );
 }
