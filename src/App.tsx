@@ -13,6 +13,10 @@ import Account from "./pages/Account";
 import Multiplayer from "./pages/Multiplayer";
 import RaceRoom from "./pages/RaceRoom";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import { Footer } from "./components/Footer";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { useTypingStore } from "./store/useTypingStore";
@@ -59,14 +63,13 @@ const App = () => {
                 <Route path="/account" element={<Account />} />
                 <Route path="/multiplayer" element={<Multiplayer />} />
                 <Route path="/race/:code" element={<RaceRoom />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t border-border/20 bg-gradient-to-t from-background/80 to-transparent backdrop-blur-sm">
-              <span className="opacity-70 hover:opacity-100 transition-opacity duration-300">
-                Created by Abhinav Vaidya :)
-              </span>
-            </footer>
+            <Footer />
           </div>
         </BrowserRouter>
       </TooltipProvider>
