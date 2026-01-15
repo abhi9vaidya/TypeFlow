@@ -29,9 +29,12 @@ export function Header() {
           onClick={() => navigate("/")}
           className="flex items-center gap-1.5 sm:gap-2.5 text-lg sm:text-xl md:text-2xl font-bold tracking-tight transition-all duration-300 group"
         >
-          <div className="relative p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20 group-hover:from-primary/30 group-hover:to-secondary/30 transition-all duration-500 group-hover:scale-105">
-            <Keyboard className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-300" />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary via-primary/0 to-secondary opacity-0 group-hover:opacity-40 blur-sm transition-all duration-500" />
+          <div className="relative group-hover:scale-105 transition-transform duration-300">
+            <img
+              src="/logo.png"
+              alt="TypeFlow Logo"
+              className="w-16 h-16 object-contain drop-shadow-lg"
+            />
           </div>
           <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] bg-clip-text text-transparent group-hover:animate-gradient-shift transition-all duration-300">
             TypeFlow

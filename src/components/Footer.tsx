@@ -15,8 +15,8 @@ export function Footer() {
                     {/* Brand */}
                     <Link to="/" className="flex items-center gap-3 group">
                         <div className="flex items-center gap-2 text-lg font-bold">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 group-hover:from-primary/30 group-hover:to-secondary/30 transition-colors">
-                                <Keyboard className="h-4 w-4 text-primary" />
+                            <div className="group-hover:scale-110 transition-transform duration-300">
+                                <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain drop-shadow-md" />
                             </div>
                             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 TypeFlow
