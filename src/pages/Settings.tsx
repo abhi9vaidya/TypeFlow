@@ -2,13 +2,13 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSettingsStore, FontFamily, CaretStyle } from "@/store/useSettingsStore";
-import { 
-  Keyboard, 
-  Volume2, 
-  Palette, 
-  Type, 
-  Eye, 
-  MousePointer2, 
+import {
+  Keyboard,
+  Volume2,
+  Palette,
+  Type,
+  Eye,
+  MousePointer2,
   Zap,
   Check
 } from "lucide-react";
@@ -59,9 +59,9 @@ export default function Settings() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen text-foreground">
       <Header />
-      
+
       <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 sm:px-0">
@@ -69,7 +69,7 @@ export default function Settings() {
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Settings</h1>
               <p className="text-sm sm:text-base text-muted-foreground mt-1">Configure your typing experience and visual preferences.</p>
             </div>
-            <Button 
+            <Button
               onClick={() => navigate("/")}
               className="glow-primary self-start touch-manipulation h-10 sm:h-11"
             >
@@ -112,9 +112,9 @@ export default function Settings() {
                       <Label>Include Punctuation</Label>
                       <p className="text-sm text-muted-foreground italic">Add dots, commas, and other symbols.</p>
                     </div>
-                    <Switch 
-                      checked={settings.includePunctuation} 
-                      onCheckedChange={settings.setIncludePunctuation} 
+                    <Switch
+                      checked={settings.includePunctuation}
+                      onCheckedChange={settings.setIncludePunctuation}
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -122,9 +122,9 @@ export default function Settings() {
                       <Label>Include Numbers</Label>
                       <p className="text-sm text-muted-foreground italic">Test your number row speed.</p>
                     </div>
-                    <Switch 
-                      checked={settings.includeNumbers} 
-                      onCheckedChange={settings.setIncludeNumbers} 
+                    <Switch
+                      checked={settings.includeNumbers}
+                      onCheckedChange={settings.setIncludeNumbers}
                     />
                   </div>
                 </CardContent>
@@ -169,44 +169,44 @@ export default function Settings() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex items-center justify-between">
                       <Label>Streak Counter</Label>
-                      <Switch 
-                        checked={settings.showStreakCounter} 
-                        onCheckedChange={settings.setShowStreakCounter} 
+                      <Switch
+                        checked={settings.showStreakCounter}
+                        onCheckedChange={settings.setShowStreakCounter}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label>Speed Zone Color</Label>
-                      <Switch 
-                        checked={settings.showSpeedZone} 
-                        onCheckedChange={settings.setShowSpeedZone} 
+                      <Switch
+                        checked={settings.showSpeedZone}
+                        onCheckedChange={settings.setShowSpeedZone}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label>Particle Effects</Label>
-                      <Switch 
-                        checked={settings.showParticleEffects} 
-                        onCheckedChange={settings.setShowParticleEffects} 
+                      <Switch
+                        checked={settings.showParticleEffects}
+                        onCheckedChange={settings.setShowParticleEffects}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label>Keyboard Heatmap</Label>
-                      <Switch 
-                        checked={settings.showKeyboardHeatmap} 
-                        onCheckedChange={settings.setShowKeyboardHeatmap} 
+                      <Switch
+                        checked={settings.showKeyboardHeatmap}
+                        onCheckedChange={settings.setShowKeyboardHeatmap}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label>Blur Unused Words</Label>
-                      <Switch 
-                        checked={settings.blurUnusedWords} 
-                        onCheckedChange={settings.setBlurUnusedWords} 
+                      <Switch
+                        checked={settings.blurUnusedWords}
+                        onCheckedChange={settings.setBlurUnusedWords}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <Label>Character Glow</Label>
-                      <Switch 
-                        checked={settings.showCharacterGlow} 
-                        onCheckedChange={settings.setShowCharacterGlow} 
+                      <Switch
+                        checked={settings.showCharacterGlow}
+                        onCheckedChange={settings.setShowCharacterGlow}
                       />
                     </div>
                   </div>
@@ -232,8 +232,8 @@ export default function Settings() {
                           onClick={() => settings.setFontFamily(font.value)}
                           className={`
                             p-4 rounded-xl border text-left transition-all duration-200 group
-                            ${settings.fontFamily === font.value 
-                              ? "border-primary bg-primary/10 ring-1 ring-primary" 
+                            ${settings.fontFamily === font.value
+                              ? "border-primary bg-primary/10 ring-1 ring-primary"
                               : "border-primary/10 hover:border-primary/40 bg-primary/5"}
                           `}
                         >
@@ -246,10 +246,10 @@ export default function Settings() {
                             )}
                           </div>
                           <p className={`text-2xl ${FONT_CLASSES[font.value]} leading-tight`}>
-                            {font.value === 'vt323' ? 'INSERT COIN TO START' : 
-                             font.value === 'space-mono' ? 'hello_world.exe' :
-                             font.value === 'lexend' ? 'Focus on the flow.' :
-                             'The quick brown fox'}
+                            {font.value === 'vt323' ? 'INSERT COIN TO START' :
+                              font.value === 'space-mono' ? 'hello_world.exe' :
+                                font.value === 'lexend' ? 'Focus on the flow.' :
+                                  'The quick brown fox'}
                           </p>
                         </button>
                       ))}
@@ -260,11 +260,11 @@ export default function Settings() {
                     <div className="flex items-center justify-between">
                       <Label>Font Size ({settings.fontSize}px)</Label>
                     </div>
-                    <Slider 
-                      value={[settings.fontSize]} 
-                      min={16} 
-                      max={48} 
-                      step={1} 
+                    <Slider
+                      value={[settings.fontSize]}
+                      min={16}
+                      max={48}
+                      step={1}
                       onValueChange={([val]) => settings.setFontSize(val)}
                       className="py-4"
                     />
@@ -287,9 +287,9 @@ export default function Settings() {
                       <Label>Key Click Sounds</Label>
                       <p className="text-sm text-muted-foreground italic">Play mechanical sound on every keypress.</p>
                     </div>
-                    <Switch 
-                      checked={settings.keySoundEnabled} 
-                      onCheckedChange={settings.setKeySound} 
+                    <Switch
+                      checked={settings.keySoundEnabled}
+                      onCheckedChange={settings.setKeySound}
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -297,9 +297,9 @@ export default function Settings() {
                       <Label>Error Sound</Label>
                       <p className="text-sm text-muted-foreground italic">Play a distinctive sound when you make a mistake.</p>
                     </div>
-                    <Switch 
-                      checked={settings.errorSoundEnabled} 
-                      onCheckedChange={settings.setErrorSound} 
+                    <Switch
+                      checked={settings.errorSoundEnabled}
+                      onCheckedChange={settings.setErrorSound}
                     />
                   </div>
                 </CardContent>

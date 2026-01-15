@@ -44,14 +44,14 @@ export default function Statistics() {
   }));
 
   // WPM progression over time
-  const wpmTrend = recentTests.length > 1 
-    ? recentTests[recentTests.length - 1].wpm - recentTests[0].wpm 
+  const wpmTrend = recentTests.length > 1
+    ? recentTests[recentTests.length - 1].wpm - recentTests[0].wpm
     : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
-      
+
       <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
         <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           {/* Header */}
@@ -132,7 +132,7 @@ export default function Statistics() {
                   Typing Speed Progress
                 </CardTitle>
                 <CardDescription>
-                  Last {recentTests.length} tests · 
+                  Last {recentTests.length} tests ·
                   <span className={cn(
                     "ml-2 font-medium",
                     wpmTrend > 0 ? "text-green-500" : wpmTrend < 0 ? "text-red-500" : "text-muted-foreground"
@@ -145,13 +145,13 @@ export default function Statistics() {
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={wpmChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="test" 
+                    <XAxis
+                      dataKey="test"
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={12}
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--panel))",
                         border: "1px solid hsl(var(--border))",
@@ -159,18 +159,18 @@ export default function Statistics() {
                       }}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="wpm" 
-                      stroke="hsl(var(--primary))" 
+                    <Line
+                      type="monotone"
+                      dataKey="wpm"
+                      stroke="hsl(var(--primary))"
                       strokeWidth={3}
                       dot={{ fill: "hsl(var(--primary))", r: 4 }}
                       name="WPM"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="rawWpm" 
-                      stroke="hsl(var(--muted-foreground))" 
+                    <Line
+                      type="monotone"
+                      dataKey="rawWpm"
+                      stroke="hsl(var(--muted-foreground))"
                       strokeWidth={2}
                       strokeDasharray="5 5"
                       dot={{ fill: "hsl(var(--muted-foreground))", r: 3 }}
@@ -208,8 +208,8 @@ export default function Statistics() {
                         <span className={cn(
                           "font-medium",
                           key.accuracy >= 95 ? "text-green-500" :
-                          key.accuracy >= 85 ? "text-yellow-500" :
-                          "text-red-500"
+                            key.accuracy >= 85 ? "text-yellow-500" :
+                              "text-red-500"
                         )}>
                           {Math.round(key.accuracy)}% accuracy
                         </span>
@@ -235,13 +235,13 @@ export default function Statistics() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={leastAccurateKeys}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                    <XAxis 
-                      dataKey="key" 
+                    <XAxis
+                      dataKey="key"
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={12}
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--panel))",
                         border: "1px solid hsl(var(--border))",
@@ -249,8 +249,8 @@ export default function Statistics() {
                       }}
                       formatter={(value: number) => [`${Math.round(value)}%`, "Accuracy"]}
                     />
-                    <Bar 
-                      dataKey="accuracy" 
+                    <Bar
+                      dataKey="accuracy"
                       fill="hsl(var(--destructive))"
                       radius={[8, 8, 0, 0]}
                     />
@@ -272,7 +272,7 @@ export default function Statistics() {
                   {["time", "words", "quote", "zen"].map((mode) => {
                     const modeTests = history.filter(t => t.mode.includes(mode));
                     if (modeTests.length === 0) return null;
-                    
+
                     const avgModeWpm = modeTests.reduce((sum, test) => sum + test.wpm, 0) / modeTests.length;
                     const avgModeAccuracy = modeTests.reduce((sum, test) => sum + test.accuracy, 0) / modeTests.length;
 

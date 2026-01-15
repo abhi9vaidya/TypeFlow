@@ -21,8 +21,52 @@ import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { useTypingStore } from "./store/useTypingStore";
 import { supabase } from "./lib/supabase";
+import { AnimatePresence, motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const queryClient = new QueryClient();
+
+function PageTransition({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="flex-1 w-full"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const AppContent = () => {
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageTransition><TypingTest /></PageTransition>} />
+            <Route path="/history" element={<PageTransition><History /></PageTransition>} />
+            <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+            <Route path="/statistics" element={<PageTransition><Statistics /></PageTransition>} />
+            <Route path="/leaderboard" element={<PageTransition><Leaderboard /></PageTransition>} />
+            <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
+            <Route path="/multiplayer" element={<PageTransition><Multiplayer /></PageTransition>} />
+            <Route path="/race/:code" element={<PageTransition><RaceRoom /></PageTransition>} />
+            <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+            <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+            <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+          </Routes>
+        </AnimatePresence>
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 const App = () => {
   const setUser = useAuthStore((state) => state.setUser);
@@ -52,25 +96,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col">
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<TypingTest />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/statistics" element={<Statistics />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/multiplayer" element={<Multiplayer />} />
-                <Route path="/race/:code" element={<RaceRoom />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

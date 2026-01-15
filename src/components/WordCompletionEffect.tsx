@@ -1,7 +1,7 @@
-// Build: 20260115 - Particles spread throughout typing area
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Particle {
   id: number;
@@ -23,42 +23,47 @@ export function WordCompletionEffect() {
     // Only trigger at 5+ streak
     if (currentStreak < 5) return [];
 
-    // Spread particles throughout the screen (typing area region)
-    const particleCount = Math.min(4 + Math.floor(currentStreak / 5), 12);
+    // Get caret position
+    const caret = document.querySelector('.animate-caret-pulse, .bg-primary');
+    let originX = window.innerWidth / 2;
+    let originY = window.innerHeight / 2;
+
+    if (caret) {
+      const rect = caret.getBoundingClientRect();
+      originX = rect.left + rect.width / 2;
+      originY = rect.top + rect.height / 2;
+    }
+
+    const particleCount = Math.min(6 + Math.floor(currentStreak / 5), 20);
     const newParticles: Particle[] = [];
 
-    // Typing area is roughly in the center-bottom half of the screen
-    // Spread particles across different regions
-    const regions = [
-      { xMin: 15, xMax: 35, yMin: 35, yMax: 55 },   // Left side
-      { xMin: 35, xMax: 65, yMin: 30, yMax: 50 },   // Center
-      { xMin: 65, xMax: 85, yMin: 35, yMax: 55 },   // Right side
-      { xMin: 25, xMax: 75, yMin: 50, yMax: 70 },   // Lower area
-    ];
-
     for (let i = 0; i < particleCount; i++) {
-      const region = regions[i % regions.length];
-      const x = region.xMin + Math.random() * (region.xMax - region.xMin);
-      const y = region.yMin + Math.random() * (region.yMax - region.yMin);
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 50 + Math.random() * 100;
+      const x = originX;
+      const y = originY;
 
       // Color based on streak level
       let color;
-      if (currentStreak >= 20) {
-        color = `rgba(251, 191, 36, ${0.5 + Math.random() * 0.3})`; // Gold
-      } else if (currentStreak >= 10) {
-        color = `rgba(249, 115, 22, ${0.4 + Math.random() * 0.3})`; // Orange
+      if (currentStreak >= 50) {
+        color = `hsl(${260 + Math.random() * 60}, 100%, 70%)`; // Purple/Pink (Godlike)
+      } else if (currentStreak >= 25) {
+        color = `hsl(${40 + Math.random() * 20}, 100%, 60%)`; // Gold (Legendary)
+      } else if (currentStreak >= 15) {
+        color = `hsl(${10 + Math.random() * 30}, 100%, 60%)`; // Orange/Red (Blazing)
       } else {
-        color = `rgba(168, 85, 247, ${0.4 + Math.random() * 0.2})`; // Purple
+        color = `hsl(${200 + Math.random() * 60}, 100%, 70%)`; // Blue/Cyan (Warm)
       }
 
       newParticles.push({
         id: Date.now() + i + Math.random(),
-        x,
-        y,
-        size: 3 + Math.random() * 4,
+        x: x, // Percentages work better for random spread, but pixels better for caret origin. 
+        // We'll use fixed positioning in pixels for this effect
+        y: y,
+        size: 4 + Math.random() * 6,
         opacity: 1,
         color,
-        delay: i * 0.03, // Staggered appearance
+        delay: Math.random() * 0.1,
       });
     }
 
@@ -71,60 +76,50 @@ export function WordCompletionEffect() {
     if (currentWordIndex > lastWordIndexRef.current && currentStreak >= 5) {
       const newParticles = createParticles();
       if (newParticles.length > 0) {
-        setParticles(newParticles);
+        setParticles(prev => [...prev, ...newParticles]);
         lastWordIndexRef.current = currentWordIndex;
-
-        // Clear after animation
-        const timeout = setTimeout(() => {
-          setParticles([]);
-        }, 800);
-
-        return () => clearTimeout(timeout);
       }
+    } else if (currentWordIndex < lastWordIndexRef.current) {
+      // Reset if restarted
+      lastWordIndexRef.current = currentWordIndex;
     }
-
-    lastWordIndexRef.current = currentWordIndex;
   }, [currentWordIndex, currentStreak, showParticleEffects, createParticles]);
-
-  if (particles.length === 0) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
-      {particles.map((particle) => (
-        <div
-          key={particle.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            backgroundColor: particle.color,
-            boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-            animation: `particle-float 0.8s ease-out forwards`,
-            animationDelay: `${particle.delay}s`,
-            opacity: 0,
-          }}
-        />
-      ))}
-
-      {/* Inline keyframes for the particle animation */}
-      <style>{`
-        @keyframes particle-float {
-          0% {
-            opacity: 0;
-            transform: translateY(0) scale(0.5);
-          }
-          30% {
-            opacity: 1;
-            transform: translateY(-10px) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-30px) scale(0.3);
-          }
-        }
-      `}</style>
+      <AnimatePresence>
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{
+              x: particle.x,
+              y: particle.y,
+              opacity: 1,
+              scale: 0
+            }}
+            animate={{
+              x: particle.x + (Math.random() * 200 - 100),
+              y: particle.y + (Math.random() * 200 - 100),
+              opacity: 0,
+              scale: 0
+            }}
+            transition={{
+              duration: 0.8,
+              ease: "easeOut"
+            }}
+            onAnimationComplete={() => {
+              setParticles(prev => prev.filter(p => p.id !== particle.id));
+            }}
+            className="absolute rounded-full"
+            style={{
+              width: particle.size,
+              height: particle.size,
+              backgroundColor: particle.color,
+              boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+            }}
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

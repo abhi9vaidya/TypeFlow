@@ -1,16 +1,45 @@
-// Build: 20260115 - Polished version
 import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Flame, Zap, Star } from "lucide-react";
+import { Flame, Zap, Star, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
 export function StreakCounter() {
-  const { currentStreak, maxStreak, isRunning } = useTypingStore();
+  const { currentStreak, isRunning } = useTypingStore();
   const { showStreakCounter } = useSettingsStore();
 
-  if (!isRunning || currentStreak === 0 || !showStreakCounter) return null;
+  const scale = useSpring(0, { stiffness: 400, damping: 15 });
+  const rotate = useSpring(0, { stiffness: 200, damping: 20 });
+  const streakValue = useSpring(0, { stiffness: 100, damping: 20 });
+
+  // Transform spring value to display integer
+  const displayStreak = useTransform(streakValue, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    if (currentStreak > 0) {
+      // "Pop" effect on update
+      scale.set(1.2);
+      setTimeout(() => scale.set(1), 100);
+
+      // Animate the number
+      streakValue.set(currentStreak);
+
+      // Shake on milestones
+      if (currentStreak % 10 === 0) {
+        rotate.set(Math.random() * 20 - 10);
+        setTimeout(() => rotate.set(0), 300);
+      }
+    } else {
+      scale.set(0);
+      streakValue.set(0);
+    }
+  }, [currentStreak, scale, rotate, streakValue]);
+
+  if (!isRunning || !showStreakCounter || currentStreak < 2) return null;
 
   const getStreakLevel = (streak: number) => {
+    if (streak >= 50) return "godlike";
     if (streak >= 25) return "legendary";
     if (streak >= 15) return "blazing";
     if (streak >= 8) return "fire";
@@ -20,7 +49,16 @@ export function StreakCounter() {
 
   const level = getStreakLevel(currentStreak);
 
-  const levelConfig = {
+  const levelConfig: Record<string, any> = {
+    godlike: {
+      gradient: "from-purple-500 via-pink-500 to-rose-500",
+      glow: "shadow-[0_0_50px_rgba(236,72,153,0.8),0_0_100px_rgba(168,85,247,0.5)]",
+      border: "border-purple-400/80",
+      bg: "bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-rose-600/30",
+      text: "text-purple-100",
+      icon: Crown,
+      pulse: true,
+    },
     legendary: {
       gradient: "from-amber-400 via-yellow-300 to-amber-500",
       glow: "shadow-[0_0_40px_rgba(251,191,36,0.6),0_0_80px_rgba(251,191,36,0.3)]",
@@ -69,93 +107,103 @@ export function StreakCounter() {
   };
 
   const config = levelConfig[level];
-  const Icon = config.icon;
+  const Icon = config.icon || Zap;
   const multiplier = Math.floor(currentStreak / 5);
 
   return (
-    <div className="fixed top-24 right-6 z-50 animate-spring-in">
-      <div className={cn(
-        "relative rounded-2xl overflow-hidden",
-        config.glow,
-        "transition-all duration-500"
-      )}>
-        {/* Animated gradient border */}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.5 }}
+        style={{ scale, rotate }}
+        className="fixed top-24 right-6 z-50 origin-center"
+      >
         <div className={cn(
-          "absolute inset-0 rounded-2xl bg-gradient-to-r p-[1px]",
-          config.gradient,
-          config.pulse && "animate-pulse"
+          "relative rounded-2xl overflow-hidden backdrop-blur-md",
+          config.glow,
+          "transition-colors duration-500"
         )}>
-          <div className="absolute inset-[1px] rounded-2xl bg-background/95 backdrop-blur-xl" />
-        </div>
-
-        {/* Content */}
-        <div className={cn(
-          "relative flex items-center gap-4 px-5 py-3.5",
-          config.bg
-        )}>
-          {/* Animated icon container */}
+          {/* Animated gradient border */}
           <div className={cn(
-            "relative flex items-center justify-center w-11 h-11 rounded-xl",
-            "bg-gradient-to-br",
+            "absolute inset-0 rounded-2xl bg-gradient-to-r p-[1px]",
             config.gradient,
-            "shadow-lg",
             config.pulse && "animate-pulse"
           )}>
-            <Icon className="w-5 h-5 text-white drop-shadow-lg" />
-
-            {/* Sparkle effect for high streaks */}
-            {level === "legendary" && (
-              <>
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-ping opacity-75" />
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-yellow-200 rounded-full animate-ping opacity-60" style={{ animationDelay: "0.5s" }} />
-              </>
-            )}
+            <div className="absolute inset-[1px] rounded-2xl bg-background/95 backdrop-blur-xl" />
           </div>
 
-          {/* Streak info */}
-          <div className="flex flex-col">
-            <div className="flex items-baseline gap-2">
-              <span className={cn(
-                "text-3xl font-black tabular-nums tracking-tight",
-                config.text,
-                level === "legendary" && "text-gradient-animated"
-              )}>
-                {currentStreak}
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
-                streak
-              </span>
-            </div>
+          {/* Content */}
+          <div className={cn(
+            "relative flex items-center gap-4 px-5 py-3.5",
+            config.bg
+          )}>
+            {/* Animated icon container */}
+            <motion.div
+              whileHover={{ rotate: 180 }}
+              className={cn(
+                "relative flex items-center justify-center w-11 h-11 rounded-xl",
+                "bg-gradient-to-br",
+                config.gradient,
+                "shadow-lg"
+              )}
+            >
+              <Icon className="w-5 h-5 text-white drop-shadow-lg" />
+            </motion.div>
 
-            {/* Progress to next multiplier */}
-            {multiplier > 0 && (
-              <div className="flex items-center gap-2 mt-1">
-                <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className={cn("h-full rounded-full bg-gradient-to-r", config.gradient)}
-                    style={{ width: `${(currentStreak % 5) * 20}%` }}
-                  />
-                </div>
+            {/* Streak info */}
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-2">
+                <motion.span className={cn(
+                  "text-3xl font-black tabular-nums tracking-tight",
+                  config.text
+                )}>
+                  {displayStreak}
+                </motion.span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
+                  streak
+                </span>
               </div>
-            )}
-          </div>
 
-          {/* Multiplier badge */}
-          {multiplier > 0 && (
-            <div className={cn(
-              "absolute -top-2 -right-2 flex items-center justify-center",
-              "w-8 h-8 rounded-full",
-              "bg-gradient-to-br",
-              config.gradient,
-              "text-white text-xs font-bold",
-              "shadow-lg border-2 border-background",
-              config.pulse && "animate-bounce"
-            )}>
-              ×{multiplier}
+              {/* Progress to next multiplier */}
+              {multiplier > 0 && (
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                      className={cn("h-full rounded-full bg-gradient-to-r", config.gradient)}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(currentStreak % 5) * 20}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Multiplier badge animation */}
+            <AnimatePresence>
+              {multiplier > 0 && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className={cn(
+                    "absolute -top-2 -right-2 flex items-center justify-center",
+                    "w-8 h-8 rounded-full",
+                    "bg-gradient-to-br",
+                    config.gradient,
+                    "text-white text-xs font-bold",
+                    "shadow-lg border-2 border-background"
+                  )}
+                >
+                  ×{multiplier}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
+
+

@@ -345,7 +345,7 @@ export default function TypingTest() {
   }, [isFinished]);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden relative">
+    <div className="min-h-screen overflow-x-hidden relative">
       <Header />
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 

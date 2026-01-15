@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AuthModal } from "./AuthModal";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,14 +16,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+import { useTypingStore } from "@/store/useTypingStore";
+import { cn } from "@/lib/utils";
+
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut, isLoading } = useAuthStore();
+  const { isRunning, testMode } = useTypingStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20">
+    <header className={cn(
+      "sticky top-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20 transition-all duration-700 ease-in-out",
+      isRunning && testMode !== "zen" && "opacity-20 hover:opacity-100 focus-within:opacity-100 grayscale hover:grayscale-0"
+    )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <button
@@ -43,60 +51,42 @@ export function Header() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-0.5 sm:gap-1 md:gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/statistics")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-1"
-            title="Statistics"
-          >
-            <LineChart className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] duration-300" />
-            <span className="absolute inset-0 rounded-xl bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/leaderboard")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-2"
-            title="Leaderboard"
-          >
-            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.6)] duration-300" />
-            <span className="absolute inset-0 rounded-xl bg-yellow-500/0 group-hover:bg-yellow-500/5 transition-colors duration-300" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/multiplayer")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-cyan-500 hover:bg-cyan-500/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-3"
-            title="Multiplayer"
-          >
-            <Users className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] duration-300" />
-            <span className="absolute inset-0 rounded-xl bg-cyan-500/0 group-hover:bg-cyan-500/5 transition-colors duration-300" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/history")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-secondary hover:bg-secondary/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-4"
-            title="History"
-          >
-            <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.6)] duration-300" />
-            <span className="absolute inset-0 rounded-xl bg-secondary/0 group-hover:bg-secondary/5 transition-colors duration-300" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/settings")}
-            className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl text-muted-foreground hover:text-accent hover:bg-accent/10 transition-all duration-300 group touch-manipulation animate-slide-up-fade stagger-5"
-            title="Settings"
-          >
-            <Settings className="h-4 w-4 sm:h-5 sm:w-5 transition-all group-hover:rotate-90 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] duration-500" />
-            <span className="absolute inset-0 rounded-xl bg-accent/0 group-hover:bg-accent/5 transition-colors duration-300" />
-          </Button>
+          {[
+            { path: "/statistics", icon: LineChart, label: "Statistics", color: "primary" },
+            { path: "/leaderboard", icon: Trophy, label: "Leaderboard", color: "yellow-500" },
+            { path: "/multiplayer", icon: Users, label: "Multiplayer", color: "cyan-500" },
+            { path: "/history", icon: BarChart3, label: "History", color: "secondary" },
+            { path: "/settings", icon: Settings, label: "Settings", color: "accent" }
+          ].map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <div key={item.path} className="relative">
+                {isActive && (
+                  <motion.div
+                    layoutId="nav-bg"
+                    className="absolute inset-0 bg-primary/10 rounded-xl"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl transition-all duration-300 group touch-manipulation z-10",
+                    isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
+                  )}
+                  title={item.label}
+                >
+                  <item.icon className={cn(
+                    "h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300",
+                    isActive && "scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]",
+                    !isActive && "group-hover:scale-110"
+                  )} />
+                </Button>
+              </div>
+            );
+          })}
 
           <div className="w-px h-6 bg-gradient-to-b from-transparent via-border/50 to-transparent mx-0.5 sm:mx-1 md:mx-2" />
 
