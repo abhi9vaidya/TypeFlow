@@ -6,7 +6,7 @@
 - [x] Add real-time typing races with Supabase Presence/Broadcast.
 - [x] Implement friend system (Following/Followers).
 - [x] Create personal activity feed for friends.
-- [ ] Add account settings for avatar customization.
+- [x] Add account settings for avatar customization.
 
 ## Typography & Themes
 - [x] Add custom font selector (JetBrains Mono, Roboto Mono, etc).
