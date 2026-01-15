@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useFriendsStore } from "@/store/useFriendsStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMultiplayerStore } from "@/store/useMultiplayerStore";
@@ -146,9 +147,12 @@ export default function Leaderboard() {
                         <div className="flex items-center gap-3 mb-3">
                           <div className="flex-shrink-0 w-8">{getRankIcon(index)}</div>
                           <div className="flex items-center gap-2 flex-1">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <User className="h-4 w-4 text-primary" />
-                            </div>
+                            <Avatar className="h-8 w-8 border border-primary/10">
+                              <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                              <AvatarFallback className="bg-primary/5">
+                                <User className="h-4 w-4 text-primary" />
+                              </AvatarFallback>
+                            </Avatar>
                             <span className="font-medium truncate">
                               {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
                             </span>
@@ -213,9 +217,12 @@ export default function Leaderboard() {
                             <td className="px-6 py-4">{getRankIcon(index)}</td>
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <User className="h-4 w-4 text-primary" />
-                                </div>
+                                <Avatar className="h-8 w-8 border border-primary/10">
+                                  <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                                  <AvatarFallback className="bg-primary/5">
+                                    <User className="h-4 w-4 text-primary" />
+                                  </AvatarFallback>
+                                </Avatar>
                                 <span className="font-medium">
                                   {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
                                 </span>

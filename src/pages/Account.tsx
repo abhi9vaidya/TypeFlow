@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User, AtSign, FileText, Save, Loader2, Users } from "lucide-react";
+import { User, AtSign, FileText, Save, Loader2, Users, Camera, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FriendsPanel } from "@/components/FriendsPanel";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Account() {
   const { user, profile, fetchProfile } = useAuthStore();
@@ -18,12 +19,16 @@ export default function Account() {
   
   const [nickname, setNickname] = useState("");
   const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile) {
       setNickname(profile.nickname || "");
       setBio(profile.bio || "");
+      setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile]);
 
@@ -38,6 +43,38 @@ export default function Account() {
     };
     checkAuth();
   }, [navigate]);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!user) return;
+      setIsUploading(true);
+      
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setAvatarUrl(publicUrl);
+      toast.success("Avatar uploaded! Don't forget to save your profile.");
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error("Failed to upload avatar. Make sure you have an 'avatars' bucket in Supabase.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -55,6 +92,7 @@ export default function Account() {
           id: user.id,
           nickname,
           bio,
+          avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
         });
 
@@ -118,6 +156,63 @@ export default function Account() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Avatar Section */}
+                  <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-primary/10">
+                    <div className="relative group">
+                      <Avatar className="h-24 w-24 border-2 border-primary/20 transition-all group-hover:border-primary/50">
+                        <AvatarImage src={avatarUrl || ""} alt={nickname} className="object-cover" />
+                        <AvatarFallback className="bg-primary/10 text-xl font-bold">
+                          {nickname ? nickname.substring(0, 2).toUpperCase() : "GK"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:cursor-not-allowed"
+                      >
+                        {isUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Camera className="h-6 w-6" />}
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-2 items-center sm:items-start text-center sm:text-left">
+                      <Label className="text-sm font-medium">Profile Picture</Label>
+                      <p className="text-xs text-muted-foreground max-w-[240px]">
+                        Upload a square image for best results. Max size 2MB.
+                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 gap-2 border-primary/20 hover:border-primary/40"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                        >
+                          <Upload className="h-3.5 w-3.5" />
+                          Upload
+                        </Button>
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={handleFileChange}
+                        />
+                        {avatarUrl && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => setAvatarUrl(null)}
+                            disabled={isUploading}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2">
                       <AtSign className="h-4 w-4 text-muted-foreground" />

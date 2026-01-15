@@ -7,6 +7,8 @@ export interface Profile {
   nickname: string;
   avatar_url: string | null;
   bio: string | null;
+  wpm_best: number;
+  tests_completed: number;
 }
 
 interface AuthState {
