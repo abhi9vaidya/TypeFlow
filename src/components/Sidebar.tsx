@@ -62,39 +62,49 @@ export function Sidebar() {
                         return (
                             <Tooltip key={item.path}>
                                 <TooltipTrigger asChild>
-                                    <div className="relative group w-full flex justify-center">
+                                    <div className="relative group w-full flex justify-center perspective-1000">
                                         {isActive && (
-                                            <motion.div
-                                                layoutId="sidebar-nav-bg"
-                                                className="absolute inset-0 bg-primary/10 rounded-xl mx-2"
-                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                            />
+                                            <>
+                                                <motion.div
+                                                    layoutId="sidebar-nav-bg"
+                                                    className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-xl mx-2 border border-primary/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                />
+                                                <motion.div
+                                                    layoutId="sidebar-active-glow"
+                                                    className="absolute -inset-1 bg-primary/20 blur-xl rounded-full opacity-50 z-0"
+                                                />
+                                            </>
                                         )}
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => navigate(item.path)}
                                             className={cn(
-                                                "relative h-12 w-12 rounded-xl transition-all duration-300 group z-10",
-                                                isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
+                                                "relative h-12 w-12 rounded-xl transition-all duration-300 group z-10 overflow-hidden",
+                                                isActive ? "text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                             )}
                                         >
                                             <item.icon className={cn(
                                                 "h-6 w-6 transition-all duration-300",
-                                                isActive && "scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]",
-                                                !isActive && "group-hover:scale-110"
+                                                isActive && "scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]",
+                                                !isActive && "group-hover:scale-110 group-hover:drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]"
                                             )} />
+
+                                            {/* Shine effect on hover */}
+                                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                                         </Button>
+
                                         {/* Active Indicator Line */}
                                         {isActive && (
                                             <motion.div
                                                 layoutId="sidebar-active-indicator"
-                                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full"
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full shadow-[0_0_10px_rgba(168,85,247,0.8)]"
                                             />
                                         )}
                                     </div>
                                 </TooltipTrigger>
-                                <TooltipContent side="right" className="bg-popover/80 backdrop-blur-md border-border/50 ml-2">
+                                <TooltipContent side="right" className="z-[60] bg-popover/90 backdrop-blur-md border-border/50 ml-4 px-3 py-1.5 text-xs font-medium shadow-xl animate-in slide-in-from-left-2">
                                     <p>{item.label}</p>
                                 </TooltipContent>
                             </Tooltip>

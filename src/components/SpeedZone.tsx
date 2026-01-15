@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 export function SpeedZone() {
   const { correctChars, incorrectChars, startTime, isRunning, currentWordIndex } = useTypingStore();
-  const { showSpeedZone } = useSettingsStore();
+  const { showSpeedZone, navbarLayout } = useSettingsStore();
   const [displayWPM, setDisplayWPM] = useState(0);
 
   // Smooth WPM calculation
@@ -92,7 +92,10 @@ export function SpeedZone() {
   const wordsTyped = currentWordIndex;
 
   return (
-    <div className="fixed top-24 left-6 z-50 animate-spring-in">
+    <div className={cn(
+      "fixed top-24 z-50 animate-spring-in transition-all duration-300",
+      navbarLayout === 'vertical' ? "left-24" : "left-6"
+    )}>
       <div className={cn(
         "flex items-center gap-3 px-4 py-3 rounded-xl",
         "bg-background/80 backdrop-blur-xl",
