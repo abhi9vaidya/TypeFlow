@@ -1,14 +1,40 @@
 import { Header } from "@/components/Header";
 import { Keyboard, Zap, Target, Users, Trophy, Heart, Github } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2
+        }
+    }
+};
+
+const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 100 }
+    }
+};
 
 export default function About() {
     return (
         <div className="min-h-screen bg-background">
             <Header />
 
-            <main className="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
+            <motion.main
+                className="container mx-auto px-4 pt-24 pb-16 max-w-4xl"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 {/* Hero Section */}
-                <div className="text-center mb-16 animate-spring-in">
+                <motion.div variants={itemVariants} className="text-center mb-16">
                     <div className="inline-flex items-center justify-center p-4 mb-6 hover:scale-110 transition-transform duration-300">
                         <img
                             src="/logo.png"
@@ -22,10 +48,10 @@ export default function About() {
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                         The modern typing speed test designed to help you improve your typing skills with style.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Features Grid */}
-                <div className="grid md:grid-cols-2 gap-6 mb-16">
+                <motion.div variants={containerVariants} className="grid md:grid-cols-2 gap-6 mb-16">
                     <FeatureCard
                         icon={<Zap className="h-6 w-6" />}
                         title="Real-time Metrics"
@@ -46,20 +72,20 @@ export default function About() {
                         title="Achievements & Stats"
                         description="Earn achievements, track your progress, and climb the global leaderboard."
                     />
-                </div>
+                </motion.div>
 
                 {/* Mission Section */}
-                <div className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16">
+                <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16">
                     <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                     <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                         TypeFlow was created with one goal in mind: to make typing practice enjoyable and effective.
                         We believe that with the right tools and motivation, anyone can become a faster, more accurate typist.
                         Our platform combines beautiful design with powerful features to create the ultimate typing experience.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Open Source Section */}
-                <div className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16 border border-primary/20 bg-primary/5">
+                <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16 border border-primary/20 bg-primary/5">
                     <h2 className="text-2xl font-bold mb-4 flex items-center justify-center gap-3">
                         <Github className="h-6 w-6" />
                         <span>Proudly Open Source</span>
@@ -77,23 +103,23 @@ export default function About() {
                         <Github className="h-5 w-5" />
                         <span>Star on GitHub</span>
                     </a>
-                </div>
+                </motion.div>
 
                 {/* Creator Section */}
-                <div className="text-center">
+                <motion.div variants={itemVariants} className="text-center">
                     <p className="flex items-center justify-center gap-2 text-muted-foreground">
                         Made with <Heart className="h-4 w-4 text-red-500" /> by
                         <span className="font-semibold text-foreground">Abhinav Vaidya</span>
                     </p>
-                </div>
-            </main>
+                </motion.div>
+            </motion.main>
         </div>
     );
 }
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
     return (
-        <div className="glass-premium rounded-2xl p-6 card-hover-lift">
+        <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-6 card-hover-lift">
             <div className="flex items-start gap-4">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 text-primary">
                     {icon}
@@ -103,6 +129,6 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
                     <p className="text-muted-foreground text-sm">{description}</p>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
