@@ -26,6 +26,10 @@ import {
   calculateConsistency,
 } from "@/utils/metrics";
 
+import { useShallow } from "zustand/react/shallow";
+
+// ... other imports
+
 export default function TypingTest() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -54,7 +58,34 @@ export default function TypingTest() {
     nextWord,
     addSample,
     finishTest,
-  } = useTypingStore();
+  } = useTypingStore(
+    useShallow((state) => ({
+      words: state.words,
+      isRunning: state.isRunning,
+      isFinished: state.isFinished,
+      startTime: state.startTime,
+      duration: state.duration,
+      currentWordIndex: state.currentWordIndex,
+      currentCharIndex: state.currentCharIndex,
+      correctChars: state.correctChars,
+      incorrectChars: state.incorrectChars,
+      extraChars: state.extraChars,
+      samples: state.samples,
+      currentResult: state.currentResult,
+      mode: state.mode,
+      testMode: state.testMode,
+      wordCount: state.wordCount,
+      setWords: state.setWords,
+      startTest: state.startTest,
+      stopTest: state.stopTest,
+      resetTest: state.resetTest,
+      typeChar: state.typeChar,
+      deleteChar: state.deleteChar,
+      nextWord: state.nextWord,
+      addSample: state.addSample,
+      finishTest: state.finishTest,
+    }))
+  );
 
   const {
     theme,
@@ -64,7 +95,17 @@ export default function TypingTest() {
     includeNumbers,
     showKeyboardHeatmap,
     showPerfectGlow,
-  } = useSettingsStore();
+  } = useSettingsStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      keySoundEnabled: state.keySoundEnabled,
+      errorSoundEnabled: state.errorSoundEnabled,
+      includePunctuation: state.includePunctuation,
+      includeNumbers: state.includeNumbers,
+      showKeyboardHeatmap: state.showKeyboardHeatmap,
+      showPerfectGlow: state.showPerfectGlow,
+    }))
+  );
 
   const { recordKeyPress, recordRealtimeKeyPress } = useHeatmapStore();
   const { goals, updateGoalProgress, unlockAchievement, updateStreak, achievements } = useGoalsStore();

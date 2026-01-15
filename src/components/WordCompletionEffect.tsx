@@ -24,7 +24,7 @@ export function WordCompletionEffect() {
     if (currentStreak < 5) return [];
 
     // Get caret position
-    const caret = document.querySelector('.animate-caret-pulse, .bg-primary');
+    const caret = document.getElementById('active-caret');
     let originX = window.innerWidth / 2;
     let originY = window.innerHeight / 2;
 

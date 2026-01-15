@@ -4,12 +4,12 @@ import { persist } from "zustand/middleware";
 
 export type Theme = "purple-glow" | "cyber-blue" | "matrix" | "sunset" | "fire" | "dark" | "custom";
 export type CaretStyle = "line" | "block" | "underline";
-export type FontFamily = 
-  | "jetbrains" 
-  | "roboto-mono" 
-  | "fira-code" 
-  | "space-mono" 
-  | "vt323" 
+export type FontFamily =
+  | "jetbrains"
+  | "roboto-mono"
+  | "fira-code"
+  | "space-mono"
+  | "vt323"
   | "lexend";
 
 export interface CustomColors {
@@ -98,7 +98,7 @@ export const useSettingsStore = create<SettingsState>()(
       // Visual Effects
       showStreakCounter: false,
       showSpeedZone: false,
-      showParticleEffects: false,
+      showParticleEffects: true,
       showCircularProgress: false,
       showPerfectGlow: false,
       showCharacterGlow: false,
