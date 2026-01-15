@@ -24,6 +24,10 @@ import { supabase } from "./lib/supabase";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { Sidebar } from "@/components/Sidebar";
+import { Header } from "@/components/Header";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { cn } from "@/lib/utils";
 
 const queryClient = new QueryClient();
 
@@ -43,9 +47,15 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 
 const AppContent = () => {
   const location = useLocation();
+  const { navbarLayout } = useSettingsStore();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={cn(
+      "min-h-screen flex flex-col transition-all duration-300",
+      navbarLayout === 'vertical' ? "pl-20" : "pt-16"
+    )}>
+      {navbarLayout === 'vertical' ? <Sidebar /> : <Header />}
+
       <main className="flex-1">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>

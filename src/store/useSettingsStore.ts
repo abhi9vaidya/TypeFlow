@@ -45,12 +45,14 @@ interface SettingsState {
   showCircularProgress: boolean;
   showPerfectGlow: boolean;
   showCharacterGlow: boolean;
+  navbarLayout: 'horizontal' | 'vertical';
   setShowStreakCounter: (show: boolean) => void;
   setShowSpeedZone: (show: boolean) => void;
   setShowParticleEffects: (show: boolean) => void;
   setShowCircularProgress: (show: boolean) => void;
   setShowPerfectGlow: (show: boolean) => void;
   setShowCharacterGlow: (show: boolean) => void;
+  setNavbarLayout: (layout: 'horizontal' | 'vertical') => void;
 
   // Typing
   includePunctuation: boolean;
@@ -102,12 +104,14 @@ export const useSettingsStore = create<SettingsState>()(
       showCircularProgress: false,
       showPerfectGlow: false,
       showCharacterGlow: false,
+      navbarLayout: 'horizontal',
       setShowStreakCounter: (show) => set({ showStreakCounter: show }),
       setShowSpeedZone: (show) => set({ showSpeedZone: show }),
       setShowParticleEffects: (show) => set({ showParticleEffects: show }),
       setShowCircularProgress: (show) => set({ showCircularProgress: show }),
       setShowPerfectGlow: (show) => set({ showPerfectGlow: show }),
       setShowCharacterGlow: (show) => set({ showCharacterGlow: show }),
+      setNavbarLayout: (layout) => set({ navbarLayout: layout }),
 
       // Typing
       includePunctuation: false,

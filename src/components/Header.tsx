@@ -28,8 +28,8 @@ export function Header() {
 
   return (
     <header className={cn(
-      "sticky top-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20 transition-all duration-700 ease-in-out",
-      isRunning && testMode !== "zen" && "opacity-20 hover:opacity-100 focus-within:opacity-100 grayscale hover:grayscale-0"
+      "fixed top-0 left-0 right-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20 transition-all duration-700 ease-in-out",
+      isRunning && "opacity-0 hover:opacity-100 focus-within:opacity-100"
     )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo */}

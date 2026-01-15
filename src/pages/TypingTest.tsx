@@ -8,7 +8,6 @@ import { generateWords } from "@/utils/words";
 import { getRandomQuote, quoteToWords } from "@/utils/quotes";
 import { soundPlayer } from "@/utils/sounds";
 import { applyTheme } from "@/utils/themes";
-import { Header } from "@/components/Header";
 import { ModeSelector } from "@/components/ModeSelector";
 import { WordStream } from "@/components/WordStream";
 import { LiveMetrics } from "@/components/LiveMetrics";
@@ -104,6 +103,7 @@ export default function TypingTest() {
       includeNumbers: state.includeNumbers,
       showKeyboardHeatmap: state.showKeyboardHeatmap,
       showPerfectGlow: state.showPerfectGlow,
+
     }))
   );
 
@@ -387,8 +387,9 @@ export default function TypingTest() {
 
   return (
     <div className="min-h-screen overflow-x-hidden relative">
-      <Header />
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
+
 
       {/* Floating indicators */}
       <StreakCounter />
@@ -493,7 +494,7 @@ export default function TypingTest() {
           currentResult && <ResultsCard result={currentResult} />
         )}
       </main>
-    </div>
+    </div >
   );
 }
 

@@ -149,7 +149,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   >
                     {/* Background glow on hover/active */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/0 transition-all duration-300" />
-                    
+
                     {Icon ? (
                       <Icon
                         className={cn(
@@ -184,6 +184,49 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <CustomThemeEditor colors={customColors} onChange={setCustomColors} />
               </div>
             )}
+          </section>
+
+          <Separator className="bg-border/20" />
+
+          {/* Navigation Layout */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-6 w-1 bg-gradient-to-b from-primary to-emerald-400 rounded-full" />
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/90">Navigation</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant={useSettingsStore((s) => s.navbarLayout) === 'horizontal' ? "default" : "outline"}
+                onClick={() => useSettingsStore.getState().setNavbarLayout('horizontal')}
+                className={cn(
+                  "h-20 flex flex-col gap-2 rounded-xl transition-all",
+                  useSettingsStore((s) => s.navbarLayout) === 'horizontal'
+                    ? "bg-primary/20 hover:bg-primary/30 border-primary/50 text-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
+                )}
+              >
+                <div className="w-full h-8 rounded border-2 border-current opacity-50 flex flex-col gap-1 p-1">
+                  <div className="w-full h-2 bg-current rounded-sm" />
+                </div>
+                <span className="text-xs font-medium">Top Bar</span>
+              </Button>
+
+              <Button
+                variant={useSettingsStore((s) => s.navbarLayout) === 'vertical' ? "default" : "outline"}
+                onClick={() => useSettingsStore.getState().setNavbarLayout('vertical')}
+                className={cn(
+                  "h-20 flex flex-col gap-2 rounded-xl transition-all",
+                  useSettingsStore((s) => s.navbarLayout) === 'vertical'
+                    ? "bg-primary/20 hover:bg-primary/30 border-primary/50 text-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
+                )}
+              >
+                <div className="w-full h-8 rounded border-2 border-current opacity-50 flex gap-1 p-1">
+                  <div className="w-2 h-full bg-current rounded-sm" />
+                </div>
+                <span className="text-xs font-medium">Sidebar</span>
+              </Button>
+            </div>
           </section>
 
           <Separator className="bg-border/20" />
@@ -275,7 +318,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
               <div className="h-6 w-1 bg-gradient-to-b from-primary to-accent rounded-full" />
               <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/90">Typography</h3>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Font Family</Label>
@@ -310,11 +353,11 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                   <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Font Size</Label>
                   <span className="text-xs font-mono text-primary font-bold">{fontSize}px</span>
                 </div>
-                <Slider 
-                  value={[fontSize]} 
-                  min={16} 
-                  max={48} 
-                  step={1} 
+                <Slider
+                  value={[fontSize]}
+                  min={16}
+                  max={48}
+                  step={1}
                   onValueChange={([val]) => setFontSize(val)}
                   className="py-2"
                 />
