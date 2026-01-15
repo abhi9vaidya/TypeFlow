@@ -1,8 +1,8 @@
-// Build: 20251114
 import { useEffect, useRef } from "react";
 import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore, FontFamily } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
+import { motion, useSpring, useMotionValue } from "framer-motion";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -25,11 +25,19 @@ export function WordStream() {
     fontSize
   } = useSettingsStore();
   const containerRef = useRef<HTMLDivElement>(null);
-  const caretRef = useRef<HTMLDivElement>(null);
+
+  // Motion values for smooth caret
+  const caretX = useMotionValue(0);
+  const caretY = useMotionValue(0);
+
+  // Spring physics for "gliding" feel
+  const springConfig = { stiffness: 500, damping: 28, mass: 0.5 };
+  const springX = useSpring(caretX, springConfig);
+  const springY = useSpring(caretY, springConfig);
 
   // Update caret position with optimized performance
   useEffect(() => {
-    if (!caretRef.current || !containerRef.current) return;
+    if (!containerRef.current) return;
 
     const wordElement = containerRef.current.querySelector(
       `[data-word-index="${currentWordIndex}"]`
@@ -52,11 +60,11 @@ export function WordStream() {
       const x = rect.left - containerRect.left - paddingLeft;
       const y = rect.top - containerRect.top - paddingTop;
 
-      // Apply full position transformation
-      caretRef.current.style.transform = `translate(${x}px, ${y}px)`;
-      caretRef.current.style.willChange = 'transform';
+      // Update motion values instead of direct DOM manipulation
+      caretX.set(x);
+      caretY.set(y);
     }
-  }, [currentWordIndex, currentCharIndex]);
+  }, [currentWordIndex, currentCharIndex, caretX, caretY]);
 
   return (
     <div
@@ -71,15 +79,16 @@ export function WordStream() {
       )}
     >
       {/* Enhanced Caret with different styles */}
-      <div
-        ref={caretRef}
+      <motion.div
         className={cn(
-          "absolute transition-transform duration-150 cubic-bezier-smooth animate-caret-pulse",
+          "absolute transition-colors duration-150 animate-caret-pulse",
           caretStyle === "line" && "bg-gradient-to-b from-primary via-primary to-primary/60 rounded-full",
           caretStyle === "block" && "bg-primary/40 border-2 border-primary rounded-sm",
           caretStyle === "underline" && "bg-primary rounded-full"
         )}
         style={{
+          x: springX,
+          y: springY,
           ...(caretStyle === "line"
             ? {
               width: '3px',
@@ -99,8 +108,6 @@ export function WordStream() {
                 marginTop: '1.1em',
                 boxShadow: '0 0 8px hsl(var(--primary) / 0.8)',
               }),
-          willChange: 'transform',
-          transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
         }}
       />
 

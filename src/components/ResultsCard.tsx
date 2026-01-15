@@ -1,7 +1,8 @@
-// Build: 20251114
 import { TestResult } from "@/utils/metrics";
 import { ResultsChart } from "./ResultsChart";
 import { Button } from "@/components/ui/button";
+import { motion, useSpring, useTransform, useMotionValue, animate } from "framer-motion";
+import { useEffect, useRef } from "react";
 import {
   Share2,
   Copy,
@@ -25,11 +26,32 @@ import { checkAchievements } from "@/utils/achievements";
 import { useToast } from "@/hooks/use-toast";
 import { triggerConfetti } from "@/utils/confetti";
 import { soundPlayer } from "@/utils/sounds";
-import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface ResultsCardProps {
   result: TestResult;
+}
+
+
+function AnimatedNumber({ value, className, format = (v: number) => Math.round(v).toString() }: { value: number, className?: string, format?: (v: number) => string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { damping: 30, stiffness: 100 });
+  const displayValue = useTransform(springValue, (latest) => format(latest));
+
+  useEffect(() => {
+    animate(motionValue, value, { duration: 1, ease: "easeOut" });
+  }, [value, motionValue]);
+
+  useEffect(() => {
+    return springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = format(latest);
+      }
+    });
+  }, [springValue, format]);
+
+  return <span ref={ref} className={className} />;
 }
 
 export function ResultsCard({ result }: ResultsCardProps) {
@@ -71,11 +93,33 @@ export function ResultsCard({ result }: ResultsCardProps) {
     });
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="w-full max-w-6xl mx-auto p-3 sm:p-4 md:p-8 space-y-8 animate-scale-in">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="w-full max-w-6xl mx-auto p-3 sm:p-4 md:p-8 space-y-8"
+    >
       {/* Header with PB badge and achievements */}
       {(result.isPB || earnedAchievements.length > 0) && (
-        <div className="flex flex-col items-center gap-6">
+        <motion.div variants={itemVariants} className="flex flex-col items-center gap-6">
           {result.isPB && (
             <div className="relative group animate-bounce-slow">
               <div className="absolute -inset-1 bg-gradient-to-r from-gold via-yellow-400 to-gold rounded-full blur opacity-40 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
@@ -91,25 +135,28 @@ export function ResultsCard({ result }: ResultsCardProps) {
           {earnedAchievements.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-3">
               {earnedAchievements.map((achievement) => (
-                <div
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   key={achievement.id}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg animate-fade-in-up"
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg"
                 >
                   <span className="text-xl">{achievement.icon}</span>
                   <span className="text-xs font-semibold text-primary-foreground/80 lowercase tracking-tight">
                     {achievement.name}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* Main Hero Section */}
       <div className="grid lg:grid-cols-12 gap-6">
         {/* WPM Display */}
-        <div className="lg:col-span-4 flex flex-col items-center justify-center p-8 rounded-3xl glass-premium relative overflow-hidden group card-hover-lift">
+        <motion.div variants={itemVariants} className="lg:col-span-4 flex flex-col items-center justify-center p-8 rounded-3xl glass-premium relative overflow-hidden group card-hover-lift">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity duration-500">
             <Zap className="h-24 w-24 text-primary" strokeWidth={1} />
           </div>
@@ -118,24 +165,28 @@ export function ResultsCard({ result }: ResultsCardProps) {
             Words Per Minute
           </div>
           <div className="text-8xl md:text-9xl font-black text-gradient-animated tracking-tighter tabular-nums">
-            {result.wpm}
+            <AnimatedNumber value={result.wpm} />
           </div>
 
           <div className="flex gap-8 mt-8 w-full">
             <div className="flex-1 text-center">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Accuracy</div>
-              <div className="text-2xl font-bold text-secondary tabular-nums drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]">{result.accuracy}%</div>
+              <div className="text-2xl font-bold text-secondary tabular-nums drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]">
+                <AnimatedNumber value={result.accuracy} format={(v) => Math.round(v) + '%'} />
+              </div>
             </div>
             <div className="w-px h-10 bg-gradient-to-b from-transparent via-white/10 to-transparent self-end" />
             <div className="flex-1 text-center">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Consistency</div>
-              <div className="text-2xl font-bold text-gold tabular-nums drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]">{result.consistency}%</div>
+              <div className="text-2xl font-bold text-gold tabular-nums drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]">
+                <AnimatedNumber value={result.consistency} format={(v) => Math.round(v) + '%'} />
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Chart Area */}
-        <div className="lg:col-span-8 p-6 md:p-8 rounded-3xl glass-premium flex flex-col justify-center card-hover-lift">
+        <motion.div variants={itemVariants} className="lg:col-span-8 p-6 md:p-8 rounded-3xl glass-premium flex flex-col justify-center card-hover-lift">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
               <Activity className="h-3 w-3 text-primary" />
@@ -146,21 +197,21 @@ export function ResultsCard({ result }: ResultsCardProps) {
             </div>
           </div>
           <ResultsChart samples={result.samples} isPB={result.isPB} />
-        </div>
+        </motion.div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatBox label="Mode" value={result.mode} icon={<Target className="h-3 w-3" />} />
         <StatBox label="Raw WPM" value={result.rawWpm} icon={<Zap className="h-3 w-3" />} />
         <StatBox label="Time" value={`${result.duration}s`} icon={<Timer className="h-3 w-3" />} />
         <StatBox label="Correct" value={result.chars.correct} icon={<CheckCircle2 className="h-3 w-3" />} color="text-success" />
         <StatBox label="Errors" value={result.chars.incorrect} icon={<AlertCircle className="h-3 w-3" />} color="text-destructive" />
         <StatBox label="Extras" value={result.chars.extra} icon={<PlusCircle className="h-3 w-3" />} color="text-gold" />
-      </div>
+      </motion.div>
 
       {/* Unified Action Footer */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
         <div className="flex items-center gap-2 p-1.5 bg-panel/50 border border-white/5 rounded-2xl">
           <Button
             variant="ghost"
@@ -187,8 +238,8 @@ export function ResultsCard({ result }: ResultsCardProps) {
           <Sparkles className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
           Start New Race
         </Button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

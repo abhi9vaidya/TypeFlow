@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState, useCallback } from "react";
 import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword } from "lucide-react";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ export default function Leaderboard() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
-  
+
   const { user } = useAuthStore();
   const { following, fetchFollowing, followUser, unfollowUser, isFollowing } = useFriendsStore();
   const { createRoom } = useMultiplayerStore();
@@ -64,7 +65,7 @@ export default function Leaderboard() {
           .select('id, wpm, accuracy, mode, duration, timestamp')
           .order('wpm', { ascending: false })
           .limit(50);
-        
+
         if (simpleError) throw simpleError;
         setEntries(simpleData as unknown as LeaderboardEntry[]);
       } else {
@@ -103,10 +104,25 @@ export default function Leaderboard() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-2">
@@ -139,49 +155,56 @@ export default function Leaderboard() {
                       </div>
                     ))
                   ) : entries.length > 0 ? (
-                    entries.map((entry, index) => (
-                      <div
-                        key={entry.id}
-                        className="p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="flex-shrink-0 w-8">{getRankIcon(index)}</div>
-                          <div className="flex items-center gap-2 flex-1">
-                            <Avatar className="h-8 w-8 border border-primary/10">
-                              <AvatarImage src={entry.profiles?.avatar_url || ""} />
-                              <AvatarFallback className="bg-primary/5">
-                                <User className="h-4 w-4 text-primary" />
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="font-medium truncate">
-                              {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
-                            </span>
+                    <motion.div
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      {entries.map((entry, index) => (
+                        <motion.div
+                          variants={itemVariants}
+                          key={entry.id}
+                          className="p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="flex-shrink-0 w-8">{getRankIcon(index)}</div>
+                            <div className="flex items-center gap-2 flex-1">
+                              <Avatar className="h-8 w-8 border border-primary/10">
+                                <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                                <AvatarFallback className="bg-primary/5">
+                                  <User className="h-4 w-4 text-primary" />
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium truncate">
+                                {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">WPM:</span>
-                            <span className="ml-2 font-bold text-primary">{entry.wpm}</span>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">WPM:</span>
+                              <span className="ml-2 font-bold text-primary">{entry.wpm}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Accuracy:</span>
+                              <span className="ml-2">{entry.accuracy}%</span>
+                            </div>
+                            <div className="col-span-2">
+                              <Badge variant="outline" className="capitalize text-[10px] h-5">
+                                {entry.mode} {entry.duration}s
+                              </Badge>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-muted-foreground">Accuracy:</span>
-                            <span className="ml-2">{entry.accuracy}%</span>
-                          </div>
-                          <div className="col-span-2">
-                            <Badge variant="outline" className="capitalize text-[10px] h-5">
-                              {entry.mode} {entry.duration}s
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    ))
+                        </motion.div>
+                      ))}
+                    </motion.div>
                   ) : (
                     <div className="p-12 text-center text-muted-foreground">
                       No records found yet. Be the first to top the leaderboard!
                     </div>
                   )}
                 </div>
-                
+
                 {/* Desktop Table Layout */}
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
@@ -209,69 +232,77 @@ export default function Leaderboard() {
                           </tr>
                         ))
                       ) : entries.length > 0 ? (
-                        entries.map((entry, index) => (
-                          <tr 
-                            key={entry.id} 
-                            className="border-b border-primary/5 hover:bg-primary/5 transition-colors group"
-                          >
-                            <td className="px-6 py-4">{getRankIcon(index)}</td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-8 w-8 border border-primary/10">
-                                  <AvatarImage src={entry.profiles?.avatar_url || ""} />
-                                  <AvatarFallback className="bg-primary/5">
-                                    <User className="h-4 w-4 text-primary" />
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="font-medium">
-                                  {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-right font-bold text-primary italic">
-                              {entry.wpm}
-                            </td>
-                            <td className="px-6 py-4 text-right text-muted-foreground">
-                              {entry.accuracy}%
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <Badge variant="outline" className="capitalize text-[10px] h-5">
-                                {entry.mode} {entry.duration}s
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
-                              {new Date(entry.timestamp).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                {entry.profiles?.id !== user?.id && entry.profiles?.id && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => isFollowing(entry.profiles!.id) 
-                                        ? unfollowUser(entry.profiles!.id) 
-                                        : followUser(entry.profiles!.id)}
-                                      title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
-                                    >
-                                      {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-primary"
-                                      onClick={() => handleChallenge(entry.profiles!.id)}
-                                      title="Challenge"
-                                    >
-                                      <Sword className="h-4 w-4" />
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))
+                        <motion.tr
+                          style={{ display: "table-row-group" }}
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                        >
+                          {entries.map((entry, index) => (
+                            <motion.tr
+                              variants={itemVariants}
+                              key={entry.id}
+                              className="border-b border-primary/5 hover:bg-primary/5 transition-colors group"
+                            >
+                              <td className="px-6 py-4">{getRankIcon(index)}</td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="h-8 w-8 border border-primary/10">
+                                    <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                                    <AvatarFallback className="bg-primary/5">
+                                      <User className="h-4 w-4 text-primary" />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span className="font-medium">
+                                    {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-right font-bold text-primary italic">
+                                {entry.wpm}
+                              </td>
+                              <td className="px-6 py-4 text-right text-muted-foreground">
+                                {entry.accuracy}%
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <Badge variant="outline" className="capitalize text-[10px] h-5">
+                                  {entry.mode} {entry.duration}s
+                                </Badge>
+                              </td>
+                              <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
+                                {new Date(entry.timestamp).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {entry.profiles?.id !== user?.id && entry.profiles?.id && (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => isFollowing(entry.profiles!.id)
+                                          ? unfollowUser(entry.profiles!.id)
+                                          : followUser(entry.profiles!.id)}
+                                        title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
+                                      >
+                                        {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-primary"
+                                        onClick={() => handleChallenge(entry.profiles!.id)}
+                                        title="Challenge"
+                                      >
+                                        <Sword className="h-4 w-4" />
+                                      </Button>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </motion.tr>
                       ) : (
                         <tr>
                           <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
@@ -286,7 +317,7 @@ export default function Leaderboard() {
             </Card>
           </Tabs>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }
