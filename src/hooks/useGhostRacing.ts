@@ -35,30 +35,54 @@ export function useGhostRacing(elapsedTime: number) {
     }
 
     const samples = pbResult.samples;
-    // Find the sample closest to current elapsed time
-    let currentSample: LiveSample | null = null;
+    if (samples.length === 0) return { charIndex: 0, wordIndex: 0, wpm: 0, isActive: true };
+
+    // Find the two samples surrounding the current time for interpolation
+    let prevSample = samples[0];
+    let nextSample = samples[samples.length - 1];
     
-    for (let i = 0; i < samples.length; i++) {
-        if (samples[i].t <= elapsedTime) {
-            currentSample = samples[i];
-        } else {
-            // Interpolate between samples[i-1] and samples[i] if we want to be smooth
-            // For now, let's just take the last passed sample for simplicity
-            break;
+    // If we are before the first sample (0-1 second)
+    if (elapsedTime < samples[0].t) {
+        prevSample = { t: 0, wpm: 0, errors: 0 };
+        nextSample = samples[0];
+    } else {
+        // Find the specific window
+        for (let i = 0; i < samples.length - 1; i++) {
+            if (samples[i].t <= elapsedTime && samples[i+1].t > elapsedTime) {
+                prevSample = samples[i];
+                nextSample = samples[i+1];
+                break;
+            }
+        }
+        
+        // If we are past the last sample
+        if (elapsedTime >= samples[samples.length - 1].t) {
+            prevSample = samples[samples.length - 1];
+            nextSample = samples[samples.length - 1]; // No interpolation, just hold
         }
     }
 
-    if (!currentSample) {
-        return { charIndex: 0, wordIndex: 0, wpm: 0, isActive: true };
+    // Calculate exact char count for prev and next points
+    // Formula: chars = (WPM * time) / 12
+    const prevChars = (prevSample.wpm * prevSample.t) / 12;
+    const nextChars = (nextSample.wpm * nextSample.t) / 12;
+
+    // Interpolate
+    let totalChars = prevChars;
+    
+    if (nextSample.t > prevSample.t) {
+        const progress = (elapsedTime - prevSample.t) / (nextSample.t - prevSample.t);
+        totalChars = prevChars + (nextChars - prevChars) * progress;
     }
 
-    // Calculate characters typed at this WPM and time
-    // Chars = (WPM * time * 5) / 60 = (WPM * time) / 12
-    const totalChars = (currentSample.wpm * currentSample.t) / 12;
+    // Current WPM to display (also interpolated for smoothness)
+    // Avoid division by zero
+    const currentWpmDisplay = Math.round(
+      prevSample.wpm + (nextSample.wpm - prevSample.wpm) * 
+      (nextSample.t > prevSample.t ? (elapsedTime - prevSample.t) / (nextSample.t - prevSample.t) : 0)
+    );
     
-    // Convert totalChars to wordIndex and charIndex based on the CURRENT test words
-    // Note: The words might be different from the PB, but we want to show where 
-    // the ghost WOULD be in terms of progress.
+    // specific word logic
     let remainingChars = Math.floor(totalChars);
     let wordIdx = 0;
     let charIdx = 0;
@@ -72,7 +96,7 @@ export function useGhostRacing(elapsedTime: number) {
     return {
       charIndex: charIdx,
       wordIndex: wordIdx,
-      wpm: currentSample.wpm,
+      wpm: currentWpmDisplay,
       isActive: true
     };
   }, [pbResult, elapsedTime, words]);
