@@ -308,30 +308,29 @@ export default function TypingTest() {
   // Keyboard handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // Prevent spacebar from scrolling on results page
+      if (isFinished && e.key === " ") {
+        e.preventDefault();
+        return;
+      }
+
       // Tab to restart - regenerate words based on current mode
       if (e.key === "Tab") {
         e.preventDefault();
         setElapsedTime(0);
-        console.log("Tab pressed - Current testMode:", testMode, "wordCount:", wordCount, "duration:", duration);
-
         const wordOptions = { includePunctuation, includeNumbers };
         let newWords: string[];
         if (testMode === "quote") {
           const quote = getRandomQuote();
           newWords = quoteToWords(quote);
-          console.log("Generating quote with", newWords.length, "words");
         } else if (testMode === "words") {
           newWords = generateWords(wordCount || 25, wordOptions);
-          console.log("Generating", wordCount || 25, "words for words mode");
         } else if (testMode === "zen") {
           newWords = generateWords(200, wordOptions);
-          console.log("Generating 200 words for zen mode");
         } else {
           // time mode
           newWords = generateWords(100, wordOptions);
-          console.log("Generating 100 words for time mode");
         }
-
         setWords(newWords);
         resetTest();
         return;
@@ -379,6 +378,12 @@ export default function TypingTest() {
     },
     [isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest]
   );
+  // Scroll to top when results page is shown
+  useEffect(() => {
+    if (isFinished) {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+  }, [isFinished]);
 
   useEffect(() => {
     // Primary handler (bubbling phase)
