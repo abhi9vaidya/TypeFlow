@@ -26,7 +26,12 @@ export function useGhostRacing(elapsedTime: number) {
 
     if (filtered.length === 0) return null;
 
-    return filtered.reduce((prev, current) => (prev.wpm > current.wpm) ? prev : current);
+    // Sort by WPM (desc), then Accuracy (desc), then Date (desc) to find the "best" best run
+    return filtered.sort((a, b) => {
+      if (b.wpm !== a.wpm) return b.wpm - a.wpm; // Higher WPM first
+      if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy; // Higher Accuracy first
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(); // Newer first
+    })[0];
   }, [history, mode, duration, wordCount, showGhost]);
 
   const ghostProgress = useMemo((): GhostState => {

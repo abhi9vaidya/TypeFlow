@@ -224,6 +224,17 @@ export default function TypingTest() {
         // Fixed errors = Total cumulative errors - Current errors remaining
         const fixedErrors = Math.max(0, totalErrors - (incorrectChars + extraChars));
 
+        // Ensure we capture the final state as the last sample
+        const finalSamples = [...samples];
+        // Only add if significant time has passed since last sample to avoid duplicates
+        if (samples.length === 0 || elapsed - samples[samples.length - 1].t > 0.1) {
+          finalSamples.push({
+            t: elapsed,
+            wpm,
+            errors: 0
+          });
+        }
+
         const result = {
           id: Date.now().toString(),
           mode,
@@ -240,7 +251,7 @@ export default function TypingTest() {
             fixed: fixedErrors,
             extra: extraChars,
           },
-          samples,
+          samples: finalSamples,
           isPB: false,
         };
 
