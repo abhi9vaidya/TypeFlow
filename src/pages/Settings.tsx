@@ -209,6 +209,16 @@ export default function Settings() {
                         onCheckedChange={settings.setShowCharacterGlow}
                       />
                     </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Ghost Racing (PB Replay)</Label>
+                        <p className="text-[10px] text-muted-foreground/60">Race against your personal best</p>
+                      </div>
+                      <Switch
+                        checked={settings.showGhost}
+                        onCheckedChange={settings.setShowGhost}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

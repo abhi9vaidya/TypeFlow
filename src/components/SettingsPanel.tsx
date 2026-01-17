@@ -50,8 +50,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     setErrorSound,
     showKeyboardHeatmap,
     blurUnusedWords,
+    showGhost,
     setShowKeyboardHeatmap,
     setBlurUnusedWords,
+    setShowGhost,
     showStreakCounter,
     showSpeedZone,
     showParticleEffects,
@@ -384,7 +386,16 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                 <Label htmlFor="show-keyboard" className="text-sm font-medium cursor-pointer text-foreground/80">
                   Show keyboard heatmap
                 </Label>
-                <Switch checked={showKeyboardHeatmap} onCheckedChange={setShowKeyboardHeatmap} />
+                <Switch id="show-keyboard" checked={showKeyboardHeatmap} onCheckedChange={setShowKeyboardHeatmap} />
+              </div>
+              <div className="flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-muted/30 transition-colors duration-200">
+                <div className="space-y-0.5">
+                  <Label htmlFor="show-ghost" className="text-sm font-medium cursor-pointer text-foreground/80">
+                    Ghost Racing (PB Replay)
+                  </Label>
+                  <p className="text-[10px] text-muted-foreground/60">Race against your personal best</p>
+                </div>
+                <Switch id="show-ghost" checked={showGhost} onCheckedChange={setShowGhost} />
               </div>
             </div>
           </section>

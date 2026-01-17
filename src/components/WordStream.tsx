@@ -3,6 +3,8 @@ import { useTypingStore } from "@/store/useTypingStore";
 import { useSettingsStore, FontFamily } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
 import { motion, useSpring, useMotionValue } from "framer-motion";
+import { useGhostRacing } from "@/hooks/useGhostRacing";
+import { useShallow } from "zustand/react/shallow";
 
 
 const FONT_CLASSES: Record<FontFamily, string> = {
@@ -24,6 +26,8 @@ interface WordProps {
   blurUnusedWords: boolean;
   showCharacterGlow: boolean;
   activeCharIndex: number;
+  ghostWordIndex: number;
+  ghostCharIndex: number;
 }
 
 const Word = memo(({
@@ -35,7 +39,9 @@ const Word = memo(({
   isFuture,
   blurUnusedWords,
   showCharacterGlow,
-  activeCharIndex
+  activeCharIndex,
+  ghostWordIndex,
+  ghostCharIndex
 }: WordProps) => {
   return (
     <div
@@ -59,6 +65,9 @@ const Word = memo(({
         // activeCharIndex is -1 if not current word, so this is safe
         const isCurrentChar = isCurrent && charIdx === activeCharIndex;
 
+        // Ghost progress
+        const isGhostTyped = (wordIdx < ghostWordIndex) || (wordIdx === ghostWordIndex && charIdx < ghostCharIndex);
+
         return (
           <span
             key={charIdx}
@@ -71,7 +80,9 @@ const Word = memo(({
               !isTyped && isCurrent && "text-foreground/70",
               !isTyped && isFuture && "text-muted-foreground/40",
               !isTyped && !isCurrent && "text-muted-foreground/35",
-              isCurrentChar && "relative"
+              isCurrentChar && "relative",
+              // Ghost highlight for untyped chars
+              !isTyped && isGhostTyped && "text-secondary opacity-80"
             )}
             style={{
               transitionTimingFunction: 'cubic-bezier(0.4, 0.25, 0.46, 0.88)'
@@ -82,6 +93,7 @@ const Word = memo(({
             {isCorrect && isCurrent && showCharacterGlow && (
               <span className="absolute inset-0 bg-primary/30 blur-sm animate-pulse-glow pointer-events-none" />
             )}
+            
             {isIncorrect && (
               <>
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-destructive/80 rounded-full animate-pulse pointer-events-none" />
@@ -115,6 +127,8 @@ const Word = memo(({
     prevProps.blurUnusedWords === nextProps.blurUnusedWords &&
     prevProps.showCharacterGlow === nextProps.showCharacterGlow &&
     prevProps.word === nextProps.word &&
+    prevProps.ghostWordIndex === nextProps.ghostWordIndex &&
+    prevProps.ghostCharIndex === nextProps.ghostCharIndex &&
     // Shallow compare typed array is usually enough if reference changes, 
     // but deeper check avoids re-render if array content is same but ref diff (though zustand usually handles this well).
     // For now, strict equality on reference is fastest.
@@ -123,17 +137,16 @@ const Word = memo(({
 });
 Word.displayName = 'MemoizedWord';
 
-import { useShallow } from "zustand/react/shallow";
-
 // ... existing imports
 
-export function WordStream() {
-  const { words, currentWordIndex, currentCharIndex, typedChars } = useTypingStore(
+export function WordStream({ elapsedTime = 0 }: { elapsedTime?: number }) {
+  const { words, currentWordIndex, currentCharIndex, typedChars, samples } = useTypingStore(
     useShallow((state) => ({
       words: state.words,
       currentWordIndex: state.currentWordIndex,
       currentCharIndex: state.currentCharIndex,
       typedChars: state.typedChars,
+      samples: state.samples,
     }))
   );
 
@@ -142,7 +155,8 @@ export function WordStream() {
     blurUnusedWords,
     showCharacterGlow,
     fontFamily,
-    fontSize
+    fontSize,
+    showGhost
   } = useSettingsStore(
     useShallow((state) => ({
       caretStyle: state.caretStyle,
@@ -150,8 +164,16 @@ export function WordStream() {
       showCharacterGlow: state.showCharacterGlow,
       fontFamily: state.fontFamily,
       fontSize: state.fontSize,
+      showGhost: state.showGhost,
     }))
   );
+
+  const ghost = useGhostRacing(elapsedTime);
+  
+  // Calculate delta if ghost is active
+  const currentWpm = samples.length > 0 ? samples[samples.length - 1].wpm : 0;
+  const wpmDelta = currentWpm - ghost.wpm;
+  const isAhead = wpmDelta > 0;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const containerStyleRef = useRef<{ paddingLeft: number; paddingTop: number } | null>(null);
@@ -160,10 +182,17 @@ export function WordStream() {
   const caretX = useMotionValue(0);
   const caretY = useMotionValue(0);
 
+  // Motion values for ghost caret
+  const ghostX = useMotionValue(0);
+  const ghostY = useMotionValue(0);
+
   // Spring physics for "gliding" feel
   const springConfig = { stiffness: 500, damping: 28, mass: 0.5 };
   const springX = useSpring(caretX, springConfig);
   const springY = useSpring(caretY, springConfig);
+
+  const ghostSpringX = useSpring(ghostX, springConfig);
+  const ghostSpringY = useSpring(ghostY, springConfig);
 
   // Cache container styles on mount/resize
   useEffect(() => {
@@ -188,38 +217,55 @@ export function WordStream() {
     if (!containerRef.current) return;
 
     // Use requestAnimationFrame to ensure DOM is ready
-    const updateCaret = () => {
+    const updateCarets = () => {
+      // 1. Update active caret
       const wordElement = containerRef.current?.querySelector(
         `[data-word-index="${currentWordIndex}"]`
       );
 
-      if (!wordElement) return;
+      if (wordElement) {
+        const charElement = wordElement.querySelector(
+          `[data-char-index="${currentCharIndex}"]`
+        ) as HTMLElement;
 
-      const charElement = wordElement.querySelector(
-        `[data-char-index="${currentCharIndex}"]`
-      ) as HTMLElement;
+        if (charElement) {
+          const rect = charElement.getBoundingClientRect();
+          const containerRect = containerRef.current!.getBoundingClientRect();
+          const paddingLeft = containerStyleRef.current?.paddingLeft ?? 0;
+          const paddingTop = containerStyleRef.current?.paddingTop ?? 0;
 
-      if (charElement) {
-        const rect = charElement.getBoundingClientRect();
-        const containerRect = containerRef.current!.getBoundingClientRect();
+          caretX.set(rect.left - containerRect.left - paddingLeft);
+          caretY.set(rect.top - containerRect.top - paddingTop);
+        }
+      }
 
-        // Use cached styles or fallback
-        const paddingLeft = containerStyleRef.current?.paddingLeft ?? 0;
-        const paddingTop = containerStyleRef.current?.paddingTop ?? 0;
+      // 2. Update ghost caret if active
+      if (showGhost && ghost.isActive) {
+        const ghostWordElement = containerRef.current?.querySelector(
+          `[data-word-index="${ghost.wordIndex}"]`
+        );
 
-        // Calculate position relative to container's content area (after padding)
-        const x = rect.left - containerRect.left - paddingLeft;
-        const y = rect.top - containerRect.top - paddingTop;
+        if (ghostWordElement) {
+          const ghostCharElement = ghostWordElement.querySelector(
+            `[data-char-index="${ghost.charIndex}"]`
+          ) as HTMLElement;
 
-        // Update motion values instead of direct DOM manipulation
-        caretX.set(x);
-        caretY.set(y);
+          if (ghostCharElement) {
+            const rect = ghostCharElement.getBoundingClientRect();
+            const containerRect = containerRef.current!.getBoundingClientRect();
+            const paddingLeft = containerStyleRef.current?.paddingLeft ?? 0;
+            const paddingTop = containerStyleRef.current?.paddingTop ?? 0;
+
+            ghostX.set(rect.left - containerRect.left - paddingLeft);
+            ghostY.set(rect.top - containerRect.top - paddingTop);
+          }
+        }
       }
     };
 
-    const rafId = requestAnimationFrame(updateCaret);
+    const rafId = requestAnimationFrame(updateCarets);
     return () => cancelAnimationFrame(rafId);
-  }, [currentWordIndex, currentCharIndex, caretX, caretY]);
+  }, [currentWordIndex, currentCharIndex, ghost.isActive, ghost.wordIndex, ghost.charIndex, showGhost, caretX, caretY, ghostX, ghostY]);
 
   return (
     <div
@@ -267,6 +313,27 @@ export function WordStream() {
         }}
       />
 
+      {/* Ghost Caret (Personal Best) - Minimalist Line Only */}
+      {showGhost && ghost.isActive && (
+        <motion.div
+           id="ghost-caret"
+           className="absolute z-0 pointer-events-none"
+           style={{
+             x: ghostSpringX,
+             y: ghostSpringY,
+           }}
+         >
+          {/* Simple Ghost Caret Line */}
+          <div 
+            className="w-[2px] bg-secondary/80 rounded-full"
+            style={{ 
+              height: '1.2em',
+              boxShadow: '0 0 8px hsl(var(--secondary) / 0.4)',
+            }} 
+          />
+        </motion.div>
+      )}
+
       {/* Words with improved wrapping and performance */}
       <div className="flex flex-wrap gap-x-4 gap-y-3">
         {words.map((word, wordIdx) => {
@@ -286,6 +353,8 @@ export function WordStream() {
               // Only pass the changing char index to the current word.
               // For all other words, this stays -1, preventing re-renders on keystrokes.
               activeCharIndex={isCurrent ? currentCharIndex : -1}
+              ghostWordIndex={showGhost ? ghost.wordIndex : -1}
+              ghostCharIndex={showGhost ? ghost.charIndex : -1}
             />
           );
         })}

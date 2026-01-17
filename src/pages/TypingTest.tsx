@@ -31,6 +31,7 @@ import { useShallow } from "zustand/react/shallow";
 
 export default function TypingTest() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   const {
     words,
@@ -131,6 +132,7 @@ export default function TypingTest() {
 
     if (!isRunning) {
       startTest();
+      setElapsedTime(0);
     }
 
     const expectedChar = words[currentWordIndex]?.[currentCharIndex];
@@ -187,6 +189,7 @@ export default function TypingTest() {
 
     const interval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000;
+      setElapsedTime(elapsed);
       const currentSecond = Math.floor(elapsed);
 
       // Add sample every second
@@ -219,6 +222,7 @@ export default function TypingTest() {
           id: Date.now().toString(),
           mode,
           duration: testMode === "time" ? duration : elapsed,
+          wordCount: testMode === "words" ? wordCount : undefined,
           timestamp: new Date().toISOString(),
           wpm,
           rawWpm: calculateRawWPM(totalChars, elapsed),
@@ -282,7 +286,7 @@ export default function TypingTest() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isRunning, startTime, duration, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest]);
+  }, [isRunning, startTime, duration, wordCount, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest]);
 
   // Keyboard handler
   const handleKeyDown = useCallback(
@@ -290,7 +294,7 @@ export default function TypingTest() {
       // Tab to restart - regenerate words based on current mode
       if (e.key === "Tab") {
         e.preventDefault();
-
+        setElapsedTime(0);
         console.log("Tab pressed - Current testMode:", testMode, "wordCount:", wordCount, "duration:", duration);
 
         const wordOptions = { includePunctuation, includeNumbers };
@@ -446,7 +450,7 @@ export default function TypingTest() {
                   setInputValue(val);
                 }}
               />
-              <WordStream />
+              <WordStream elapsedTime={elapsedTime} />
 
               {/* Ambient glow effect when typing perfectly */}
               {isRunning && showPerfectGlow && (

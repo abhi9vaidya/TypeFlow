@@ -35,8 +35,10 @@ interface SettingsState {
   // Display
   showKeyboardHeatmap: boolean;
   blurUnusedWords: boolean;
+  showGhost: boolean;
   setShowKeyboardHeatmap: (show: boolean) => void;
   setBlurUnusedWords: (blur: boolean) => void;
+  setShowGhost: (show: boolean) => void;
 
   // Visual Effects
   showStreakCounter: boolean;
@@ -94,8 +96,10 @@ export const useSettingsStore = create<SettingsState>()(
       // Display
       showKeyboardHeatmap: false,
       blurUnusedWords: false,
+      showGhost: true,
       setShowKeyboardHeatmap: (show) => set({ showKeyboardHeatmap: show }),
       setBlurUnusedWords: (blur) => set({ blurUnusedWords: blur }),
+      setShowGhost: (show) => set({ showGhost: show }),
 
       // Visual Effects
       showStreakCounter: false,

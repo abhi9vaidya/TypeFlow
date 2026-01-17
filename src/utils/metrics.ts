@@ -16,6 +16,7 @@ export interface TestResult {
   id: string;
   mode: "time" | "words" | "quote" | "zen";
   duration: number;
+  wordCount?: number;
   timestamp: string;
   wpm: number;
   rawWpm: number;
