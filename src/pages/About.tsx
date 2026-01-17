@@ -23,9 +23,7 @@ const itemVariants: Variants = {
 
 export default function About() {
     return (
-        <div className="min-h-screen bg-background">
-            
-
+        <div>
             <motion.main
                 className="container mx-auto px-4 pb-16 max-w-4xl"
                 variants={containerVariants}

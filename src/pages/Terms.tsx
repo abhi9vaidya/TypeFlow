@@ -2,9 +2,7 @@ import { FileText, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 export default function Terms() {
     return (
-        <div className="min-h-screen bg-background">
-            
-
+        <div>
             <main className="container mx-auto px-4 pb-16 max-w-4xl">
                 {/* Header */}
                 <div className="text-center mb-12 animate-spring-in">
