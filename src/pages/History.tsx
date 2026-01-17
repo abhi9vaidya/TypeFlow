@@ -19,8 +19,7 @@ export default function History() {
 
   if (history.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
-        
+      <div>
         <main className="container mx-auto px-4 pb-12">
           <div className="text-center max-w-md mx-auto animate-fade-in-up space-y-6">
             <div className="relative mx-auto w-24 h-24 mb-4">
@@ -50,9 +49,7 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      
-      
+    <div>
       <main className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">

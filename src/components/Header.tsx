@@ -27,6 +27,8 @@ export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const isHome = location.pathname === "/";
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -38,7 +40,7 @@ export function Header() {
   return (
     <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out",
-      isScrolled ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-lg shadow-black/5" : "bg-transparent border-b border-transparent",
+      (isScrolled || !isHome) ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-lg shadow-black/5" : "bg-transparent border-b border-transparent",
       isRunning && "opacity-0 hover:opacity-100 focus-within:opacity-100"
     )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">

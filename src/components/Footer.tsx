@@ -20,9 +20,9 @@ export function Footer() {
 
                     {/* Brand */}
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="flex items-center gap-2 text-lg font-bold">
+                        <div className="flex items-center gap-2 text-base font-bold">
                             <div className="group-hover:scale-110 transition-transform duration-300">
-                                <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain drop-shadow-md" />
+                                <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain drop-shadow-md" />
                             </div>
                             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 TypeFlow
@@ -83,8 +83,8 @@ export function Footer() {
                 </div>
 
                 {/* Bottom accent line */}
-                <div className="mt-6 pt-4 border-t border-border/10 flex items-center justify-center gap-2 text-xs text-muted-foreground/40">
-                    <Coffee className="h-3 w-3" />
+                <div className="mt-4 pt-4 border-t border-border/10 flex items-center justify-center gap-2 text-[10px] text-muted-foreground/40">
+                    <Coffee className="h-2.5 w-2.5" />
                     <span>Fueled by caffeine and a passion for speed</span>
                 </div>
             </div>
