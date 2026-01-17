@@ -26,6 +26,8 @@ interface TypingState {
   correctChars: number;
   incorrectChars: number;
   extraChars: number;
+  totalTyped: number;
+  totalErrors: number;
   currentStreak: number;
   maxStreak: number;
   
@@ -75,6 +77,8 @@ export const useTypingStore = create<TypingState>()(
       correctChars: 0,
       incorrectChars: 0,
       extraChars: 0,
+      totalTyped: 0,
+      totalErrors: 0,
       currentStreak: 0,
       maxStreak: 0,
       samples: [],
@@ -122,6 +126,8 @@ export const useTypingStore = create<TypingState>()(
           correctChars: 0,
           incorrectChars: 0,
           extraChars: 0,
+          totalTyped: 0,
+          totalErrors: 0,
           currentStreak: 0,
           maxStreak: 0,
           samples: [],
@@ -142,15 +148,18 @@ export const useTypingStore = create<TypingState>()(
         let correct = state.correctChars;
         let incorrect = state.incorrectChars;
         let extra = state.extraChars;
+        let newTotalErrors = state.totalErrors;
         
         if (state.currentCharIndex < word.length) {
           if (char === word[state.currentCharIndex]) {
             correct++;
           } else {
             incorrect++;
+            newTotalErrors++;
           }
         } else {
           extra++;
+          newTotalErrors++;
         }
         
         set({
@@ -159,6 +168,8 @@ export const useTypingStore = create<TypingState>()(
           correctChars: correct,
           incorrectChars: incorrect,
           extraChars: extra,
+          totalTyped: state.totalTyped + 1,
+          totalErrors: newTotalErrors,
         });
       },
       
@@ -194,6 +205,7 @@ export const useTypingStore = create<TypingState>()(
           correctChars: correct,
           incorrectChars: incorrect,
           extraChars: extra,
+          totalTyped: state.totalTyped + 1,
         });
       },
       

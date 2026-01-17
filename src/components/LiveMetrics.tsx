@@ -13,6 +13,7 @@ export function LiveMetrics() {
     correctChars,
     incorrectChars,
     extraChars,
+    totalErrors,
   } = useTypingStore();
 
   const { showCircularProgress } = useSettingsStore();
@@ -30,11 +31,12 @@ export function LiveMetrics() {
     setElapsed(Math.floor(elapsedSeconds));
 
     const currentWpm = calculateWPM(correctChars, elapsedSeconds);
-    const currentAccuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
+    // Use totalErrors for accuracy calculation to mimic Monkeytype behavior (penalize corrected errors)
+    const currentAccuracy = calculateAccuracy(correctChars, totalErrors, 0);
 
     setWpm(currentWpm);
     setAccuracy(currentAccuracy);
-  }, [isRunning, startTime, correctChars, incorrectChars, extraChars]);
+  }, [isRunning, startTime, correctChars, incorrectChars, extraChars, totalErrors]);
 
   useEffect(() => {
     if (!isRunning || !startTime) return;

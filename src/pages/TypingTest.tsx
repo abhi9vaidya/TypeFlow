@@ -44,6 +44,8 @@ export default function TypingTest() {
     correctChars,
     incorrectChars,
     extraChars,
+    totalTyped,
+    totalErrors,
     samples,
     currentResult,
     mode,
@@ -70,6 +72,8 @@ export default function TypingTest() {
       correctChars: state.correctChars,
       incorrectChars: state.incorrectChars,
       extraChars: state.extraChars,
+      totalTyped: state.totalTyped,
+      totalErrors: state.totalErrors,
       samples: state.samples,
       currentResult: state.currentResult,
       mode: state.mode,
@@ -214,9 +218,11 @@ export default function TypingTest() {
       if (shouldFinish) {
         stopTest();
 
-        const totalChars = correctChars + incorrectChars + extraChars;
         const wpm = calculateWPM(correctChars, elapsed);
-        const accuracy = calculateAccuracy(correctChars, incorrectChars, extraChars);
+        // Accuracy uses total cumulative errors to penalize fixed mistakes
+        const accuracy = calculateAccuracy(correctChars, totalErrors, 0);
+        // Fixed errors = Total cumulative errors - Current errors remaining
+        const fixedErrors = Math.max(0, totalErrors - (incorrectChars + extraChars));
 
         const result = {
           id: Date.now().toString(),
@@ -225,13 +231,13 @@ export default function TypingTest() {
           wordCount: testMode === "words" ? wordCount : undefined,
           timestamp: new Date().toISOString(),
           wpm,
-          rawWpm: calculateRawWPM(totalChars, elapsed),
+          rawWpm: calculateRawWPM(totalTyped, elapsed),
           accuracy,
           consistency: calculateConsistency(samples.map(s => s.wpm)),
           chars: {
             correct: correctChars,
             incorrect: incorrectChars,
-            fixed: 0,
+            fixed: fixedErrors,
             extra: extraChars,
           },
           samples,
@@ -286,7 +292,7 @@ export default function TypingTest() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isRunning, startTime, duration, wordCount, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest]);
+  }, [isRunning, startTime, duration, wordCount, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest, totalErrors, totalTyped]);
 
   // Keyboard handler
   const handleKeyDown = useCallback(
