@@ -429,7 +429,7 @@ export default function TypingTest() {
             {isRunning && testMode !== "zen" && <LiveMetrics />}
 
             <div
-              className="max-w-5xl mx-auto mt-12 relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
+              className="max-w-5xl mx-auto relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
               onClick={() => document.getElementById("mobile-input")?.focus()}
             >
               {/* Hidden input for mobile keyboard support */}

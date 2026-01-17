@@ -36,7 +36,7 @@ export function Sidebar() {
         >
             {/* Logo */}
             <button
-                onClick={() => navigate("/")}
+                onClick={() => { navigate("/"); window.scrollTo(0, 0); }}
                 className="mb-8 relative group"
             >
                 <div className="relative group-hover:scale-110 transition-transform duration-300">

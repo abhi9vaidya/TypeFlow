@@ -46,7 +46,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Logo */}
         <button
-          onClick={() => navigate("/")}
+          onClick={() => { navigate("/"); window.scrollTo(0, 0); }}
           className="flex items-center gap-1.5 sm:gap-2.5 text-lg sm:text-xl md:text-2xl font-bold tracking-tight transition-all duration-300 group"
         >
           <div className="relative group-hover:scale-105 transition-transform duration-300">
