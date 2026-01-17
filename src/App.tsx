@@ -17,7 +17,8 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import { Footer } from "./components/Footer";
-import { useEffect } from "react";
+import { SettingsPanel } from "@/components/SettingsPanel";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { useTypingStore } from "./store/useTypingStore";
 import { supabase } from "./lib/supabase";
@@ -27,6 +28,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,25 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 const AppContent = () => {
   const location = useLocation();
   const { navbarLayout } = useSettingsStore();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (location.pathname === "/settings") {
+          toast({
+            title: "🤔 Already in Settings!",
+            description: "Trying to open Quick Settings while you're already in the full Settings? That's like looking for your glasses while wearing them.",
+            duration: 5000,
+          });
+        } else {
+          setIsSettingsOpen((prev) => !prev);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleGlobalEscape);
+    return () => window.removeEventListener("keydown", handleGlobalEscape);
+  }, [location.pathname]);
 
   return (
     <div className={cn(
@@ -55,6 +76,9 @@ const AppContent = () => {
       navbarLayout === 'vertical' ? "pl-20" : "pt-24"
     )}>
       {navbarLayout === 'vertical' ? <Sidebar /> : <Header />}
+
+      {/* Global Quick Settings Sidebar (real sidebar, not modal) */}
+      <SettingsPanel isOpen={isSettingsOpen && location.pathname !== "/settings"} onClose={() => setIsSettingsOpen(false)} />
 
       <main className="flex-1">
         <AnimatePresence mode="wait">

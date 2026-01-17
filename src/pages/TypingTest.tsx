@@ -12,7 +12,7 @@ import { ModeSelector } from "@/components/ModeSelector";
 import { WordStream } from "@/components/WordStream";
 import { LiveMetrics } from "@/components/LiveMetrics";
 import { ResultsCard } from "@/components/ResultsCard";
-import { SettingsPanel } from "@/components/SettingsPanel";
+// import { SettingsPanel } from "@/components/SettingsPanel";
 import { KeyboardHeatmap } from "@/components/KeyboardHeatmap";
 import { StreakCounter } from "@/components/StreakCounter";
 import { SpeedZone } from "@/components/SpeedZone";
@@ -30,7 +30,7 @@ import { useShallow } from "zustand/react/shallow";
 // ... other imports
 
 export default function TypingTest() {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
   const {
@@ -395,25 +395,11 @@ export default function TypingTest() {
   }, [handleKeyDown]);
 
   // Handle Escape key to open/close settings (when not in finished state)
-  useEffect(() => {
-    const handleEscapeGlobal = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isFinished) {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsSettingsOpen((prev) => !prev);
-      }
-    };
-
-    // Use capture phase to ensure we catch Escape even if another component tries to stop propagation
-    document.addEventListener("keydown", handleEscapeGlobal, true);
-    return () => {
-      document.removeEventListener("keydown", handleEscapeGlobal, true);
-    };
-  }, [isFinished]);
+  // Quick Settings is now global, Escape handled in App
 
   return (
     <div className="min-h-screen overflow-x-hidden relative">
-      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      {/* SettingsPanel is now global, handled in App.tsx */}
 
 
 
