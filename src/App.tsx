@@ -1,4 +1,3 @@
-// Build: 20251114
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -52,23 +51,28 @@ const AppContent = () => {
   const { navbarLayout } = useSettingsStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  useEffect(() => {
-    const handleGlobalEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (location.pathname === "/settings") {
-          toast({
-            title: "🤔 Already in Settings!",
-            description: "Trying to open Quick Settings while you're already in the full Settings? That's like looking for your glasses while wearing them.",
-            duration: 5000,
-          });
-        } else {
-          setIsSettingsOpen((prev) => !prev);
-        }
-      }
-    };
-    window.addEventListener("keydown", handleGlobalEscape);
-    return () => window.removeEventListener("keydown", handleGlobalEscape);
-  }, [location.pathname]);
+useEffect(() => {
+  const handleGlobalEscape = (e: KeyboardEvent) => {
+    if (e.key !== "Escape") return;
+
+    // On the full Settings page, just show the toast and don't open quick settings
+    if (location.pathname === "/settings") {
+      toast({
+        title: "🤔 Already in Settings!",
+        description:
+          "Trying to open Quick Settings while you're already in the full Settings? That's like looking for your glasses while wearing them.",
+        duration: 5000,
+      });
+      return;
+    }
+
+    // Everywhere else: ESC toggles quick settings open/closed
+    setIsSettingsOpen((prevOpen) => !prevOpen);
+  };
+
+  window.addEventListener("keydown", handleGlobalEscape);
+  return () => window.removeEventListener("keydown", handleGlobalEscape);
+}, [location.pathname]);
 
   return (
     <div className={cn(
