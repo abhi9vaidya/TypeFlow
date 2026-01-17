@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useHeatmapStore } from "@/store/useHeatmapStore";
 import { GoalsPanel } from "@/components/GoalsPanel";
 import { AchievementsPanel } from "@/components/AchievementsPanel";
+import { PersonalBests } from "@/components/PersonalBests";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -68,6 +69,10 @@ export default function Statistics() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <GoalsPanel />
             <AchievementsPanel />
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            <PersonalBests history={history} />
           </div>
 
           {/* Overview Stats */}
