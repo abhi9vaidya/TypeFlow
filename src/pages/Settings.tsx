@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useSettingsStore, FontFamily, CaretStyle } from "@/store/useSettingsStore";
@@ -60,9 +59,9 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen text-foreground">
-      <Header />
+      
 
-      <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
+      <main className="container mx-auto px-3 sm:px-4 pb-12">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 sm:px-0">
             <div>

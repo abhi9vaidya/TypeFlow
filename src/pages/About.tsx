@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { Keyboard, Zap, Target, Users, Trophy, Heart, Github } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 
@@ -25,10 +24,10 @@ const itemVariants: Variants = {
 export default function About() {
     return (
         <div className="min-h-screen bg-background">
-            <Header />
+            
 
             <motion.main
-                className="container mx-auto px-4 pt-24 pb-16 max-w-4xl"
+                className="container mx-auto px-4 pb-16 max-w-4xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"

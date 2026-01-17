@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState, useCallback } from "react";
 import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword } from "lucide-react";
@@ -121,9 +120,9 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      
 
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">

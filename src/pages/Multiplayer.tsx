@@ -1,4 +1,3 @@
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,8 +43,8 @@ export default function Multiplayer() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      
+      <main className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">

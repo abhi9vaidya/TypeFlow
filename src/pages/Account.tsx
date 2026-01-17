@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Header } from "@/components/Header";
 import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -121,9 +120,9 @@ export default function Account() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      
+      <main className="container mx-auto px-4 pb-12">
         <div className="max-w-2xl mx-auto space-y-8 animate-fade-in-up">
           <div className="space-y-2 text-center md:text-left">
             <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>

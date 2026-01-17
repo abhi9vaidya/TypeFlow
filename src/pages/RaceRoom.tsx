@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
 import { useMultiplayerStore, Participant } from "@/store/useMultiplayerStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTypingStore } from "@/store/useTypingStore";
@@ -381,8 +380,8 @@ export default function RaceRoom() {
     // Show cached result even if the live room snapshot is unavailable after a tab switch
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-24 pb-12">
+        
+        <main className="container mx-auto px-4 pb-12">
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="space-y-6 animate-fade-in-up">
               <Card className="bg-panel/40 border-border/50 backdrop-blur-sm overflow-hidden">
@@ -430,9 +429,9 @@ export default function RaceRoom() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      
+      <main className="container mx-auto px-4 pb-12">
         <div className="max-w-5xl mx-auto space-y-8">
           
           {/* Room Header */}

@@ -52,7 +52,7 @@ const AppContent = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col transition-all duration-300",
-      navbarLayout === 'vertical' ? "pl-20" : "pt-16"
+      navbarLayout === 'vertical' ? "pl-20 py-8" : "pt-24 pb-8"
     )}>
       {navbarLayout === 'vertical' ? <Sidebar /> : <Header />}
 

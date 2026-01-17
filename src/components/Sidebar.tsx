@@ -49,62 +49,46 @@ export function Sidebar() {
             </button>
 
             {/* Navigation */}
-            <nav className="flex-1 flex flex-col items-center gap-4 w-full px-2">
+            <nav className="flex-1 flex flex-col items-center gap-3 w-full px-2">
                 <TooltipProvider delayDuration={0}>
                     {[
-                        { path: "/", icon: Home, label: "Home", color: "primary" },
-                        { path: "/statistics", icon: LineChart, label: "Statistics", color: "primary" },
-                        { path: "/leaderboard", icon: Trophy, label: "Leaderboard", color: "yellow-500" },
-                        { path: "/multiplayer", icon: Users, label: "Multiplayer", color: "cyan-500" },
-                        { path: "/history", icon: BarChart3, label: "History", color: "secondary" },
+                        { path: "/", icon: Home, label: "Home" },
+                        { path: "/statistics", icon: LineChart, label: "Statistics" },
+                        { path: "/leaderboard", icon: Trophy, label: "Leaderboard" },
+                        { path: "/multiplayer", icon: Users, label: "Multiplayer" },
+                        { path: "/history", icon: BarChart3, label: "History" },
+                        { path: "/settings", icon: Settings, label: "Settings" },
                     ].map((item) => {
                         const isActive = location.pathname === item.path;
                         return (
                             <Tooltip key={item.path}>
                                 <TooltipTrigger asChild>
-                                    <div className="relative group w-full flex justify-center perspective-1000">
-                                        {isActive && (
-                                            <>
-                                                <motion.div
-                                                    layoutId="sidebar-nav-bg"
-                                                    className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-xl mx-2 border border-primary/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                />
-                                                <motion.div
-                                                    layoutId="sidebar-active-glow"
-                                                    className="absolute -inset-1 bg-primary/20 blur-xl rounded-full opacity-50 z-0"
-                                                />
-                                            </>
-                                        )}
+                                    <div className="relative group w-full flex justify-center">
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => navigate(item.path)}
                                             className={cn(
-                                                "relative h-12 w-12 rounded-xl transition-all duration-300 group z-10 overflow-hidden",
-                                                isActive ? "text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                                "relative h-12 w-12 rounded-xl transition-all duration-200 z-10",
+                                                isActive 
+                                                    ? "text-primary bg-primary/10 shadow-[0_0_15px_rgba(168,85,247,0.15)] border border-primary/20" 
+                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                                             )}
                                         >
                                             <item.icon className={cn(
-                                                "h-6 w-6 transition-all duration-300",
-                                                isActive && "scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]",
-                                                !isActive && "group-hover:scale-110 group-hover:drop-shadow-[0_0_5px_rgba(168,85,247,0.4)]"
+                                                "h-5 w-5 transition-transform duration-200",
+                                                isActive && "text-primary drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] scale-110",
+                                                !isActive && "group-hover:scale-110"
                                             )} />
-
-                                            {/* Shine effect on hover */}
-                                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                                            
+                                            {/* Simple Active Indicator Dot inside the button */}
+                                            {isActive && (
+                                                <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1 h-1 bg-primary rounded-full shadow-[0_0_5px_rgba(168,85,247,0.8)]" /> 
+                                            )}
                                         </Button>
-
-                                        {/* Active Indicator Line */}
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="sidebar-active-indicator"
-                                                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full shadow-[0_0_10px_rgba(168,85,247,0.8)]"
-                                            />
-                                        )}
                                     </div>
                                 </TooltipTrigger>
-                                <TooltipContent side="right" className="z-[60] bg-popover/90 backdrop-blur-md border-border/50 ml-4 px-3 py-1.5 text-xs font-medium shadow-xl animate-in slide-in-from-left-2">
+                                <TooltipContent side="right" className="ml-2 font-medium bg-popover/90 backdrop-blur-md border-border/50">
                                     <p>{item.label}</p>
                                 </TooltipContent>
                             </Tooltip>
@@ -116,29 +100,8 @@ export function Sidebar() {
             {/* Bottom Actions */}
             <div className="flex flex-col items-center gap-4 w-full px-2 mt-auto">
                 <TooltipProvider delayDuration={0}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => navigate("/settings")}
-                                className={cn(
-                                    "h-12 w-12 rounded-xl text-muted-foreground hover:text-accent transition-all duration-300",
-                                    location.pathname === "/settings" && "text-accent bg-accent/10"
-                                )}
-                            >
-                                <Settings className="h-6 w-6 transition-transform duration-300 hover:rotate-90" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="bg-popover/80 backdrop-blur-md border-border/50 ml-2">
-                            <p>Settings</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <div className="w-8 h-px bg-border/50" />
-
                     {isLoading ? (
-                        <div className="h-10 w-10 rounded-full bg-primary/10 animate-pulse border border-primary/20" />
+                        <div className="h-10 w-10 rounded-full bg-primary/10 animate-pulse" />
                     ) : user ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

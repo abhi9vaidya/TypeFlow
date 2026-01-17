@@ -205,7 +205,7 @@ export const useTypingStore = create<TypingState>()(
           correctChars: correct,
           incorrectChars: incorrect,
           extraChars: extra,
-          totalTyped: state.totalTyped + 1,
+          totalTyped: state.totalTyped + 1, // Backspace counts as a keystroke for Raw WPM
         });
       },
       

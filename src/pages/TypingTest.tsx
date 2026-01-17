@@ -417,11 +417,11 @@ export default function TypingTest() {
       <SpeedZone />
       <WordCompletionEffect />
 
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-4 pb-12 flex-1 flex flex-col justify-center min-h-[calc(100vh-6rem)]">
         {!isFinished ? (
           <>
             {!isRunning && (
-              <div className="mb-12 animate-fade-in-down">
+              <div className="mb-8 animate-fade-in-down">
                 <ModeSelector />
               </div>
             )}

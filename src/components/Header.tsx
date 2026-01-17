@@ -1,10 +1,10 @@
 // Build: 20251114
-import { Settings, BarChart3, Keyboard, LineChart, LogIn, LogOut, User, Trophy, Users } from "lucide-react";
+import { Settings, BarChart3, Keyboard, LineChart, LogIn, LogOut, User, Trophy, Users, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AuthModal } from "./AuthModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -25,10 +25,20 @@ export function Header() {
   const { user, profile, signOut, isLoading } = useAuthStore();
   const { isRunning, testMode } = useTypingStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <header className={cn(
-      "fixed top-0 left-0 right-0 z-50 border-b border-border/20 bg-background/70 backdrop-blur-2xl shadow-lg shadow-background/20 transition-all duration-700 ease-in-out",
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out",
+      isScrolled ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-lg shadow-black/5" : "bg-transparent border-b border-transparent",
       isRunning && "opacity-0 hover:opacity-100 focus-within:opacity-100"
     )}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
@@ -50,39 +60,40 @@ export function Header() {
         </button>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-0.5 sm:gap-1 md:gap-2">
+        <nav className="flex items-center gap-1 sm:gap-2">
           {[
-            { path: "/statistics", icon: LineChart, label: "Statistics", color: "primary" },
-            { path: "/leaderboard", icon: Trophy, label: "Leaderboard", color: "yellow-500" },
-            { path: "/multiplayer", icon: Users, label: "Multiplayer", color: "cyan-500" },
-            { path: "/history", icon: BarChart3, label: "History", color: "secondary" },
-            { path: "/settings", icon: Settings, label: "Settings", color: "accent" }
+            { path: "/", icon: Home, label: "Home" },
+            { path: "/statistics", icon: LineChart, label: "Statistics" },
+            { path: "/leaderboard", icon: Trophy, label: "Leaderboard" },
+            { path: "/multiplayer", icon: Users, label: "Multiplayer" },
+            { path: "/history", icon: BarChart3, label: "History" },
+            { path: "/settings", icon: Settings, label: "Settings" }
           ].map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <div key={item.path} className="relative">
-                {isActive && (
-                  <motion.div
-                    layoutId="nav-bg"
-                    className="absolute inset-0 bg-primary/10 rounded-xl"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
+              <div key={item.path} className="relative group">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => navigate(item.path)}
                   className={cn(
-                    "relative h-9 w-9 sm:h-10 sm:w-10 rounded-xl transition-all duration-300 group touch-manipulation z-10",
-                    isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
+                    "relative h-10 w-10 rounded-xl transition-all duration-200 z-10",
+                    isActive 
+                      ? "text-primary bg-primary/10 shadow-[0_0_15px_rgba(168,85,247,0.15)] border border-primary/20" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                   title={item.label}
                 >
                   <item.icon className={cn(
-                    "h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300",
-                    isActive && "scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]",
+                    "h-5 w-5 transition-transform duration-200",
+                    isActive && "text-primary drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] scale-110",
                     !isActive && "group-hover:scale-110"
                   )} />
+                  
+                  {/* Active Indicator Dot (Bottom) */}
+                  {isActive && (
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full shadow-[0_0_5px_rgba(168,85,247,0.8)]" />
+                  )}
                 </Button>
               </div>
             );

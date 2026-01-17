@@ -1,5 +1,4 @@
 // Build: 20251114
-import { Header } from "@/components/Header";
 import { useTypingStore } from "@/store/useTypingStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Trophy, Calendar, Clock, Target, Keyboard } from "lucide-react";
@@ -21,8 +20,8 @@ export default function History() {
   if (history.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 pt-24 pb-12">
+        
+        <main className="container mx-auto px-4 pb-12">
           <div className="text-center max-w-md mx-auto animate-fade-in-up space-y-6">
             <div className="relative mx-auto w-24 h-24 mb-4">
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
@@ -52,9 +51,9 @@ export default function History() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      
+      <main className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8 animate-fade-in-up">
             <h1 className="text-3xl font-bold">Test History</h1>

@@ -51,9 +51,9 @@ export default function Statistics() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      {/* Header handled by App layout */}
 
-      <main className="container mx-auto px-3 sm:px-4 pt-24 pb-12">
+      <main className="container mx-auto px-3 sm:px-4 pb-12">
         <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           {/* Header */}
           <div className="space-y-2 px-2 sm:px-0">
