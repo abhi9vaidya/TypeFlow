@@ -336,13 +336,6 @@ export default function TypingTest() {
 
       if (isFinished) return;
 
-      // Escape to toggle settings
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setIsSettingsOpen(prev => !prev);
-        return;
-      }
-
       // Start test on first keypress and handle the character
       const shouldStartTest = !isRunning && e.key.length === 1 && !e.ctrlKey && !e.metaKey;
       if (shouldStartTest) {

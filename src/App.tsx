@@ -67,11 +67,20 @@ useEffect(() => {
     }
 
     // Everywhere else: ESC toggles quick settings open/closed
-    setIsSettingsOpen((prevOpen) => !prevOpen);
+    setIsSettingsOpen((prevOpen) => {
+      const newState = !prevOpen;
+      // If we are closing, we don't need to do anything special.
+      // If we are opening, we want to prevent other handlers from closing it immediately.
+      if (newState === true) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      return newState;
+    });
   };
 
-  window.addEventListener("keydown", handleGlobalEscape);
-  return () => window.removeEventListener("keydown", handleGlobalEscape);
+  window.addEventListener("keydown", handleGlobalEscape, true); // Use capture phase
+  return () => window.removeEventListener("keydown", handleGlobalEscape, true);
 }, [location.pathname]);
 
   return (
