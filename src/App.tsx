@@ -90,8 +90,12 @@ useEffect(() => {
     )}>
       {navbarLayout === 'vertical' ? <Sidebar /> : <Header />}
 
-      {/* Global Quick Settings Sidebar (real sidebar, not modal) */}
-      <SettingsPanel isOpen={isSettingsOpen && location.pathname !== "/settings"} onClose={() => setIsSettingsOpen(false)} />
+      {/* Global Quick Settings Sidebar */}
+      <AnimatePresence>
+        {isSettingsOpen && location.pathname !== "/settings" && (
+          <SettingsPanel isOpen={true} onClose={() => setIsSettingsOpen(false)} />
+        )}
+      </AnimatePresence>
 
       <main className="flex-1">
         <AnimatePresence mode="wait">

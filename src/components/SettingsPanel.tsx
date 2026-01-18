@@ -9,9 +9,9 @@ import { useEffect } from "react";
 import { applyTheme } from "@/utils/themes";
 import { CustomThemeEditor } from "./CustomThemeEditor";
 import { cn } from "@/lib/utils";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const FONT_CLASSES: Record<FontFamily, string> = {
   "jetbrains": "font-jetbrains",
@@ -83,15 +83,21 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   }, [theme, customColors]);
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => {
-      // When Sheet tries to close (e.g., user presses Escape or clicks overlay),
-      // we call onClose which will update the parent state.
-      // The parent (TypingTest) controls the actual state via setIsSettingsOpen.
-      if (!open) {
-        onClose();
-      }
-    }}>
-      <SheetContent side="right" className="w-full max-w-md bg-gradient-to-b from-background via-background to-muted/30 backdrop-blur-xl border-l border-border/40 shadow-2xl p-0 overflow-hidden">
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+      />
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-gradient-to-b from-background via-background to-muted/30 backdrop-blur-xl border-l border-border/40 shadow-2xl z-[101] overflow-hidden flex flex-col"
+      >
         {/* Header with gradient background */}
         <div className="sticky top-0 z-10 bg-gradient-to-b from-background via-background/95 to-background/80 border-b border-border/30 backdrop-blur-sm px-6 py-6 transition-all duration-300">
           <div className="flex items-center justify-between gap-4">
@@ -128,7 +134,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto h-[calc(100vh-120px)] px-6 py-6 space-y-6">
+        <div className="overflow-y-auto flex-1 px-6 py-6 space-y-6 custom-scrollbar">
           {/* Theme Section */}
           <section className="space-y-4">
             <div className="flex items-center gap-3">
@@ -496,8 +502,8 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
           {/* Bottom padding for scrolling */}
           <div className="h-8" />
         </div>
-      </SheetContent>
-    </Sheet>
+      </motion.div>
+    </>
   );
 }
 
