@@ -1,132 +1,116 @@
-# TypeFlow - Beautiful Typing Speed Test
+# TypeFlow
 
-**Created by**: Abhinav Vaidya
+<div align="center">
+  <h3>Minimal Typing Speed Test with Real-time Metrics & Stunning Visuals</h3>
+  <p>Practice. Improve. Compete. Glow.</p>
 
-A beautiful, minimalist typing speed test application built with modern web technologies. Test and improve your typing speed with real-time metrics, performance graphs, and a stunning dark mode interface.
+  [![CI](https://github.com/abhi9vaidya/TypeFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/abhi9vaidya/TypeFlow/actions/workflows/ci.yml)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
 
-## 🚀 Open Source
+---
 
-TypeFlow is a fully open-source project! We believe in the power of community collaboration. Feel free to explore the code, contribute features, or report issues on our [GitHub Repository](https://github.com/abhi9vaidya/TypeFlow).
+**TypeFlow** is a modern, performance-focused typing speed test application. Built with **React 18**, **TypeScript**, and **Tailwind CSS**, it offers a seamless experience with real-time feedback, detailed analytics, and a highly customizable interface. Whether you're a casual typist or a speed-typing enthusiast, TypeFlow provides the tools you need to reach your peak performance.
 
-## Features
+## ✨ Features
 
-- ⚡ **Real-time Typing Metrics** - WPM, accuracy, and consistency tracking
-- 📊 **Performance Graphs** - Visual representation of your typing performance
-- 🎨 **Multiple Themes** - Beautiful color schemes to choose from
-- ⌨️ **Keyboard Heatmap** - See which keys you use most frequently
-- 🎯 **Multiple Test Modes** - Words, quotes, and zen modes
-- 🔊 **Audio Feedback** - Optional sound effects for key presses
-- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
-- ✨ **Smooth Animations** - GPU-accelerated transitions and effects
+### ⌨️ Core Experience
+- **Real-time Metrics**: Track WPM, accuracy, and consistency as you type.
+- **Multiple Modes**: Switch between Words, Quotes, and a distraction-free Zen mode.
+- **Advanced Caret Styles**: Choose from Line, Block, or Underline to match your preference.
 
-## Getting Started
+### 📊 Analytics & Insights
+- **Performance Graphs**: High-resolution charts showing your speed trends over time.
+- **Keyboard Heatmap**: Visualize which keys are your strongest and which need work.
+- **History Tracking**: Automatically save your best sessions (Supabase integrated).
+- **Personal Bests & Goals**: Set targets and beat your records.
+
+### 🎮 Gamification & Social
+- **Multiplayer Racing**: Compete in real-time with friends in custom race rooms.
+- **Achievements**: Unlock milestones as you progress.
+- **Friends System**: Keep track of your typing buddies.
+- **Leaderboards**: See how you stack up against the community.
+
+### 🎨 Personalization
+- **Theme Editor**: Create and save your custom themes with the built-in editor.
+- **Visual Effects**: Toggle particle effects, glow animations, and progress rings.
+- **Audio Feedback**: Satisfying keypress sounds (optional).
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- [Node.js](https://nodejs.org/) (v18.x or later)
+- [Bun](https://bun.sh/) or `npm` / `yarn` / `pnpm`
 
 ### Installation
 
-```sh
-# Step 1: Clone the repository
-git clone <YOUR_GIT_URL>
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/abhi9vaidya/TypeFlow.git
+   cd typeflow
+   ```
 
-# Step 2: Navigate to the project directory
-cd typeflow
+2. **Install dependencies**
+   ```bash
+   bun install
+   # or
+   npm install
+   ```
 
-# Step 3: Install dependencies
-npm install
+3. **Start development server**
+   ```bash
+   bun run dev
+   # or
+   npm run dev
+   ```
 
-# Step 4: Start the development server
-npm run dev
-```
+4. **Open the App**
+   Navigate to `http://localhost:5173/`
 
-The application will be available at `http://localhost:8080/`
+## 🛠️ Tech Stack
 
-### Building for Production
+- **Frontend**: [React 18](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Framer Motion](https://www.framer.com/motion/)
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/) (Radix UI)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Data Fetching**: [React Query](https://tanstack.com/query/latest)
+- **Backend**: [Supabase](https://supabase.com/) (Auth, Database, Realtime)
+- **Charts**: [Recharts](https://recharts.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-```sh
-npm run build
-```
+## 📂 Project Structure
 
-This generates an optimized production build in the `dist/` directory.
-
-## Technologies Used
-
-- **Frontend Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS with custom animations
-- **UI Components**: shadcn-ui (Radix UI primitives)
-- **State Management**: Zustand
-- **Charts**: Recharts
-- **Icons**: Lucide React
-- **Forms**: React Hook Form
-
-## Project Structure
-
-```
+```text
 src/
-├── components/        # React components
-│   ├── ui/           # shadcn-ui components
-│   ├── Header.tsx
-│   ├── WordStream.tsx
-│   ├── SettingsPanel.tsx
-│   └── ...
-├── pages/            # Page components
-├── store/            # Zustand stores
-├── utils/            # Utility functions
-├── lib/              # Library functions
-└── hooks/            # Custom hooks
+├── components/     # Reusable UI widgets & functional components
+│   └── ui/         # Base shadcn-ui primitives
+├── pages/          # Core views (History, Multiplayer, TypingTest, etc.)
+├── store/          # Zustand state definitions
+├── hooks/          # Custom React hooks (GhostRacing, metrics, etc.)
+├── utils/          # Math, formatting, and constants
+└── lib/            # Third-party integrations (Supabase, utils)
 ```
 
-## How to Edit
+## 🤝 Contributing
 
-### Using Your IDE
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Edit files directly in your preferred code editor:
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-```sh
-npm run dev      # Start development server with hot reload
-npm run build    # Build for production
-npm run lint     # Run ESLint
-```
+## 📜 License
 
-### Edit in GitHub
+Distributed under the MIT License. See `LICENSE` for more information.
 
-- Navigate to the desired file
-- Click the "Edit" button (pencil icon)
-- Make your changes and commit
+## 🌟 Acknowledgments
 
-### Using GitHub Codespaces
+- Inspired by Monkeytype and other typing speed tests.
+- UI components powered by [shadcn/ui](https://ui.shadcn.com/).
+- Icons by [Lucide](https://lucide.dev/).
 
-- Click "Code" (green button) on the repository
-- Select "Codespaces" tab
-- Click "New codespace" to start editing
-
-## Keyboard Shortcuts
-
-- **Esc** - Open/close settings panel
-- **Tab** - Restart the current test
-- **Any key** - Begin typing test
-
-## Customization
-
-### Themes
-
-Choose from multiple pre-built themes including:
-- Purple Glow
-- Cyber Blue
-- Matrix
-- Sunset
-- Fire
-- Dark Mode
-- Custom (create your own)
-
-### Settings
-
-Customize your experience with options for:
-- Sound effects
-- Keyboard heatmap display
-- Visual effects (particle effects, glow, progress rings)
-- Caret style (line, block, underline)
-- Test options (punctuation, numbers)
+---
+<p align="center">Made with ❤️ by Abhinav Vaidya</p>
