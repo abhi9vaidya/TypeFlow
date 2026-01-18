@@ -24,7 +24,7 @@ export function Footer() {
                             <div className="group-hover:scale-110 transition-transform duration-300">
                                 <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain drop-shadow-md" />
                             </div>
-                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            <span className="font-outfit italic tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pr-2">
                                 TypeFlow
                             </span>
                         </div>

@@ -56,7 +56,7 @@ export function Header() {
               className="w-16 h-16 object-contain drop-shadow-lg"
             />
           </div>
-          <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] bg-clip-text text-transparent group-hover:animate-gradient-shift transition-all duration-300">
+          <span className="font-outfit italic tracking-tighter bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] bg-clip-text text-transparent group-hover:animate-gradient-shift transition-all duration-300 pr-2">
             TypeFlow
           </span>
         </button>

@@ -88,6 +88,7 @@ export default {
         'space-mono': ['Space Mono', 'monospace'],
         'vt323': ['VT323', 'monospace'],
         'lexend': ['Lexend', 'sans-serif'],
+        'outfit': ['Outfit', 'sans-serif'],
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1rem' }],
