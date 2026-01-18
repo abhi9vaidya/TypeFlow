@@ -23,7 +23,7 @@ export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut, isLoading } = useAuthStore();
-  const { isRunning, testMode } = useTypingStore();
+  const { isRunning, mode } = useTypingStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 

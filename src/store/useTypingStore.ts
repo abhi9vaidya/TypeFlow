@@ -4,11 +4,11 @@ import { persist } from 'zustand/middleware';
 import { TestResult, LiveSample, CharStats } from '@/utils/metrics';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from './useAuthStore';
+import { generateWords } from '@/utils/words';
 
 interface TypingState {
   // ... existing config and state
   mode: 'time' | 'words' | 'quote' | 'zen';
-  testMode: 'time' | 'words' | 'quote' | 'zen';
   duration: 15 | 30 | 60 | 120;
   wordCount: 10 | 25 | 50 | 100;
   
@@ -41,7 +41,6 @@ interface TypingState {
   
   // Actions
   setMode: (mode: 'time' | 'words' | 'quote' | 'zen') => void;
-  setTestMode: (mode: 'time' | 'words' | 'quote' | 'zen') => void;
   setDuration: (duration: 15 | 30 | 60 | 120) => void;
   setWordCount: (count: 10 | 25 | 50 | 100) => void;
   setWords: (words: string[]) => void;
@@ -63,7 +62,6 @@ export const useTypingStore = create<TypingState>()(
     (set, get) => ({
       // Initial state
       mode: 'time',
-      testMode: 'time',
       duration: 30,
       wordCount: 25,
       isRunning: false,
@@ -88,8 +86,6 @@ export const useTypingStore = create<TypingState>()(
 
       // Actions
       setMode: (mode) => set({ mode }),
-      
-      setTestMode: (testMode) => set({ testMode }),
       
       setDuration: (duration) => set({ duration }),
       
@@ -171,6 +167,18 @@ export const useTypingStore = create<TypingState>()(
           totalTyped: state.totalTyped + 1,
           totalErrors: newTotalErrors,
         });
+
+        // Optimization: Immediate finish check for words/quote mode
+        // This removes the small delay from the 100ms interval in TypingTest.tsx
+        if (state.mode === 'words' || state.mode === 'quote') {
+          const isLastWord = state.currentWordIndex === state.words.length - 1;
+          const isLastChar = state.currentCharIndex + 1 >= word.length;
+          if (isLastWord && isLastChar) {
+            // Test should finish. TypingTest.tsx effect will handle the final stopTest() 
+            // but we can signal it here if needed. 
+            // For now, let the effect handle it to keep logic centralized.
+          }
+        }
       },
       
       deleteChar: () => {
@@ -211,9 +219,21 @@ export const useTypingStore = create<TypingState>()(
       
       nextWord: () => {
         const state = get();
-        if (state.currentWordIndex < state.words.length - 1) {
-          const currentWord = state.words[state.currentWordIndex];
-          const typedWord = state.typedChars[state.currentWordIndex];
+        
+        let words = state.words;
+        let typedChars = state.typedChars;
+
+        // Dynamic loading for endless modes (time, zen)
+        if ((state.mode === 'time' || state.mode === 'zen') && 
+            state.currentWordIndex >= words.length - 10) {
+          const extraWords = generateWords(50);
+          words = [...words, ...extraWords];
+          typedChars = [...typedChars, ...extraWords.map(() => [])];
+        }
+
+        if (state.currentWordIndex < words.length - 1) {
+          const currentWord = words[state.currentWordIndex];
+          const typedWord = typedChars[state.currentWordIndex];
           
           // Calculate missed characters (if word finished early)
           const missedChars = Math.max(0, currentWord.length - typedWord.length);
@@ -227,6 +247,8 @@ export const useTypingStore = create<TypingState>()(
           const newMaxStreak = Math.max(newStreak, state.maxStreak);
           
           set({
+            words,
+            typedChars,
             currentWordIndex: state.currentWordIndex + 1,
             currentCharIndex: 0,
             currentStreak: newStreak,
@@ -382,7 +404,6 @@ export const useTypingStore = create<TypingState>()(
       name: 'typing-storage',
       partialize: (state) => ({
         mode: state.mode,
-        testMode: state.testMode,
         duration: state.duration,
         wordCount: state.wordCount,
         history: state.history,

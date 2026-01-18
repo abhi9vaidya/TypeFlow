@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils";
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
-    const { isRunning, testMode } = useTypingStore();
+    const { isRunning, mode } = useTypingStore();
 
     return (
         <footer className={cn(
             "relative w-full border-t border-border/20 bg-gradient-to-t from-background via-background/95 to-transparent transition-all duration-700 ease-in-out",
-            isRunning && testMode !== "zen" && "opacity-20 hover:opacity-100 grayscale hover:grayscale-0"
+            isRunning && mode !== "zen" && "opacity-20 hover:opacity-100 grayscale hover:grayscale-0"
         )}>
             {/* Subtle glow effect at top */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />

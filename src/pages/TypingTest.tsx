@@ -49,7 +49,6 @@ export default function TypingTest() {
     samples,
     currentResult,
     mode,
-    testMode,
     wordCount,
     setWords,
     startTest,
@@ -77,7 +76,6 @@ export default function TypingTest() {
       samples: state.samples,
       currentResult: state.currentResult,
       mode: state.mode,
-      testMode: state.testMode,
       wordCount: state.wordCount,
       setWords: state.setWords,
       startTest: state.startTest,
@@ -173,19 +171,19 @@ export default function TypingTest() {
       let newWords: string[];
       const wordOptions = { includePunctuation, includeNumbers };
 
-      if (testMode === "quote") {
+      if (mode === "quote") {
         const quote = getRandomQuote();
         newWords = quoteToWords(quote);
-      } else if (testMode === "words") {
+      } else if (mode === "words") {
         newWords = generateWords(wordCount || 25, wordOptions);
-      } else if (testMode === "zen") {
+      } else if (mode === "zen") {
         newWords = generateWords(200, wordOptions);
       } else {
         newWords = generateWords(100, wordOptions);
       }
       setWords(newWords);
     }
-  }, [includePunctuation, includeNumbers, testMode, wordCount, words.length, setWords]);
+  }, [includePunctuation, includeNumbers, mode, wordCount, words.length, setWords]);
 
   // Handle test timer and sampling
   useEffect(() => {
@@ -210,10 +208,10 @@ export default function TypingTest() {
 
       // Check completion conditions
       const shouldFinish =
-        (testMode === "time" && elapsed >= duration) ||
-        (testMode === "words" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
-        (testMode === "quote" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
-        (testMode === "zen" && false); // Zen mode never auto-finishes
+        (mode === "time" && elapsed >= duration) ||
+        (mode === "words" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
+        (mode === "quote" && currentWordIndex >= words.length - 1 && currentCharIndex >= words[words.length - 1]?.length) ||
+        (mode === "zen" && false); // Zen mode never auto-finishes
 
       if (shouldFinish) {
         stopTest();
@@ -238,8 +236,8 @@ export default function TypingTest() {
         const result = {
           id: Date.now().toString(),
           mode,
-          duration: testMode === "time" ? duration : elapsed,
-          wordCount: testMode === "words" ? wordCount : undefined,
+          duration: mode === "time" ? duration : elapsed,
+          wordCount: mode === "words" ? wordCount : undefined,
           timestamp: new Date().toISOString(),
           wpm,
           rawWpm: calculateRawWPM(totalTyped, elapsed),
@@ -303,7 +301,7 @@ export default function TypingTest() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isRunning, startTime, duration, wordCount, correctChars, samples, testMode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, mode, stopTest, totalErrors, totalTyped]);
+  }, [isRunning, startTime, duration, wordCount, correctChars, samples, mode, currentWordIndex, currentCharIndex, words, goals, updateGoalProgress, updateStreak, unlockAchievement, achievements, addSample, extraChars, finishTest, hasAchievement, incorrectChars, stopTest, totalErrors, totalTyped]);
 
   // Keyboard handler
   const handleKeyDown = useCallback(
@@ -320,12 +318,12 @@ export default function TypingTest() {
         setElapsedTime(0);
         const wordOptions = { includePunctuation, includeNumbers };
         let newWords: string[];
-        if (testMode === "quote") {
+        if (mode === "quote") {
           const quote = getRandomQuote();
           newWords = quoteToWords(quote);
-        } else if (testMode === "words") {
+        } else if (mode === "words") {
           newWords = generateWords(wordCount || 25, wordOptions);
-        } else if (testMode === "zen") {
+        } else if (mode === "zen") {
           newWords = generateWords(200, wordOptions);
         } else {
           // time mode
@@ -376,7 +374,7 @@ export default function TypingTest() {
         handleTyping(e.key);
       }
     },
-    [isFinished, currentWordIndex, words, testMode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest]
+    [isFinished, currentWordIndex, words, mode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest]
   );
   // Scroll to top when results page is shown
   useEffect(() => {
@@ -417,7 +415,7 @@ export default function TypingTest() {
               </div>
             )}
 
-            {isRunning && testMode !== "zen" && <LiveMetrics />}
+            {isRunning && mode !== "zen" && <LiveMetrics />}
 
             <div
               className="max-w-5xl mx-auto relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"

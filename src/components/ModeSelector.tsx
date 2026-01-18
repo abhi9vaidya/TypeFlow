@@ -42,11 +42,9 @@ export function ModeSelector() {
     mode,
     duration,
     wordCount,
-    testMode,
     setMode,
     setDuration,
     setWordCount,
-    setTestMode,
     setWords,
     resetTest,
     isRunning
@@ -62,8 +60,6 @@ export function ModeSelector() {
 
     console.log("Mode changing to:", newMode);
 
-    // Set both testMode and mode to keep them in sync
-    setTestMode(newMode);
     setMode(newMode);
 
     const wordOptions = { includePunctuation, includeNumbers };
@@ -119,18 +115,18 @@ export function ModeSelector() {
             className={cn(
               "relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 group touch-manipulation min-h-[44px] overflow-hidden",
               "hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed",
-              testMode === m.id
+              mode === m.id
                 ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30"
                 : "text-muted-foreground hover:text-foreground/90 hover:bg-white/5"
             )}
             style={{ animationDelay: `${index * 0.05}s` }}
           >
-            {testMode === m.id && (
+            {mode === m.id && (
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient-shift opacity-20" />
             )}
             <m.icon className={cn(
               "h-4 w-4 sm:h-5 sm:w-5 transition-all duration-300 relative z-10",
-              testMode === m.id && "drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]"
+              mode === m.id && "drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]"
             )} />
             <span className="hidden sm:inline relative z-10">{m.label}</span>
           </button>
@@ -138,7 +134,7 @@ export function ModeSelector() {
       </div>
 
       {/* Options Selector */}
-      {testMode === "time" && (
+      {mode === "time" && (
         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 glass-premium rounded-2xl shadow-lg shadow-secondary/5 animate-spring-in">
           {timeOptions.map((t) => (
             <button
@@ -162,7 +158,7 @@ export function ModeSelector() {
         </div>
       )}
 
-      {testMode === "words" && (
+      {mode === "words" && (
         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 glass-premium rounded-2xl shadow-lg shadow-secondary/5 animate-spring-in">
           {wordOptions.map((w) => (
             <button

@@ -2,62 +2,65 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TestResult } from "@/utils/metrics";
 import { Trophy, Timer, FileType2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 interface PersonalBestsProps {
   history: TestResult[];
 }
 
 export function PersonalBests({ history }: PersonalBestsProps) {
-  // Helper to find PB for a specific filter
-  const getPB = (filter: (r: TestResult) => boolean) => {
-    const matches = history.filter(filter);
-    if (matches.length === 0) return null;
-    // Sort by WPM descending
-    return matches.sort((a, b) => b.wpm - a.wpm)[0];
-  };
+  const categories = useMemo(() => {
+    // Helper to find PB for a specific filter
+    const getPB = (filter: (r: TestResult) => boolean) => {
+      const matches = history.filter(filter);
+      if (matches.length === 0) return null;
+      // Sort by WPM descending
+      return [...matches].sort((a, b) => b.wpm - a.wpm)[0];
+    };
 
-  const categories = [
-    {
-      label: "Time 15s",
-      icon: Timer,
-      result: getPB(r => r.mode === 'time' && r.duration === 15)
-    },
-    {
-      label: "Time 30s",
-      icon: Timer,
-      result: getPB(r => r.mode === 'time' && r.duration === 30)
-    },
-    {
-      label: "Time 60s",
-      icon: Timer,
-      result: getPB(r => r.mode === 'time' && r.duration === 60)
-    },
-    {
-        label: "Time 120s",
+    return [
+      {
+        label: "Time 15s",
         icon: Timer,
-        result: getPB(r => r.mode === 'time' && r.duration === 120)
-    },
-    {
-      label: "Words 10",
-      icon: FileType2,
-      result: getPB(r => r.mode === 'words' && r.wordCount === 10)
-    },
-    {
-      label: "Words 25",
-      icon: FileType2,
-      result: getPB(r => r.mode === 'words' && r.wordCount === 25)
-    },
-    {
-      label: "Words 50",
-      icon: FileType2,
-      result: getPB(r => r.mode === 'words' && r.wordCount === 50)
-    },
-    {
-      label: "Words 100",
-      icon: FileType2,
-      result: getPB(r => r.mode === 'words' && r.wordCount === 100)
-    },
-  ];
+        result: getPB(r => r.mode === 'time' && r.duration === 15)
+      },
+      {
+        label: "Time 30s",
+        icon: Timer,
+        result: getPB(r => r.mode === 'time' && r.duration === 30)
+      },
+      {
+        label: "Time 60s",
+        icon: Timer,
+        result: getPB(r => r.mode === 'time' && r.duration === 60)
+      },
+      {
+          label: "Time 120s",
+          icon: Timer,
+          result: getPB(r => r.mode === 'time' && r.duration === 120)
+      },
+      {
+        label: "Words 10",
+        icon: FileType2,
+        result: getPB(r => r.mode === 'words' && r.wordCount === 10)
+      },
+      {
+        label: "Words 25",
+        icon: FileType2,
+        result: getPB(r => r.mode === 'words' && r.wordCount === 25)
+      },
+      {
+        label: "Words 50",
+        icon: FileType2,
+        result: getPB(r => r.mode === 'words' && r.wordCount === 50)
+      },
+      {
+        label: "Words 100",
+        icon: FileType2,
+        result: getPB(r => r.mode === 'words' && r.wordCount === 100)
+      },
+    ];
+  }, [history]);
 
   return (
     <Card className="col-span-1 lg:col-span-2 bg-gradient-to-br from-panel/50 to-panel/30 border-border/50">
