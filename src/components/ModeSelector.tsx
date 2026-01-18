@@ -4,7 +4,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
 import { generateWords } from "@/utils/words";
 import { getRandomQuote, quoteToWords } from "@/utils/quotes";
-import { Clock, FileText, Quote, Infinity } from "lucide-react";
+import { Clock, FileText, Quote, Infinity as InfinityIcon } from "lucide-react";
 
 type TestMode = "time" | "words" | "quote" | "zen";
 
@@ -17,7 +17,7 @@ const modes = [
   { id: "time" as TestMode, label: "Time", icon: Clock },
   { id: "words" as TestMode, label: "Words", icon: FileText },
   { id: "quote" as TestMode, label: "Quote", icon: Quote },
-  { id: "zen" as TestMode, label: "Zen", icon: Infinity },
+  { id: "zen" as TestMode, label: "Zen", icon: InfinityIcon },
 ];
 
 const timeModes: ModeOption[] = [
