@@ -273,7 +273,15 @@ export const useTypingStore = create<TypingState>()(
         
         // Check if it's a personal best
         const existingPBs = state.history
-          .filter(r => r.mode === result.mode && r.duration === result.duration)
+          .filter(r => {
+            if (r.mode !== result.mode) return false;
+            // For time mode, compare by same duration (15s, 30s, etc)
+            if (r.mode === 'time') return r.duration === result.duration;
+            // For words mode, compare by same word count (10, 25, 50, 100)
+            if (r.mode === 'words') return r.wordCount === result.wordCount;
+            // For other modes, just compare by mode for now
+            return true;
+          })
           .sort((a, b) => b.wpm - a.wpm);
         
         const isPB = existingPBs.length === 0 || result.wpm > existingPBs[0].wpm;
@@ -299,6 +307,7 @@ export const useTypingStore = create<TypingState>()(
               consistency: finalResult.consistency,
               mode: finalResult.mode,
               duration: finalResult.duration,
+              word_count: finalResult.wordCount,
               chars: finalResult.chars,
               samples: finalResult.samples,
               timestamp: finalResult.timestamp,
@@ -327,6 +336,7 @@ export const useTypingStore = create<TypingState>()(
               id: row.id,
               mode: row.mode,
               duration: row.duration,
+              wordCount: row.word_count,
               timestamp: row.timestamp,
               wpm: row.wpm,
               rawWpm: row.raw_wpm,
