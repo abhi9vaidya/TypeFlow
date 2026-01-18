@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   nickname TEXT UNIQUE,
   avatar_url TEXT,
   bio TEXT,
-  wpm_best INTEGER DEFAULT 0,
+  wpm_best NUMERIC DEFAULT 0,
   tests_completed INTEGER DEFAULT 0,
   last_active TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS public.rooms (
 CREATE TABLE IF NOT EXISTS public.room_participants (
   room_id UUID REFERENCES public.rooms(id) ON DELETE CASCADE,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  progress INTEGER DEFAULT 0,
-  wpm INTEGER DEFAULT 0,
+  progress NUMERIC DEFAULT 0,
+  wpm NUMERIC DEFAULT 0,
   is_ready BOOLEAN DEFAULT FALSE,
   finished_at TIMESTAMPTZ,
   PRIMARY KEY (room_id, user_id)
