@@ -216,9 +216,9 @@ export default function Leaderboard() {
                         <th className="px-6 py-4 text-right text-sm font-semibold">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {isLoading ? (
-                        Array.from({ length: 10 }).map((_, i) => (
+                    {isLoading ? (
+                      <tbody>
+                        {Array.from({ length: 10 }).map((_, i) => (
                           <tr key={i} className="border-b border-primary/5">
                             <td className="px-6 py-4"><Skeleton className="h-6 w-8" /></td>
                             <td className="px-6 py-4"><Skeleton className="h-6 w-32" /></td>
@@ -226,88 +226,90 @@ export default function Leaderboard() {
                             <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-12 ml-auto" /></td>
                             <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-16 ml-auto" /></td>
                             <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-20 ml-auto" /></td>
+                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-12 ml-auto" /></td>
                           </tr>
-                        ))
-                      ) : entries.length > 0 ? (
-                        <motion.tr
-                          style={{ display: "table-row-group" }}
-                          variants={containerVariants}
-                          initial="hidden"
-                          animate="visible"
-                        >
-                          {entries.map((entry, index) => (
-                            <motion.tr
-                              variants={itemVariants}
-                              key={entry.id}
-                              className="border-b border-primary/5 hover:bg-primary/5 transition-colors group"
-                            >
-                              <td className="px-6 py-4">{getRankIcon(index)}</td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <Avatar className="h-8 w-8 border border-primary/10">
-                                    <AvatarImage src={entry.profiles?.avatar_url || ""} />
-                                    <AvatarFallback className="bg-primary/5">
-                                      <User className="h-4 w-4 text-primary" />
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="font-medium">
-                                    {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-right font-bold text-primary italic">
-                                {entry.wpm}
-                              </td>
-                              <td className="px-6 py-4 text-right text-muted-foreground">
-                                {entry.accuracy}%
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                <Badge variant="outline" className="capitalize text-[10px] h-5">
-                                  {entry.mode} {entry.duration}s
-                                </Badge>
-                              </td>
-                              <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
-                                {new Date(entry.timestamp).toLocaleDateString()}
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  {entry.profiles?.id !== user?.id && entry.profiles?.id && (
-                                    <>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8"
-                                        onClick={() => isFollowing(entry.profiles!.id)
-                                          ? unfollowUser(entry.profiles!.id)
-                                          : followUser(entry.profiles!.id)}
-                                        title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
-                                      >
-                                        {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-primary"
-                                        onClick={() => handleChallenge(entry.profiles!.id)}
-                                        title="Challenge"
-                                      >
-                                        <Sword className="h-4 w-4" />
-                                      </Button>
-                                    </>
-                                  )}
-                                </div>
-                              </td>
-                            </motion.tr>
-                          ))}
-                        </motion.tr>
-                      ) : (
+                        ))}
+                      </tbody>
+                    ) : entries.length > 0 ? (
+                      <motion.tbody
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                      >
+                        {entries.map((entry, index) => (
+                          <motion.tr
+                            variants={itemVariants}
+                            key={entry.id}
+                            className="border-b border-primary/5 hover:bg-primary/5 transition-colors group"
+                          >
+                            <td className="px-6 py-4">{getRankIcon(index)}</td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-8 w-8 border border-primary/10">
+                                  <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                                  <AvatarFallback className="bg-primary/5">
+                                    <User className="h-4 w-4 text-primary" />
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium">
+                                  {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right font-bold text-primary italic">
+                              {entry.wpm}
+                            </td>
+                            <td className="px-6 py-4 text-right text-muted-foreground">
+                              {entry.accuracy}%
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <Badge variant="outline" className="capitalize text-[10px] h-5">
+                                {entry.mode} {entry.duration}s
+                              </Badge>
+                            </td>
+                            <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
+                              {new Date(entry.timestamp).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {entry.profiles?.id !== user?.id && entry.profiles?.id && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => isFollowing(entry.profiles!.id)
+                                        ? unfollowUser(entry.profiles!.id)
+                                        : followUser(entry.profiles!.id)}
+                                      title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
+                                    >
+                                      {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-primary"
+                                      onClick={() => handleChallenge(entry.profiles!.id)}
+                                      title="Challenge"
+                                    >
+                                      <Sword className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </motion.tbody>
+                    ) : (
+                      <tbody>
                         <tr>
                           <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                             No records found yet. Be the first to top the leaderboard!
                           </td>
                         </tr>
-                      )}
-                    </tbody>
+                      </tbody>
+                    )}
                   </table>
                 </div>
               </CardContent>
