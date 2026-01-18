@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 import { ResultsCard } from "@/components/ResultsCard";
+import { triggerConfetti } from "@/utils/confetti";
 
 export default function RaceRoom() {
   const { code } = useParams<{ code: string }>();
@@ -201,12 +202,20 @@ export default function RaceRoom() {
     if (me?.progress === 100 && me.finished_at) {
       const stored = loadRaceResult(room.id);
       if (stored) {
+        if (!raceFinished) {
+          triggerConfetti();
+          soundPlayer.playSuccessSound();
+        }
         setRaceFinished(true);
         setFinalWpm(stored.wpm);
         setFinalAccuracy(stored.accuracy);
         setFinishTime(stored.finishTime);
       } else if (me.wpm > 0) {
         // Fallback to participant data if no stored result
+        if (!raceFinished) {
+          triggerConfetti();
+          soundPlayer.playSuccessSound();
+        }
         setRaceFinished(true);
         setFinalWpm(me.wpm);
         setFinalAccuracy(100); // Default accuracy

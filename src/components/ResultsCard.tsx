@@ -61,7 +61,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
 
   const earnedAchievements = checkAchievements(result);
 
-  // Celebrate personal best with confetti and sound
+  // Celebrate personal best with intense confetti and sound
   useEffect(() => {
     if (result.isPB) {
       triggerConfetti();
