@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState, useCallback } from "react";
-import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword } from "lucide-react";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Medal, Crown, Timer, Target, User, UserPlus, UserMinus, Sword, ChevronRight, Activity, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useMultiplayerStore } from "@/store/useMultiplayerStore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface LeaderboardEntry {
   id: string;
@@ -57,8 +58,7 @@ export default function Leaderboard() {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Database join error, falling back to basic query:', error);
-        // Fallback: Fetch results without profiles if join fails
+        console.error('Database join error:', error);
         const { data: simpleData, error: simpleError } = await supabase
           .from('test_results')
           .select('id, wpm, accuracy, mode, duration, timestamp')
@@ -87,236 +87,225 @@ export default function Leaderboard() {
       toast.error("Sign in to challenge others!");
       return;
     }
-    const code = await createRoom(true); // Private room
+    const code = await createRoom(true); 
     if (code) {
       toast.success("Room created! Send the link to your friend.");
       navigate(`/race/${code}`);
     }
   };
 
-  const getRankIcon = (index: number) => {
+  const getRankStyle = (index: number) => {
     switch (index) {
-      case 0: return <Crown className="h-6 w-6 text-yellow-400" />;
-      case 1: return <Medal className="h-6 w-6 text-slate-300" />;
-      case 2: return <Medal className="h-6 w-6 text-amber-600" />;
-      default: return <span className="font-mono text-muted-foreground w-6 text-center">{index + 1}</span>;
+      case 0: return { icon: Crown, color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20", shadow: "shadow-amber-400/20" };
+      case 1: return { icon: Medal, color: "text-slate-300", bg: "bg-slate-300/10", border: "border-slate-300/20", shadow: "shadow-slate-300/20" };
+      case 2: return { icon: Medal, color: "text-amber-600", bg: "bg-amber-600/10", border: "border-amber-600/20", shadow: "shadow-amber-600/20" };
+      default: return null;
     }
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
+    visible: { 
       opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
+      transition: { staggerChildren: 0.05 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 }
+    hidden: { y: 10, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
   };
 
   return (
-    <div>
-      <main className="container mx-auto px-4 pb-12">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
-              Global Leaderboard
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground px-4">
-              See how you stack up against the fastest typists in the world.
-            </p>
+    <div className="min-h-screen pb-20 pt-12">
+      <main className="container mx-auto px-4">
+        <motion.div 
+          className="max-w-6xl mx-auto space-y-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {/* Header Section */}
+          <div className="relative group text-center space-y-4">
+             <div className="inline-flex items-center gap-2">
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-3">
+                  <Trophy className="w-3 h-3 mr-1" /> Global Rankings
+                </Badge>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight uppercase">
+                Hall of Speed
+              </h1>
+              <p className="text-muted-foreground font-medium max-w-xl mx-auto">
+                Witness the upper echelons of mechanical proficiency. 
+                Where every millisecond dictates the hierarchy.
+              </p>
           </div>
 
-          <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-            <div className="flex justify-center mb-6 px-2">
-              <TabsList className="grid w-full max-w-md grid-cols-4 bg-primary/5 border-primary/10">
-                <TabsTrigger value="all" className="text-xs sm:text-sm touch-manipulation">All</TabsTrigger>
-                <TabsTrigger value="time" className="text-xs sm:text-sm touch-manipulation">Time</TabsTrigger>
-                <TabsTrigger value="words" className="text-xs sm:text-sm touch-manipulation">Words</TabsTrigger>
-                <TabsTrigger value="quote" className="text-xs sm:text-sm touch-manipulation">Quote</TabsTrigger>
+          <Tabs defaultValue="all" className="w-full space-y-8" onValueChange={setActiveTab}>
+            <div className="flex justify-center">
+              <TabsList className="bg-panel/10 backdrop-blur-md border border-white/5 p-1 rounded-2xl h-14">
+                {['all', 'time', 'words', 'quote'].map((tab) => (
+                  <TabsTrigger 
+                    key={tab} 
+                    value={tab} 
+                    className="px-8 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    {tab}
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </div>
 
-            <Card className="glass-lg border-primary/20">
+            <Card className="border-white/5 bg-panel/5 backdrop-blur-xl overflow-hidden rounded-3xl shadow-2xl">
               <CardContent className="p-0">
-                {/* Mobile Card Layout */}
-                <div className="block md:hidden">
-                  {isLoading ? (
-                    Array.from({ length: 10 }).map((_, i) => (
-                      <div key={i} className="p-4 border-b border-primary/5">
-                        <Skeleton className="h-20 w-full" />
-                      </div>
-                    ))
-                  ) : entries.length > 0 ? (
-                    <motion.div
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
-                      {entries.map((entry, index) => (
-                        <motion.div
-                          variants={itemVariants}
-                          key={entry.id}
-                          className="p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors"
-                        >
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="flex-shrink-0 w-8">{getRankIcon(index)}</div>
-                            <div className="flex items-center gap-2 flex-1">
-                              <Avatar className="h-8 w-8 border border-primary/10">
-                                <AvatarImage src={entry.profiles?.avatar_url || ""} />
-                                <AvatarFallback className="bg-primary/5">
-                                  <User className="h-4 w-4 text-primary" />
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className="font-medium truncate">
-                                {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">WPM:</span>
-                              <span className="ml-2 font-bold text-primary">{entry.wpm}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Accuracy:</span>
-                              <span className="ml-2">{entry.accuracy}%</span>
-                            </div>
-                            <div className="col-span-2">
-                              <Badge variant="outline" className="capitalize text-[10px] h-5">
-                                {entry.mode} {entry.duration}s
-                              </Badge>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <div className="p-12 text-center text-muted-foreground">
-                      No records found yet. Be the first to top the leaderboard!
-                    </div>
-                  )}
-                </div>
-
-                {/* Desktop Table Layout */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-primary/10 bg-primary/5">
-                        <th className="px-6 py-4 text-left text-sm font-semibold">Rank</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold">Typist</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">WPM</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">Accuracy</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">Mode</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">Date</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold">Actions</th>
+                      <tr className="bg-white/5">
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5">Rank</th>
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5">Typist</th>
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5 text-right">Speed</th>
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5 text-right">Accuracy</th>
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5 text-right">Mode</th>
+                        <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    {isLoading ? (
-                      <tbody>
-                        {Array.from({ length: 10 }).map((_, i) => (
-                          <tr key={i} className="border-b border-primary/5">
-                            <td className="px-6 py-4"><Skeleton className="h-6 w-8" /></td>
-                            <td className="px-6 py-4"><Skeleton className="h-6 w-32" /></td>
-                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-12 ml-auto" /></td>
-                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-12 ml-auto" /></td>
-                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-16 ml-auto" /></td>
-                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-20 ml-auto" /></td>
-                            <td className="px-6 py-4 text-right"><Skeleton className="h-6 w-12 ml-auto" /></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    ) : entries.length > 0 ? (
-                      <motion.tbody
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        {entries.map((entry, index) => (
-                          <motion.tr
-                            variants={itemVariants}
-                            key={entry.id}
-                            className="border-b border-primary/5 hover:bg-primary/5 transition-colors group"
-                          >
-                            <td className="px-6 py-4">{getRankIcon(index)}</td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-8 w-8 border border-primary/10">
-                                  <AvatarImage src={entry.profiles?.avatar_url || ""} />
-                                  <AvatarFallback className="bg-primary/5">
-                                    <User className="h-4 w-4 text-primary" />
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="font-medium">
-                                  {entry.profiles?.nickname || `Typist_${entry.id.slice(0, 4)}`}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-right font-bold text-primary italic">
-                              {entry.wpm}
-                            </td>
-                            <td className="px-6 py-4 text-right text-muted-foreground">
-                              {entry.accuracy}%
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <Badge variant="outline" className="capitalize text-[10px] h-5">
-                                {entry.mode} {entry.duration}s
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-4 text-right text-xs text-muted-foreground font-mono">
-                              {new Date(entry.timestamp).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                {entry.profiles?.id !== user?.id && entry.profiles?.id && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => isFollowing(entry.profiles!.id)
-                                        ? unfollowUser(entry.profiles!.id)
-                                        : followUser(entry.profiles!.id)}
-                                      title={isFollowing(entry.profiles!.id) ? "Unfollow" : "Follow"}
-                                    >
-                                      {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-primary"
-                                      onClick={() => handleChallenge(entry.profiles!.id)}
-                                      title="Challenge"
-                                    >
-                                      <Sword className="h-4 w-4" />
-                                    </Button>
-                                  </>
+                    <AnimatePresence mode="wait">
+                      {isLoading ? (
+                        <tbody>
+                          {Array.from({ length: 10 }).map((_, i) => (
+                            <tr key={i} className="border-b border-white/5">
+                              <td className="px-8 py-6"><Skeleton className="h-8 w-8 rounded-lg bg-white/5" /></td>
+                              <td className="px-8 py-6">
+                                <div className="flex items-center gap-3">
+                                  <Skeleton className="h-10 w-10 rounded-full bg-white/5" />
+                                  <Skeleton className="h-4 w-32 bg-white/5" />
+                                </div>
+                              </td>
+                              <td className="px-8 py-6"><Skeleton className="h-6 w-16 ml-auto bg-white/5" /></td>
+                              <td className="px-8 py-6"><Skeleton className="h-6 w-12 ml-auto bg-white/5" /></td>
+                              <td className="px-8 py-6"><Skeleton className="h-6 w-20 ml-auto bg-white/5" /></td>
+                              <td className="px-8 py-6"><Skeleton className="h-8 w-8 ml-auto bg-white/5 rounded-full" /></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      ) : (
+                        <motion.tbody
+                          key={activeTab}
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                          className="divide-y divide-white/5"
+                        >
+                          {entries.map((entry, index) => {
+                            const rankStyle = getRankStyle(index);
+                            const RankIcon = rankStyle?.icon;
+                            
+                            return (
+                              <motion.tr
+                                key={entry.id}
+                                variants={itemVariants}
+                                className={cn(
+                                  "group hover:bg-white/[0.02] transition-colors relative",
+                                  user?.id === entry.profiles?.id && "bg-primary/[0.03]"
                                 )}
-                              </div>
-                            </td>
-                          </motion.tr>
-                        ))}
-                      </motion.tbody>
-                    ) : (
-                      <tbody>
-                        <tr>
-                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
-                            No records found yet. Be the first to top the leaderboard!
-                          </td>
-                        </tr>
-                      </tbody>
-                    )}
+                              >
+                                <td className="px-8 py-6">
+                                  <div className="flex items-center justify-center w-10 h-10">
+                                    {RankIcon ? (
+                                      <div className={cn("p-2 rounded-xl border relative group-hover:scale-110 transition-transform duration-500", rankStyle.bg, rankStyle.border, rankStyle.shadow)}>
+                                        <RankIcon className={cn("w-5 h-5", rankStyle.color)} />
+                                      </div>
+                                    ) : (
+                                      <span className="font-mono text-sm font-black text-muted-foreground/40">{index + 1}</span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6">
+                                  <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                      <Avatar className="h-11 w-11 border-2 border-white/10 ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+                                        <AvatarImage src={entry.profiles?.avatar_url || ""} />
+                                        <AvatarFallback className="bg-white/5 text-[10px] font-black">
+                                          {entry.profiles?.nickname?.substring(0, 2).toUpperCase() || "TY"}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      {index < 3 && (
+                                        <div className={cn("absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-background", rankStyle?.bg.replace('/10', ''))} />
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col">
+                                      <span className="font-black italic tracking-tight text-foreground">
+                                        {entry.profiles?.nickname || `TYPIST_${entry.id.slice(0, 4)}`}
+                                      </span>
+                                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                                        Joined {new Date(entry.timestamp).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                  <div className="flex flex-col items-end">
+                                    <span className="text-2xl font-black italic tracking-tighter text-primary">
+                                      {entry.wpm}
+                                    </span>
+                                    <span className="text-[10px] font-black uppercase text-primary/60 tracking-widest">WPM</span>
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                  <div className="flex flex-col items-end">
+                                    <span className="text-xl font-black italic tracking-tighter text-foreground">
+                                      {entry.accuracy}%
+                                    </span>
+                                    <div className="w-16 h-1 bg-white/5 rounded-full mt-1 overflow-hidden">
+                                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${entry.accuracy}%` }} />
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                  <Badge variant="outline" className="bg-white/5 border-white/10 rounded-lg px-3 py-1 font-black italic text-[10px] uppercase tracking-widest text-muted-foreground">
+                                    {entry.mode} {entry.duration}
+                                  </Badge>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+                                    {entry.profiles?.id !== user?.id && entry.profiles?.id && (
+                                       <>
+                                       <Button
+                                         variant="ghost"
+                                         size="icon"
+                                         className="h-9 w-9 rounded-xl hover:bg-primary/20 hover:text-primary border border-transparent hover:border-primary/20"
+                                         onClick={() => isFollowing(entry.profiles!.id)
+                                           ? unfollowUser(entry.profiles!.id)
+                                           : followUser(entry.profiles!.id)}
+                                       >
+                                         {isFollowing(entry.profiles!.id) ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                                       </Button>
+                                       <Button
+                                         variant="ghost"
+                                         size="icon"
+                                         className="h-9 w-9 rounded-xl hover:bg-secondary/20 hover:text-secondary border border-transparent hover:border-secondary/20"
+                                         onClick={() => handleChallenge(entry.profiles!.id)}
+                                       >
+                                         <Sword className="h-4 w-4" />
+                                       </Button>
+                                     </>
+                                    )}
+                                  </div>
+                                </td>
+                              </motion.tr>
+                            );
+                          })}
+                        </motion.tbody>
+                      )}
+                    </AnimatePresence>
                   </table>
                 </div>
               </CardContent>
             </Card>
           </Tabs>
-        </div>
-      </main >
-    </div >
+        </motion.div>
+      </main>
+    </div>
   );
 }
+

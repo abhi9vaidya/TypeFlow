@@ -35,7 +35,7 @@ import {
   Clock, 
   Calendar,
   ChevronRight,
-  Sparkles,
+  Flame,
   BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -144,7 +144,7 @@ export default function Statistics() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-3">
-                    <Sparkles className="w-3 h-3 mr-1" /> Performance Dashboard
+                    <Flame className="w-3 h-3 mr-1" /> Performance Dashboard
                   </Badge>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight">

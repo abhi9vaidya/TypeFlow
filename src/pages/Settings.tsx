@@ -9,14 +9,25 @@ import {
   Eye,
   MousePointer2,
   Zap,
-  Check
+  Check,
+  ChevronLeft,
+  Flame,
+  Settings as SettingsIcon,
+  Activity,
+  ShieldCheck,
+  Target,
+  Hash
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const FONTS: { label: string; value: FontFamily }[] = [
   { label: "Modern Mono", value: "jetbrains" },
@@ -57,282 +68,366 @@ export default function Settings() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
-  return (
-    <div className="min-h-screen text-foreground">
-      
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5, staggerChildren: 0.1 }
+    }
+  };
 
-      <main className="container mx-auto px-3 sm:px-4 pb-12">
-        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2 sm:px-0">
-            <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Settings</h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">Configure your typing experience and visual preferences.</p>
+  const itemVariants = {
+    hidden: { opacity: 0, scale: 0.98 },
+    visible: { opacity: 1, scale: 1 }
+  };
+
+  return (
+    <div className="min-h-screen pb-20 pt-12 overflow-hidden">
+      <main className="container mx-auto px-4 relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+
+        <motion.div 
+          className="max-w-5xl mx-auto space-y-12"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate("/")}
+                  className="rounded-full h-8 w-8 p-0 border border-white/5 bg-white/5 hover:bg-white/10 transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-3">
+                  <SettingsIcon className="w-3 h-3 mr-1" /> Core Configuration
+                </Badge>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight uppercase">
+                SETTINGS
+              </h1>
+              <p className="text-muted-foreground font-medium">
+                Calibrate your mechanical interface for peak performance.
+              </p>
             </div>
+
             <Button
               onClick={() => navigate("/")}
-              className="glow-primary self-start touch-manipulation h-10 sm:h-11"
+              className="h-16 px-10 rounded-[1.5rem] bg-primary hover:bg-primary/90 text-primary-foreground font-black italic tracking-widest shadow-xl shadow-primary/20 transition-all"
             >
-              Back to Test
+              SAVE & EXIT [ESC]
             </Button>
           </div>
 
-          <Tabs defaultValue="typing" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 glass-sm mb-6 sm:mb-8">
-              <TabsTrigger value="typing" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
-                <Keyboard className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span>Typing</span>
-              </TabsTrigger>
-              <TabsTrigger value="visuals" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
-                <Palette className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span>Visuals</span>
-              </TabsTrigger>
-              <TabsTrigger value="typography" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
-                <Type className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Typography</span><span className="xs:hidden">Type</span>
-              </TabsTrigger>
-              <TabsTrigger value="sound" className="gap-1.5 sm:gap-2 text-xs sm:text-sm touch-manipulation">
-                <Volume2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span>Sound</span>
-              </TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="typing" className="w-full space-y-10">
+            <div className="flex justify-center md:justify-start overflow-x-auto pb-4 px-4 scrollbar-hide">
+              <TabsList className="bg-panel/10 backdrop-blur-md border border-white/5 p-1.5 rounded-3xl h-16 inline-flex">
+                <TabsTrigger value="typing" className="px-10 rounded-2xl font-black italic uppercase tracking-widest text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 gap-3">
+                  <Keyboard className="w-4 h-4" /> TYPING
+                </TabsTrigger>
+                <TabsTrigger value="visuals" className="px-10 rounded-2xl font-black italic uppercase tracking-widest text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 gap-3">
+                  <Palette className="w-4 h-4" /> VISUALS
+                </TabsTrigger>
+                <TabsTrigger value="typography" className="px-10 rounded-2xl font-black italic uppercase tracking-widest text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 gap-3">
+                  <Type className="w-4 h-4" /> TYPE
+                </TabsTrigger>
+                <TabsTrigger value="sound" className="px-10 rounded-2xl font-black italic uppercase tracking-widest text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 gap-3">
+                  <Volume2 className="w-4 h-4" /> SOUND
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="typing" className="space-y-6">
-              <Card className="glass-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Keyboard className="h-5 w-5 text-primary" />
-                    Input Settings
-                  </CardTitle>
-                  <CardDescription>Adjust how the typing test behaves.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Include Punctuation</Label>
-                      <p className="text-sm text-muted-foreground italic">Add dots, commas, and other symbols.</p>
-                    </div>
-                    <Switch
-                      checked={settings.includePunctuation}
-                      onCheckedChange={settings.setIncludePunctuation}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Include Numbers</Label>
-                      <p className="text-sm text-muted-foreground italic">Test your number row speed.</p>
-                    </div>
-                    <Switch
-                      checked={settings.includeNumbers}
-                      onCheckedChange={settings.setIncludeNumbers}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MousePointer2 className="h-5 w-5 text-secondary" />
-                    Caret Style
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {CARET_STYLES.map((style) => (
-                    <Button
-                      key={style.value}
-                      variant={settings.caretStyle === style.value ? "default" : "outline"}
-                      className={`h-20 flex-col gap-2 ${settings.caretStyle === style.value ? "glow-primary border-primary" : "border-primary/10 hover:border-primary/30"}`}
-                      onClick={() => settings.setCaretStyle(style.value)}
-                    >
-                      <span className="font-semibold">{style.label}</span>
-                      <div className="w-full flex justify-center">
-                        {style.value === 'line' && <div className="h-5 w-0.5 bg-current animate-pulse" />}
-                        {style.value === 'block' && <div className="h-5 w-3 bg-current/50" />}
-                        {style.value === 'underline' && <div className="h-0.5 w-4 bg-current mt-4" />}
-                      </div>
-                    </Button>
-                  ))}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="visuals" className="space-y-6">
-              <Card className="glass-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-primary" />
-                    Visual Effects
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex items-center justify-between">
-                      <Label>Streak Counter</Label>
-                      <Switch
-                        checked={settings.showStreakCounter}
-                        onCheckedChange={settings.setShowStreakCounter}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Speed Zone Color</Label>
-                      <Switch
-                        checked={settings.showSpeedZone}
-                        onCheckedChange={settings.setShowSpeedZone}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Particle Effects</Label>
-                      <Switch
-                        checked={settings.showParticleEffects}
-                        onCheckedChange={settings.setShowParticleEffects}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Keyboard Heatmap</Label>
-                      <Switch
-                        checked={settings.showKeyboardHeatmap}
-                        onCheckedChange={settings.setShowKeyboardHeatmap}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Blur Unused Words</Label>
-                      <Switch
-                        checked={settings.blurUnusedWords}
-                        onCheckedChange={settings.setBlurUnusedWords}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Character Glow</Label>
-                      <Switch
-                        checked={settings.showCharacterGlow}
-                        onCheckedChange={settings.setShowCharacterGlow}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Ghost Racing (PB Replay)</Label>
-                        <p className="text-[10px] text-muted-foreground/60">Race against your personal best</p>
-                      </div>
-                      <Switch
-                        checked={settings.showGhost}
-                        onCheckedChange={settings.setShowGhost}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="typography" className="space-y-6">
-              <Card className="glass-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Type className="h-5 w-5 text-primary" />
-                    Typography settings
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-8">
-                  <div className="space-y-4">
-                    <Label>Font Family</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {FONTS.map((font) => (
-                        <button
-                          key={font.value}
-                          onClick={() => settings.setFontFamily(font.value)}
-                          className={`
-                            p-4 rounded-xl border text-left transition-all duration-200 group
-                            ${settings.fontFamily === font.value
-                              ? "border-primary bg-primary/10 ring-1 ring-primary"
-                              : "border-primary/10 hover:border-primary/40 bg-primary/5"}
-                          `}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                              {font.label}
-                            </span>
-                            {settings.fontFamily === font.value && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
+            <div className="px-4">
+              <AnimatePresence mode="wait">
+                <TabsContent value="typing" className="mt-0 space-y-8 outline-none">
+                  <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Input Config */}
+                    <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
+                      <CardHeader className="p-10 pb-6">
+                        <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                           <Activity className="w-6 h-6 text-primary" /> ENGINE CONFIG
+                        </CardTitle>
+                        <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Behavioral mechanics and session logic</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-10 pt-0 space-y-6 flex-1">
+                        {[
+                          { label: "SMOOTH CARET", desc: "Interpolated cursor movement", value: settings.smoothCaret, setter: settings.setSmoothCaret },
+                          { label: "QUICK RESTART", desc: "Tab to reset session instantly", value: settings.quickRestart, setter: settings.setQuickRestart },
+                          { label: "INDICATE TYPOS", desc: "Visual feedback on error", value: settings.indicateTypos, setter: settings.setIndicateTypos },
+                          { label: "PUNCTUATION", desc: "Include dots and symbols", value: settings.includePunctuation, setter: settings.setIncludePunctuation },
+                          { label: "NUMBERS", desc: "Include digits row", value: settings.includeNumbers, setter: settings.setIncludeNumbers },
+                        ].map((s) => (
+                          <div key={s.label} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-primary/20 transition-all group">
+                            <div className="space-y-1">
+                              <Label className="text-sm font-black italic group-hover:text-primary transition-colors">{s.label}</Label>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{s.desc}</p>
+                            </div>
+                            <Switch checked={s.value} onCheckedChange={s.setter} />
                           </div>
-                          <p className={`text-2xl ${FONT_CLASSES[font.value]} leading-tight`}>
-                            {font.value === 'vt323' ? 'INSERT COIN TO START' :
-                              font.value === 'space-mono' ? 'hello_world.exe' :
-                                font.value === 'lexend' ? 'Focus on the flow.' :
-                                  'The quick brown fox'}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                        ))}
+                      </CardContent>
+                    </Card>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label>Font Size ({settings.fontSize}px)</Label>
-                    </div>
-                    <Slider
-                      value={[settings.fontSize]}
-                      min={16}
-                      max={48}
-                      step={1}
-                      onValueChange={([val]) => settings.setFontSize(val)}
-                      className="py-4"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                    {/* Caret Style Selector */}
+                    <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl">
+                      <CardHeader className="p-10 pb-6">
+                        <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                           <Target className="w-6 h-6 text-secondary" /> OPTICAL BEACON
+                        </CardTitle>
+                        <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Choose your focus indicator</CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-10 pt-0">
+                        <div className="grid grid-cols-1 gap-4">
+                           {CARET_STYLES.map((style) => (
+                              <button
+                                key={style.value}
+                                onClick={() => settings.setCaretStyle(style.value)}
+                                className={cn(
+                                  "relative p-6 rounded-2xl border text-left transition-all duration-300 overflow-hidden group",
+                                  settings.caretStyle === style.value 
+                                    ? "bg-secondary/10 border-secondary ring-1 ring-secondary/30" 
+                                    : "bg-white/[0.02] border-white/5 hover:border-secondary/30"
+                                )}
+                              >
+                                <div className="flex items-center justify-between relative z-10">
+                                  <div className="space-y-1">
+                                    <span className="text-sm font-black italic uppercase tracking-wider">{style.label}</span>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-40">System preset {style.value}</p>
+                                  </div>
+                                  <div className="h-4 w-4 rounded-full border-2 border-secondary/20 flex items-center justify-center p-0.5">
+                                     {settings.caretStyle === style.value && <div className="w-full h-full bg-secondary rounded-full" />}
+                                  </div>
+                                </div>
+                                <div className="absolute top-1/2 right-12 -translate-y-1/2 font-mono text-2xl opacity-20 select-none">
+                                   {style.value === 'line' && '|'}
+                                   {style.value === 'block' && '█'}
+                                   {style.value === 'underline' && '_'}
+                                </div>
+                              </button>
+                           ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </TabsContent>
 
-            <TabsContent value="sound" className="space-y-6">
-              <Card className="glass-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Volume2 className="h-5 w-5 text-primary" />
-                    Audio Feedback
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Key Click Sounds</Label>
-                      <p className="text-sm text-muted-foreground italic">Play mechanical sound on every keypress.</p>
-                    </div>
-                    <Switch
-                      checked={settings.keySoundEnabled}
-                      onCheckedChange={settings.setKeySound}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Error Sound</Label>
-                      <p className="text-sm text-muted-foreground italic">Play a distinctive sound when you make a mistake.</p>
-                    </div>
-                    <Switch
-                      checked={settings.errorSoundEnabled}
-                      onCheckedChange={settings.setErrorSound}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                <TabsContent value="visuals" className="mt-0 space-y-8 outline-none px-1">
+                   <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl">
+                        <CardHeader className="p-10 pb-6">
+                          <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                             <Eye className="w-6 h-6 text-indigo-500" /> OPTICAL PRESETS
+                          </CardTitle>
+                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Interface and background aesthetics</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-10 pt-0 space-y-8">
+                           <div className="space-y-6 bg-white/[0.02] p-8 rounded-2xl border border-white/5">
+                              <div className="flex items-center justify-between">
+                                 <div className="space-y-1">
+                                    <Label className="text-sm font-black italic">INTERFACE OPACITY</Label>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40 italic">Transparency levels</p>
+                                 </div>
+                                 <Badge variant="outline" className="font-mono text-xs font-bold bg-background/50 border-white/5">{Math.round(settings.pageOpacity * 100)}%</Badge>
+                              </div>
+                              <Slider 
+                                value={[settings.pageOpacity]} 
+                                max={1} 
+                                step={0.05} 
+                                onValueChange={([val]) => settings.setPageOpacity(val)}
+                              />
+                           </div>
+
+                           <div className="grid grid-cols-1 gap-4">
+                              {[
+                                { label: "AMBIENT AURA", desc: "Responsive background glow", value: settings.backgroundGlow, setter: settings.setBackgroundGlow },
+                                { label: "DYNAMIC HEADER", desc: "Hide navbar during focus", value: settings.hideNavbarWhileTyping, setter: settings.setHideNavbarWhileTyping },
+                                { label: "STREAK COUNTER", desc: "Precision combo meter", value: settings.showStreakCounter, setter: settings.setShowStreakCounter },
+                                { label: "SPEED ZONE", desc: "Dynamic color mapping", value: settings.showSpeedZone, setter: settings.setShowSpeedZone },
+                              ].map((v) => (
+                                <div key={v.label} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-indigo-500/20 transition-all group">
+                                  <div className="space-y-1">
+                                    <Label className="text-sm font-black italic group-hover:text-indigo-500 transition-colors uppercase">{v.label}</Label>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{v.desc}</p>
+                                  </div>
+                                  <Switch checked={v.value} onCheckedChange={v.setter} />
+                                </div>
+                              ))}
+                           </div>
+                        </CardContent>
+                     </Card>
+
+                     <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
+                        <CardHeader className="p-10 pb-6">
+                           <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                              <Flame className="w-6 h-6 text-rose-500" /> FX PROTOCOLS
+                           </CardTitle>
+                           <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Deep immersion toggles</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-10 pt-0 space-y-6 flex-1">
+                           {[
+                              { label: "PARTICLES", desc: "Kinetic typing debris", value: settings.showParticleEffects, setter: settings.setShowParticleEffects },
+                              { label: "HEATMAP", desc: "Keyboard usage overlay", value: settings.showKeyboardHeatmap, setter: settings.setShowKeyboardHeatmap },
+                              { label: "WORD BLUR", desc: "Focus non-active text", value: settings.blurUnusedWords, setter: settings.setBlurUnusedWords },
+                              { label: "GLOW KEYS", desc: "Per-char illumination", value: settings.showCharacterGlow, setter: settings.setShowCharacterGlow },
+                              { label: "GHOSTING", desc: "Race against PB replay", value: settings.showGhost, setter: settings.setShowGhost },
+                           ].map((v) => (
+                            <div key={v.label} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-rose-500/20 transition-all group">
+                              <div className="space-y-1">
+                                <Label className="text-sm font-black italic group-hover:text-rose-500 transition-colors uppercase">{v.label}</Label>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{v.desc}</p>
+                              </div>
+                              <Switch checked={v.value} onCheckedChange={v.setter} />
+                            </div>
+                           ))}
+                        </CardContent>
+                     </Card>
+                   </motion.div>
+                </TabsContent>
+
+                <TabsContent value="typography" className="mt-0 space-y-8 outline-none">
+                  <motion.div variants={itemVariants}>
+                    <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl">
+                       <CardHeader className="p-10 pb-6">
+                          <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                             <Type className="w-6 h-6 text-emerald-500" /> TYPOGRAPHY ENGINE
+                          </CardTitle>
+                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Glyph geometry and readability</CardDescription>
+                       </CardHeader>
+                       <CardContent className="p-10 pt-0 space-y-12">
+                          <div className="space-y-6">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Font Family Ecosystem</Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {FONTS.map((font) => (
+                                <button
+                                  key={font.value}
+                                  onClick={() => settings.setFontFamily(font.value)}
+                                  className={cn(
+                                    "p-6 rounded-2xl border text-left transition-all duration-300 group relative overflow-hidden",
+                                    settings.fontFamily === font.value
+                                      ? "bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/5"
+                                      : "bg-white/[0.02] border-white/5 hover:border-emerald-500/30"
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between mb-4 relative z-10">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
+                                      {font.label}
+                                    </span>
+                                    {settings.fontFamily === font.value && (
+                                      <div className="bg-emerald-500 p-1 rounded-full"><Check className="h-2.5 w-2.5 text-white" /></div>
+                                    )}
+                                  </div>
+                                  <p className={cn("text-2xl tracking-tight leading-none truncate relative z-10", FONT_CLASSES[font.value])}>
+                                    {font.value === 'vt323' ? 'INSERT COIN' : 'Typeflow Pro'}
+                                  </p>
+                                  <div className="absolute -bottom-4 -right-1 opacity-5 transition-transform group-hover:scale-125 duration-700">
+                                     <Type className="w-24 h-24" />
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-8 bg-white/[0.02] p-8 rounded-[2rem] border border-white/5">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <Label className="text-sm font-black italic">GLYPH SCALE ({settings.fontSize}px)</Label>
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40 italic">Global text dimensions</p>
+                              </div>
+                              <Badge variant="outline" className="font-mono text-xs font-bold bg-background/50 border-white/5 px-4">{settings.fontSize}px</Badge>
+                            </div>
+                            <Slider
+                              value={[settings.fontSize]}
+                              min={16}
+                              max={48}
+                              step={1}
+                              onValueChange={([val]) => settings.setFontSize(val)}
+                              className="py-2"
+                            />
+                            <div className="flex justify-between items-center px-1">
+                               <span className="text-[10px] font-black text-muted-foreground/40">16PX</span>
+                               <span className="text-[10px] font-black text-muted-foreground/40 text-center italic">DYNAMIC SCALING ACTIVE</span>
+                               <span className="text-[10px] font-black text-muted-foreground/40">48PX</span>
+                            </div>
+                          </div>
+                       </CardContent>
+                    </Card>
+                  </motion.div>
+                </TabsContent>
+
+                <TabsContent value="sound" className="mt-0 space-y-8 outline-none">
+                  <motion.div variants={itemVariants}>
+                    <Card className="border-white/5 bg-panel/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl">
+                       <CardHeader className="p-10 pb-6">
+                          <CardTitle className="text-2xl font-black italic flex items-center gap-3">
+                             <Volume2 className="w-6 h-6 text-amber-500" /> AUDIO FEEDBACK
+                          </CardTitle>
+                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-50">Haptic and auditory response systems</CardDescription>
+                       </CardHeader>
+                       <CardContent className="p-10 pt-0 space-y-6">
+                          {[
+                            { label: "KEY CLICK SOUNDS", desc: "Mechanical audio replication", value: settings.keySoundEnabled, setter: settings.setKeySound, icon: Zap },
+                            { label: "ERROR NOTIFIER", desc: "Auditory alert on missed strikes", value: settings.errorSoundEnabled, setter: settings.setErrorSound, icon: Activity },
+                          ].map((a) => (
+                             <div key={a.label} className="flex items-center justify-between p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-amber-500/20 transition-all group">
+                                <div className="flex items-center gap-6">
+                                   <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform">
+                                      <a.icon className="w-6 h-6 text-amber-500" />
+                                   </div>
+                                   <div className="space-y-1">
+                                      <Label className="text-base font-black italic group-hover:text-amber-500 transition-colors">{a.label}</Label>
+                                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{a.desc}</p>
+                                   </div>
+                                </div>
+                                <Switch checked={a.value} onCheckedChange={a.setter} />
+                             </div>
+                          ))}
+                       </CardContent>
+                       <CardFooter className="p-10 bg-white/[0.02] border-t border-white/5">
+                          <div className="flex items-center gap-4 w-full">
+                             <div className="bg-amber-500/20 p-3 rounded-xl border border-amber-500/30">
+                                <ShieldCheck className="w-5 h-5 text-amber-500" />
+                             </div>
+                             <p className="text-[10px] font-bold text-muted-foreground/60 leading-relaxed max-w-lg italic">
+                               Audio output is processed locally. For optimal experience, use headphones to monitor the mechanical resonance and timing intervals.
+                             </p>
+                          </div>
+                       </CardFooter>
+                    </Card>
+                  </motion.div>
+                </TabsContent>
+              </AnimatePresence>
+            </div>
           </Tabs>
 
-          <div className="p-6 rounded-2xl bg-panel/40 border border-primary/10">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 uppercase tracking-wide text-primary/80">
-              <Zap className="h-4 w-4" />
-              Keyboard Shortcuts
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-primary/5">
-                <span className="text-sm text-muted-foreground">Restart test</span>
-                <kbd className="px-2 py-1 rounded bg-muted border border-border/50 font-mono text-xs">Tab</kbd>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-primary/5">
-                <span className="text-sm text-muted-foreground">Main Menu</span>
-                <kbd className="px-2 py-1 rounded bg-muted border border-border/50 font-mono text-xs">Esc</kbd>
-              </div>
-            </div>
-          </div>
-        </div>
+          {/* Shortcuts Overlay */}
+          <motion.div variants={itemVariants} className="px-4">
+             <div className="p-10 rounded-[2.5rem] bg-panel/20 backdrop-blur-3xl border border-white/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <Zap className="w-32 h-32" />
+                </div>
+                <h3 className="text-xl font-black italic mb-8 flex items-center gap-3 uppercase tracking-tighter">
+                  <Zap className="h-6 w-6 text-primary animate-pulse" />
+                  KEYBOARD SHORTCUTS
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                  <div className="flex items-center justify-between p-5 rounded-2xl bg-black/40 border border-white/5 group-hover:border-primary/20 transition-all">
+                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground italic">Rapid Restart</span>
+                    <kbd className="px-4 py-1.5 rounded-xl bg-primary text-primary-foreground font-black text-xs shadow-lg shadow-primary/30">TAB</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-5 rounded-2xl bg-black/40 border border-white/5 group-hover:border-primary/20 transition-all">
+                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground italic">Main Navigation</span>
+                    <kbd className="px-4 py-1.5 rounded-xl bg-white/10 text-foreground font-black text-xs">ESC</kbd>
+                  </div>
+                </div>
+             </div>
+          </motion.div>
+        </motion.div>
       </main>
     </div>
   );

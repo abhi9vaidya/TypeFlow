@@ -65,12 +65,26 @@ interface SettingsState {
   // Caret
   caretStyle: CaretStyle;
   setCaretStyle: (style: CaretStyle) => void;
+  smoothCaret: boolean;
+  setSmoothCaret: (show: boolean) => void;
 
   // Typography
   fontFamily: FontFamily;
   setFontFamily: (font: FontFamily) => void;
   fontSize: number;
   setFontSize: (size: number) => void;
+
+  // Extra UX
+  quickRestart: boolean;
+  setQuickRestart: (show: boolean) => void;
+  indicateTypos: boolean;
+  setIndicateTypos: (show: boolean) => void;
+  pageOpacity: number;
+  setPageOpacity: (opacity: number) => void;
+  backgroundGlow: boolean;
+  setBackgroundGlow: (show: boolean) => void;
+  hideNavbarWhileTyping: boolean;
+  setHideNavbarWhileTyping: (show: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -126,12 +140,26 @@ export const useSettingsStore = create<SettingsState>()(
       // Caret
       caretStyle: "line",
       setCaretStyle: (style) => set({ caretStyle: style }),
+      smoothCaret: true,
+      setSmoothCaret: (show) => set({ smoothCaret: show }),
 
       // Typography
       fontFamily: "jetbrains",
       setFontFamily: (font) => set({ fontFamily: font }),
-      fontSize: 24,
+      fontSize: 18,
       setFontSize: (size) => set({ fontSize: size }),
+
+      // Extra UX
+      quickRestart: true,
+      setQuickRestart: (show) => set({ quickRestart: show }),
+      indicateTypos: true,
+      setIndicateTypos: (show) => set({ indicateTypos: show }),
+      pageOpacity: 1.0,
+      setPageOpacity: (opacity) => set({ pageOpacity: opacity }),
+      backgroundGlow: true,
+      setBackgroundGlow: (show) => set({ backgroundGlow: show }),
+      hideNavbarWhileTyping: false,
+      setHideNavbarWhileTyping: (show) => set({ hideNavbarWhileTyping: show }),
     }),
     {
       name: "typeflow-settings",

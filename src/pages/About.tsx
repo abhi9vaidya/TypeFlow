@@ -1,5 +1,7 @@
-import { Keyboard, Zap, Target, Users, Trophy, Heart, Github } from "lucide-react";
+import { Keyboard, Zap, Target, Users, Trophy, Heart, Github, Flame, ShieldCheck, Sword, MessageSquare, Cpu, Rocket } from "lucide-react";
 import { motion, Variants } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -23,109 +25,167 @@ const itemVariants: Variants = {
 
 export default function About() {
     return (
-        <div>
+        <div className="min-h-screen pt-12 pb-20 relative overflow-hidden">
+             {/* Background Decoration */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+
             <motion.main
-                className="container mx-auto px-4 pb-16 max-w-4xl"
+                className="container mx-auto px-4 max-w-5xl space-y-20"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 {/* Hero Section */}
-                <motion.div variants={itemVariants} className="text-center mb-16">
-                    <div className="inline-flex items-center justify-center p-4 mb-6 hover:scale-110 transition-transform duration-300">
+                <motion.div variants={itemVariants} className="text-center space-y-8">
+                    <div className="relative inline-block group">
+                        <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <img
                             src="/logo.png"
                             alt="TypeFlow Logo"
-                            className="h-40 w-40 object-contain drop-shadow-xl"
+                            className="h-48 w-48 object-contain drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-105"
                         />
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black mb-4">
-                        <span className="text-gradient">About TypeFlow</span>
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        The modern typing speed test designed to help you improve your typing skills with style.
-                    </p>
+                    
+                    <div className="space-y-4">
+                        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-4 text-xs font-black uppercase tracking-[0.2em] italic">
+                            System Manifest v1.0
+                        </Badge>
+                        <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none">
+                            TYPEFLOW<br/>NEXUS
+                        </h1>
+                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium italic">
+                            The ultimate mechanical interface for the modern typist. 
+                            Engineered for precision, designed for dominance.
+                        </p>
+                    </div>
                 </motion.div>
 
                 {/* Features Grid */}
-                <motion.div variants={containerVariants} className="grid md:grid-cols-2 gap-6 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <FeatureCard
-                        icon={<Zap className="h-6 w-6" />}
-                        title="Real-time Metrics"
-                        description="Track your WPM, accuracy, and consistency as you type with beautiful visualizations."
+                        icon={<Zap className="h-6 w-6 text-yellow-500" />}
+                        title="KINETIC FEEDBACK"
+                        description="Experience real-time telemetry with 0ms latency. Every keystroke is calculated for peak accuracy."
+                        badge="Real-time"
                     />
                     <FeatureCard
-                        icon={<Target className="h-6 w-6" />}
-                        title="Multiple Modes"
-                        description="Choose from timed tests, word counts, quotes, or zen mode for endless practice."
+                        icon={<Rocket className="h-6 w-6 text-blue-500" />}
+                        title="HYPER MODES"
+                        description="From zen-like focus to high-intensity word counts. We provide the arena; you provide the speed."
+                        badge="Versatile"
                     />
                     <FeatureCard
-                        icon={<Users className="h-6 w-6" />}
-                        title="Multiplayer Races"
-                        description="Challenge friends to real-time typing races and see who's the fastest."
+                        icon={<Sword className="h-6 w-6 text-red-500" />}
+                        title="GLADIATOR ARENA"
+                        description="Enter synchronous multiplayer combat. Challenge the world's fastest in the Hall of Speed."
+                        badge="Multiplayer"
                     />
                     <FeatureCard
-                        icon={<Trophy className="h-6 w-6" />}
-                        title="Achievements & Stats"
-                        description="Earn achievements, track your progress, and climb the global leaderboard."
+                        icon={<Cpu className="h-6 w-6 text-emerald-500" />}
+                        title="NEURAL ANALYTICS"
+                        description="Deep dive into your metrics. Identify weak links and master your typing consistency."
+                        badge="Advanced"
                     />
-                </motion.div>
+                    <FeatureCard
+                        icon={<Flame className="h-6 w-6 text-purple-500" />}
+                        title="AURA CUSTOMS"
+                        description="Full interface customization. Ambient glows, motion blurred text, and custom typography."
+                        badge="Premium"
+                    />
+                    <FeatureCard
+                        icon={<ShieldCheck className="h-6 w-6 text-orange-500" />}
+                        title="ENCRYPTED HISTORY"
+                        description="Every session is logged and searchable. Watch your evolution from novice to legend."
+                        badge="Secure"
+                    />
+                </div>
 
                 {/* Mission Section */}
-                <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16">
-                    <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        TypeFlow was created with one goal in mind: to make typing practice enjoyable and effective.
-                        We believe that with the right tools and motivation, anyone can become a faster, more accurate typist.
-                        Our platform combines beautiful design with powerful features to create the ultimate typing experience.
-                    </p>
+                <motion.div variants={itemVariants} className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition-opacity" />
+                    <div className="relative bg-panel/20 backdrop-blur-3xl rounded-[3rem] p-12 md:p-16 border border-white/5 overflow-hidden">
+                        <div className="absolute top-0 right-0 p-12 opacity-5 italic font-black text-9xl pointer-events-none select-none">MISSION</div>
+                        <div className="max-w-3xl space-y-6 relative z-10">
+                            <h2 className="text-4xl font-black italic uppercase tracking-tighter">OUR OVERRIDING MISSION</h2>
+                            <p className="text-xl text-muted-foreground leading-relaxed italic font-medium">
+                                TypeFlow was forged in the fires of frustration with static, boring typing tests. 
+                                We set out to create an ecosystem that doesn't just measure speed, but celebrates it. 
+                                We believe that typing is an art form—a direct bridge between thought and digital reality. 
+                                Our mission is to make that bridge as frictionless and beautiful as possible.
+                            </p>
+                            <div className="flex items-center gap-4 pt-4">
+                                <div className="h-1 w-20 bg-primary" />
+                                <span className="text-xs font-black uppercase tracking-widest text-primary italic">Est. 2024 / TypeFlow Global</span>
+                            </div>
+                        </div>
+                    </div>
                 </motion.div>
 
                 {/* Open Source Section */}
-                <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-8 md:p-12 text-center mb-16 border border-primary/20 bg-primary/5">
-                    <h2 className="text-2xl font-bold mb-4 flex items-center justify-center gap-3">
-                        <Github className="h-6 w-6" />
-                        <span>Proudly Open Source</span>
-                    </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-6">
-                        TypeFlow is open source and community-driven. We believe in transparency and collaboration.
-                        You can view our source code, contribute features, or report issues on GitHub.
-                    </p>
-                    <a
-                        href="https://github.com/abhi9vaidya/TypeFlow"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
-                    >
-                        <Github className="h-5 w-5" />
-                        <span>Star on GitHub</span>
-                    </a>
+                <motion.div variants={itemVariants} className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-12 text-center space-y-8 shadow-2xl">
+                    <div className="flex justify-center">
+                        <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                            <Github className="h-8 w-8" />
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <h2 className="text-3xl font-black italic uppercase tracking-tighter">DECENTRALIZED ARCHITECTURE</h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed italic font-medium">
+                            TypeFlow is, and will always be, fully open source. We believe the tools for personal 
+                            growth should be available to everyone. Forge your own path, contribute to the core, 
+                            or audit our logic on GitHub.
+                        </p>
+                    </div>
+                    <div className="pt-4 flex flex-col md:flex-row items-center justify-center gap-6">
+                        <a
+                            href="https://github.com/abhi9vaidya/TypeFlow"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-foreground text-background font-black italic uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5 border border-white/10"
+                        >
+                            <Github className="h-5 w-5" />
+                            <span>SOURCE CODE</span>
+                        </a>
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-40">
+                            MIT LICENSE / REPO: ABHI9VAIDYA/TYPEFLOW
+                        </div>
+                    </div>
                 </motion.div>
 
-                {/* Creator Section */}
-                <motion.div variants={itemVariants} className="text-center">
-                    <p className="flex items-center justify-center gap-2 text-muted-foreground">
-                        Made with <Heart className="h-4 w-4 text-red-500" /> by
-                        <span className="font-semibold text-foreground">Abhinav Vaidya</span>
+                <footer className="pt-20 text-center opacity-30 flex flex-col items-center gap-4">
+                    <Heart className="h-5 w-5 fill-primary text-primary animate-pulse" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em]">
+                        Handcrafted for speed / Built with passion
                     </p>
-                </motion.div>
+                </footer>
             </motion.main>
         </div>
     );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function FeatureCard({ icon, title, description, badge }: { icon: React.ReactNode; title: string; description: string; badge: string }) {
     return (
-        <motion.div variants={itemVariants} className="glass-premium rounded-2xl p-6 card-hover-lift">
-            <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 text-primary">
-                    {icon}
-                </div>
-                <div>
-                    <h3 className="font-bold text-lg mb-2">{title}</h3>
-                    <p className="text-muted-foreground text-sm">{description}</p>
-                </div>
-            </div>
+        <motion.div variants={itemVariants} className="group">
+            <Card className="h-full bg-panel/10 backdrop-blur-xl border-white/5 rounded-[2rem] overflow-hidden group-hover:border-primary/20 transition-all duration-500 shadow-2xl flex flex-col">
+                <CardHeader className="p-8 pb-4">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:bg-primary/5 transition-transform">
+                            {icon}
+                        </div>
+                        <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest bg-background/50 border-white/5 opacity-40 group-hover:opacity-100 group-hover:border-primary/20 transition-all">
+                            {badge}
+                        </Badge>
+                    </div>
+                    <CardTitle className="text-xl font-black italic uppercase tracking-tight group-hover:text-primary transition-colors">
+                        {title}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-0 flex-1">
+                    <p className="text-sm text-muted-foreground leading-relaxed italic font-medium opacity-70 group-hover:opacity-100 transition-opacity">
+                        {description}
+                    </p>
+                </CardContent>
+            </Card>
         </motion.div>
     );
 }

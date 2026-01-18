@@ -65,7 +65,7 @@ export function StreakCounter() {
       border: "border-amber-400/60",
       bg: "bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-amber-600/20",
       text: "text-amber-300",
-      icon: Star,
+      icon: Zap,
       pulse: true,
     },
     blazing: {

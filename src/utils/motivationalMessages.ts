@@ -10,11 +10,11 @@ export const motivationalMessages: MotivationalMessage = {
   accuracy: "⚡ Peak focus engaged",
   general: [
     "🧠 Smooth fingers today",
-    "💫 You hit a flow state",
-    "✨ Keep the rhythm going",
+    "⚡ You hit a flow state",
+    "🔥 Keep the rhythm going",
     "🎯 Precision typing",
     "⚡ Lightning fast",
-    "🌟 You're on fire"
+    "🧨 You're on fire"
   ]
 };
 

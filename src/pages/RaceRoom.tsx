@@ -11,11 +11,13 @@ import { WordStream } from "@/components/WordStream";
 import { LiveMetrics } from "@/components/LiveMetrics";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Play, Copy, Check, LogOut, Loader2, Users } from "lucide-react";
+import { Play, Copy, Check, LogOut, Loader2, Users, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateWPM, calculateAccuracy } from "@/utils/metrics";
 import { soundPlayer } from "@/utils/sounds";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 import { ResultsCard } from "@/components/ResultsCard";
 
@@ -377,36 +379,51 @@ export default function RaceRoom() {
   };
 
   if (!room && raceFinished && storedResult) {
-    // Show cached result even if the live room snapshot is unavailable after a tab switch
     return (
-      <div className="min-h-screen bg-background">
-        
-        <main className="container mx-auto px-4 pb-12">
+      <div className="min-h-screen pt-12 pb-20 relative overflow-hidden bg-background">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+        <main className="container mx-auto px-4 relative">
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="space-y-6 animate-fade-in-up">
-              <Card className="bg-panel/40 border-border/50 backdrop-blur-sm overflow-hidden">
-                <div className="bg-gradient-to-r from-primary/20 to-transparent p-6 border-b border-border/30">
-                  <h2 className="text-2xl font-bold flex items-center gap-2">🏁 Race Complete!</h2>
-                  <p className="text-muted-foreground mt-1">Your time: {storedResult.finishTime.toFixed(1)}s</p>
+              <Card className="bg-panel/10 backdrop-blur-xl border-white/5 overflow-hidden rounded-[2.5rem] shadow-2xl">
+                <div className="bg-gradient-to-r from-primary/10 via-transparent to-transparent p-10 border-b border-white/5">
+                  <Badge variant="outline" className="mb-4 bg-primary/5 text-primary border-primary/20 font-black italic uppercase tracking-widest py-1 px-3">RECORDED DATA</Badge>
+                  <h2 className="text-4xl font-black italic uppercase tracking-tighter flex items-center gap-4">
+                    🏁 MISSION COMPLETE
+                  </h2>
+                  <p className="text-muted-foreground mt-4 italic font-medium font-mono text-sm uppercase tracking-widest opacity-50">
+                    Velocity Log: {storedResult.finishTime.toFixed(1)} SECONDS
+                  </p>
                 </div>
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-2 gap-6 mb-8">
-                    <div className="text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
-                      <div className="text-4xl font-bold text-primary">{storedResult.wpm}</div>
-                      <div className="text-sm text-muted-foreground uppercase tracking-wider">WPM</div>
+                <CardContent className="p-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative bg-black/40 p-8 rounded-[2rem] border border-white/5 text-center">
+                        <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2 italic">AVERAGE VELOCITY</div>
+                        <div className="text-6xl font-black italic tracking-tighter text-primary">{storedResult.wpm}</div>
+                        <div className="text-xs font-black uppercase tracking-widest opacity-40 mt-1">WORDS PER MINUTE</div>
+                      </div>
                     </div>
-                    <div className="text-center p-4 rounded-lg bg-success/10 border border-success/20">
-                      <div className="text-4xl font-bold text-success">{storedResult.accuracy}%</div>
-                      <div className="text-sm text-muted-foreground uppercase tracking-wider">Accuracy</div>
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-transparent blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative bg-black/40 p-8 rounded-[2rem] border border-white/5 text-center">
+                        <div className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2 italic">PRECISION RATING</div>
+                        <div className="text-6xl font-black italic tracking-tighter text-emerald-500">{storedResult.accuracy}%</div>
+                        <div className="text-xs font-black uppercase tracking-widest opacity-40 mt-1">PERCENT ACCURATE</div>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-muted-foreground text-sm">Live room data is unavailable; showing your saved result.</p>
+                  <p className="text-muted-foreground text-center font-black italic uppercase tracking-widest text-[10px] opacity-40">Live server link severed. Displaying localized cache.</p>
                 </CardContent>
               </Card>
-              <div className="flex justify-center">
-                <Button variant="outline" onClick={() => navigate("/multiplayer")} className="gap-2">
-                  <LogOut className="w-4 h-4" />
-                  Back to Lobby
+              <div className="flex justify-center pt-4">
+                <Button 
+                    onClick={() => navigate("/multiplayer")}
+                    className="h-14 px-12 rounded-2xl bg-white/5 border border-white/10 font-black italic uppercase tracking-widest text-xs hover:bg-white/10 transition-all text-muted-foreground"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  RETURN TO BASE
                 </Button>
               </div>
             </div>
@@ -418,8 +435,9 @@ export default function RaceRoom() {
 
   if (!room) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+        <p className="font-black italic uppercase tracking-widest text-xs text-muted-foreground animate-pulse">Establishing Secure Uplink...</p>
       </div>
     );
   }
@@ -428,170 +446,232 @@ export default function RaceRoom() {
   const everyoneReady = participants.length > 0 && participants.every(p => p.is_ready);
 
   return (
-    <div className="min-h-screen bg-background">
-      
-      
-      <main className="container mx-auto px-4 pb-12">
-        <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen pt-12 pb-20 relative overflow-hidden bg-background">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
+
+      <main className="container mx-auto px-4 relative">
+        <div className="max-w-6xl mx-auto space-y-10">
           
-          {/* Room Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold">Race Room</h1>
-                <Badge variant="outline" className="font-mono text-lg py-1 px-3">
-                  {room.code}
-                </Badge>
-                <Button variant="ghost" size="icon" onClick={copyRoomCode}>
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate("/multiplayer")}
+                  className="rounded-full h-8 w-8 p-0 border border-white/5 bg-white/5 hover:bg-white/10 transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4" />
                 </Button>
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-3 text-[10px] font-black uppercase tracking-widest italic">
+                  ARENA: {room.code}
+                </Badge>
+                {room && (
+                  <Badge variant="secondary" className="bg-panel/50 border-white/5 shadow-inner text-[10px] font-black uppercase tracking-widest italic">
+                    {room.is_private ? "PRIVATE CIRCUIT" : "PUBLIC CIRCUIT"} • {room.mode || "WORDS"}
+                  </Badge>
+                )}
               </div>
-              <p className="text-muted-foreground">
-                {room.is_private ? "Private Room" : "Public Room"} • {room.mode} mode
-              </p>
+              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none">
+                RACE<br/>COMMAND
+              </h1>
             </div>
 
-            <div className="flex gap-2">
-              <Button variant="ghost" onClick={() => navigate("/multiplayer")} className="gap-2">
-                <LogOut className="w-4 h-4" />
-                Leave
+            <div className="flex items-center gap-3">
+              <Button 
+                 variant="ghost" 
+                 onClick={() => navigate("/multiplayer")} 
+                 className="h-14 px-8 rounded-2xl bg-white/5 border border-white/5 font-black italic uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                ABORT
               </Button>
+              
               {isHost && room.status === 'lobby' && (
                 <Button 
                   onClick={startRace} 
                   disabled={!everyoneReady || participants.length < 2}
-                  className="gap-2 shadow-[0_0_15px_rgba(var(--primary),0.3)] min-w-[140px]"
+                  className="h-14 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black italic uppercase tracking-widest text-xs shadow-xl shadow-primary/20 transition-all disabled:opacity-50"
                 >
-                  <Play className="w-4 h-4" />
-                  {participants.length < 2 ? "Waiting for players" : "Start Race"}
+                  <Play className="w-4 h-4 mr-2" />
+                  {participants.length < 2 ? "WAITING FOR PILOTS" : "INITIATE RACE"}
                 </Button>
               )}
+              
               {!isHost && room.status === 'lobby' && (
                 <Button 
                   variant={participants.find(p => p.user_id === user?.id)?.is_ready ? "outline" : "default"}
                   onClick={() => setReady(!participants.find(p => p.user_id === user?.id)?.is_ready)}
+                  className={cn(
+                    "h-14 px-10 rounded-2xl font-black italic uppercase tracking-widest text-xs transition-all",
+                    participants.find(p => p.user_id === user?.id)?.is_ready 
+                      ? "border-primary/50 text-primary hover:bg-primary/5" 
+                      : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20"
+                  )}
                 >
-                  {participants.find(p => p.user_id === user?.id)?.is_ready ? "Not Ready" : "Ready"}
+                  {participants.find(p => p.user_id === user?.id)?.is_ready ? "STAND DOWN" : "READY UP"}
                 </Button>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
             {/* Main Race Area */}
-            <div className="lg:col-span-2 space-y-8">
-              {room.status === 'lobby' && (
-                <Card className="bg-panel/40 border-border/50 backdrop-blur-sm min-h-[300px] flex flex-col items-center justify-center text-center p-8">
-                   <Users className="w-12 h-12 text-primary/40 mb-4" />
-                   <h3 className="text-xl font-medium mb-2">Waiting for participants...</h3>
-                   <p className="text-muted-foreground mb-6">Invite friends using the room code or link.</p>
-                   {participants.length < 2 && (
-                     <p className="text-sm text-yellow-500/80">At least 2 players are required to start.</p>
-                   )}
+            <div className="lg:col-span-3 space-y-8">
+              {room.status === 'lobby' ? (
+                <Card className="bg-panel/10 backdrop-blur-xl border-white/5 h-[400px] flex flex-col items-center justify-center text-center p-12 rounded-[2.5rem] relative overflow-hidden group">
+                   <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                      <Users className="w-64 h-64" />
+                   </div>
+                   <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center border border-primary/20 mb-8 group-hover:scale-110 transition-transform">
+                      <Users className="w-10 h-10 text-primary" />
+                   </div>
+                   <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-4">WAITING FOR PILOTS</h3>
+                   <p className="text-muted-foreground italic font-medium max-w-md mx-auto mb-8">
+                     Broadcast your coordinate to invite challengers. A minimum of two pilots is required for deployment.
+                   </p>
+                   
+                   <div className="flex items-center gap-3">
+                      <div className="bg-black/40 px-6 py-4 rounded-xl border border-white/5 font-mono text-xl tracking-widest text-primary font-black">
+                         {room.code}
+                      </div>
+                      <Button 
+                         variant="ghost" 
+                         size="icon" 
+                         onClick={copyRoomCode}
+                         className="h-14 w-14 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                      >
+                         {copied ? <Check className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
+                      </Button>
+                   </div>
                 </Card>
-              )}
-
-              {room.status === 'countdown' && (
-                <div className="min-h-[300px] flex flex-col items-center justify-center">
-                  <div className="text-9xl font-bold animate-pulse text-primary drop-shadow-[0_0_20px_rgba(var(--primary),0.5)]">
+              ) : room.status === 'countdown' ? (
+                <div className="h-[400px] flex flex-col items-center justify-center">
+                  <motion.div 
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-[12rem] font-black italic leading-none text-primary drop-shadow-[0_0_50px_rgba(var(--primary),0.3)] animate-pulse"
+                  >
                     {countdown}
-                  </div>
-                  <p className="text-xl text-muted-foreground mt-4 uppercase tracking-widest">Get Ready!</p>
+                  </motion.div>
+                  <p className="text-2xl font-black italic uppercase tracking-[0.5em] text-muted-foreground/60">INITIATING FLOW</p>
                 </div>
-              )}
-
-              {(room.status === 'racing' || room.status === 'finished' || raceFinished) && (
+              ) : (room.status === 'racing' || room.status === 'finished' || raceFinished) ? (
                 <div className="space-y-12">
                    {raceFinished ? (
-                     <div className="animate-fade-in-up space-y-6">
-                       {/* Race Results */}
-                       <Card className="bg-panel/40 border-border/50 backdrop-blur-sm overflow-hidden">
-                         <div className="bg-gradient-to-r from-primary/20 to-transparent p-6 border-b border-border/30">
-                           <h2 className="text-2xl font-bold flex items-center gap-2">
-                             🏁 Race Complete!
+                     <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-8"
+                     >
+                       <Card className="bg-panel/10 backdrop-blur-xl border-white/5 overflow-hidden rounded-[2.5rem] shadow-2xl">
+                         <div className="bg-gradient-to-r from-primary/10 via-transparent to-transparent p-10 border-b border-white/5">
+                           <Badge variant="outline" className="mb-4 bg-primary/5 text-primary border-primary/20 font-black italic uppercase tracking-widest py-1 px-3">MISSION RECAP</Badge>
+                           <h2 className="text-4xl font-black italic uppercase tracking-tighter">
+                             OPERATIONAL SUCCESS
                            </h2>
-                           <p className="text-muted-foreground mt-1">Your time: {finishTime?.toFixed(1)}s</p>
                          </div>
-                         <CardContent className="p-6">
-                           <div className="grid grid-cols-2 gap-6 mb-8">
-                             <div className="text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
-                               <div className="text-4xl font-bold text-primary">{finalWpm}</div>
-                               <div className="text-sm text-muted-foreground uppercase tracking-wider">WPM</div>
+                         <CardContent className="p-10">
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                             <div className="relative group">
+                               <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                               <div className="relative bg-black/40 p-8 rounded-[2rem] border border-white/5 text-center">
+                                 <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2 italic">AVERAGE VELOCITY</div>
+                                 <div className="text-6xl font-black italic tracking-tighter text-primary">{finalWpm}</div>
+                                 <div className="text-xs font-black uppercase tracking-widest opacity-40 mt-1">WORDS PER MINUTE</div>
+                               </div>
                              </div>
-                             <div className="text-center p-4 rounded-lg bg-success/10 border border-success/20">
-                               <div className="text-4xl font-bold text-success">{finalAccuracy}%</div>
-                               <div className="text-sm text-muted-foreground uppercase tracking-wider">Accuracy</div>
+                             <div className="relative group">
+                               <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-transparent blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                               <div className="relative bg-black/40 p-8 rounded-[2rem] border border-white/5 text-center">
+                                 <div className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2 italic">PRECISION RATING</div>
+                                 <div className="text-6xl font-black italic tracking-tighter text-emerald-500">{finalAccuracy}%</div>
+                                 <div className="text-xs font-black uppercase tracking-widest opacity-40 mt-1">PERCENT ACCURATE</div>
+                               </div>
                              </div>
                            </div>
                            
-                           {/* Leaderboard */}
-                           <h3 className="text-lg font-semibold mb-4">Race Standings</h3>
-                           <div className="space-y-3">
-                             {(() => {
-                               // Use live participants if available and valid, otherwise fall back to cached
-                               const displayParticipants = participants.length > 0 && participants.some(p => p.wpm > 0 || p.progress > 0)
-                                 ? participants
-                                 : cachedStandings.length > 0
-                                   ? cachedStandings
-                                   : participants;
-                               
-                               return [...displayParticipants]
-                                 .sort((a, b) => (b.finished_at ? 1 : 0) - (a.finished_at ? 1 : 0) || b.progress - a.progress || b.wpm - a.wpm)
-                                 .map((p, idx) => (
-                                 <div 
-                                   key={p.user_id} 
-                                   className={`flex items-center justify-between p-3 rounded-lg transition-all ${
-                                     p.user_id === user?.id 
-                                       ? 'bg-primary/20 border border-primary/30' 
-                                       : 'bg-panel/30 border border-border/20'
-                                   }`}
-                                 >
-                                   <div className="flex items-center gap-3">
-                                     <span className={`text-xl font-bold w-8 ${
-                                       idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-amber-600' : 'text-muted-foreground'
-                                     }`}>
-                                       {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
-                                     </span>
-                                     <Avatar className="h-8 w-8 border border-primary/20">
-                                       <AvatarImage src={p.profile?.avatar_url} />
-                                       <AvatarFallback>{p.profile?.nickname?.charAt(0) || "?"}</AvatarFallback>
-                                     </Avatar>
-                                     <span className="font-medium">{p.profile?.nickname || "Guest"}</span>
+                           <div className="space-y-4">
+                             <h3 className="text-xs font-black italic uppercase tracking-[0.4em] opacity-30 px-2">MISSION STANDINGS</h3>
+                             <div className="space-y-3">
+                               {(() => {
+                                 const displayParticipants = participants.length > 0 && participants.some(p => p.wpm > 0 || p.progress > 0)
+                                   ? participants
+                                   : cachedStandings.length > 0 ? cachedStandings : participants;
+                                 
+                                 return [...displayParticipants]
+                                   .sort((a, b) => (b.finished_at ? 1 : 0) - (a.finished_at ? 1 : 0) || b.progress - a.progress || b.wpm - a.wpm)
+                                   .map((p, idx) => (
+                                   <div 
+                                     key={p.user_id} 
+                                     className={cn(
+                                       "flex items-center justify-between p-5 rounded-2xl transition-all border",
+                                       p.user_id === user?.id 
+                                         ? 'bg-primary/10 border-primary/30 shadow-lg shadow-primary/5' 
+                                         : 'bg-white/[0.02] border-white/5'
+                                     )}
+                                   >
+                                     <div className="flex items-center gap-4">
+                                       <div className={cn(
+                                          "w-10 h-10 rounded-xl flex items-center justify-center font-black italic text-lg shadow-inner",
+                                          idx === 0 ? "bg-yellow-500 text-black" : 
+                                          idx === 1 ? "bg-slate-300 text-black" :
+                                          idx === 2 ? "bg-amber-600 text-black" :
+                                          "bg-white/5 text-muted-foreground"
+                                       )}>
+                                         {idx + 1}
+                                       </div>
+                                       <Avatar className="h-10 w-10 border-2 border-white/10">
+                                         <AvatarImage src={p.profile?.avatar_url} />
+                                         <AvatarFallback className="bg-panel font-black">{p.profile?.nickname?.charAt(0) || "?"}</AvatarFallback>
+                                       </Avatar>
+                                       <div className="flex flex-col">
+                                         <span className="font-black italic uppercase tracking-tight">{p.profile?.nickname || "GUEST_PILOT"}</span>
+                                         {p.user_id === user?.id && <span className="text-[8px] font-black text-primary uppercase tracking-widest">YOU</span>}
+                                       </div>
+                                     </div>
+                                     <div className="flex items-center gap-8">
+                                       <div className="text-right">
+                                          <div className="text-xs font-black italic text-muted-foreground tracking-widest">VELOCITY</div>
+                                          <div className="text-xl font-black italic">{p.wpm} <span className="text-[10px] opacity-40">WPM</span></div>
+                                       </div>
+                                       <div className="text-right min-w-[100px]">
+                                          <div className="text-xs font-black italic text-muted-foreground tracking-widest">STATUS</div>
+                                          <div className={cn(
+                                             "text-xs font-black italic px-3 py-1 rounded-lg uppercase tracking-wider mt-1",
+                                             p.progress === 100 ? "bg-emerald-500/20 text-emerald-500" : "bg-white/5 text-white/40"
+                                          )}>
+                                             {p.progress === 100 ? "FINISHED" : `${p.progress}%`}
+                                          </div>
+                                       </div>
+                                     </div>
                                    </div>
-                                   <div className="flex items-center gap-4 text-sm">
-                                     <span className="font-mono">{p.wpm} WPM</span>
-                                     <span className={`font-mono ${p.progress === 100 ? 'text-success' : 'text-muted-foreground'}`}>
-                                       {p.progress === 100 ? '✓ Finished' : `${p.progress}%`}
-                                     </span>
-                                   </div>
-                                 </div>
-                               ));
-                             })()}
+                                 ));
+                               })()}
+                             </div>
                            </div>
                          </CardContent>
                        </Card>
                        
-                       <div className="flex justify-center">
+                       <div className="flex justify-center pt-4">
                           <Button 
-                            variant="outline" 
                             onClick={() => navigate("/multiplayer")}
-                            className="gap-2"
+                            className="h-14 px-12 rounded-2xl bg-white/5 border border-white/10 font-black italic uppercase tracking-widest text-xs hover:bg-white/10 transition-all text-muted-foreground"
                           >
-                            <LogOut className="w-4 h-4" />
-                            Back to Lobby
+                            <LogOut className="w-4 h-4 mr-3" />
+                            RETURN TO BASE
                           </Button>
                        </div>
-                     </div>
+                     </motion.div>
                    ) : (
-                     <div className="space-y-12">
+                     <div className="space-y-16">
                         <RaceProgress participants={participants} />
                         
                         <div 
-                          className="relative cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-xl transition-all"
+                          className="relative group cursor-text focus-within:ring-2 focus-within:ring-primary/20 rounded-[2.5rem] transition-all"
                           onClick={() => document.getElementById("race-mobile-input")?.focus()}
                         >
-                          {/* Hidden input for mobile keyboard support */}
                           <input
                             id="race-mobile-input"
                             type="text"
@@ -603,21 +683,16 @@ export default function RaceRoom() {
                             value={inputValue}
                             onChange={(e) => {
                               const val = e.target.value;
-                              
-                              // Handle space for next word or finish
                               if (val.endsWith(" ")) {
                                 if (currentWordIndex < words.length - 1) {
                                   nextWord();
                                   setInputValue("");
                                 } else {
-                                  // Last word - finish the race!
                                   completeRace();
                                   setInputValue("");
                                 }
                                 return;
                               }
-
-                              // Detect backspace
                               if (val.length < inputValue.length) {
                                 deleteChar();
                               } else {
@@ -626,56 +701,87 @@ export default function RaceRoom() {
                                   handleTyping(lastChar);
                                 }
                               }
-                              
                               setInputValue(val);
                             }}
                           />
-                          <WordStream />
-                          {room.status === 'finished' && (
-                            <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center rounded-xl z-10">
-                              <h2 className="text-4xl font-bold text-primary">Race Finished!</h2>
+                          <div className={cn(
+                             "transition-all duration-500",
+                             (room.status === 'finished' || raceFinished) ? "blur-md opacity-20 pointer-events-none scale-95" : ""
+                          )}>
+                             <WordStream />
+                          </div>
+
+                          {(room.status === 'finished' || raceFinished) && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[2.5rem] z-10 animate-in fade-in zoom-in-95 duration-500">
+                              <Badge className="bg-primary text-primary-foreground font-black italic uppercase py-1 px-4 mb-4 tracking-widest">CIRCUIT CLOSED</Badge>
+                              <h2 className="text-6xl font-black text-primary italic uppercase tracking-tighter drop-shadow-2xl">RACE FINISHED</h2>
                             </div>
                           )}
                         </div>
 
-                        <LiveMetrics />
+                        <div className="max-w-2xl mx-auto">
+                           <LiveMetrics />
+                        </div>
                      </div>
                    )}
                 </div>
-              )}
+              ) : null}
             </div>
 
-            {/* Sidebar / Participants */}
-            <Card className="bg-panel/40 border-border/50 backdrop-blur-sm h-fit">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                   Players ({participants.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {participants.map((p) => (
-                  <div key={p.user_id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8 border border-primary/20">
-                        <AvatarImage src={p.profile?.avatar_url} />
-                        <AvatarFallback>{p.profile?.nickname?.charAt(0) || "U"}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{p.profile?.nickname || "Guest"}</span>
-                        <span className="text-[10px] uppercase text-muted-foreground">
-                          {p.user_id === room.host_id ? "Host" : "Player"}
-                        </span>
+            <div className="space-y-6">
+              <Card className="bg-panel/10 backdrop-blur-xl border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <CardHeader className="p-8 pb-4">
+                  <CardTitle className="text-xs font-black italic uppercase tracking-[0.3em] flex items-center justify-between opacity-50">
+                     <span>DEPLOYED PILOTS</span>
+                     <span className="text-primary">[{participants.length}]</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 pt-0 space-y-4">
+                  {participants.map((p) => (
+                    <div key={p.user_id} className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                           <Avatar className="h-10 w-10 border-2 border-white/10">
+                              <AvatarImage src={p.profile?.avatar_url} />
+                              <AvatarFallback className="bg-panel font-black">{p.profile?.nickname?.charAt(0) || "U"}</AvatarFallback>
+                           </Avatar>
+                           {p.user_id === room.host_id && (
+                              <div className="absolute -top-1 -right-1 bg-yellow-500 rounded-full p-1 border-2 border-background">
+                                 <Play className="w-2 h-2 text-black fill-current" />
+                              </div>
+                           )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-black italic uppercase tracking-tight">{p.profile?.nickname || "PILOT"}</span>
+                          <span className="text-[8px] font-black uppercase tracking-widest opacity-40">
+                            {p.user_id === room.host_id ? "COMMANDER" : "OPERATIVE"}
+                          </span>
+                        </div>
                       </div>
+                      {room.status === 'lobby' ? (
+                        p.is_ready ? (
+                          <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                        ) : (
+                          <div className="h-2 w-2 rounded-full bg-white/10" />
+                        )
+                      ) : (
+                         <div className="text-[10px] font-mono font-black italic text-primary">{p.wpm} WPM</div>
+                      )}
                     </div>
-                    {p.is_ready ? (
-                      <Badge className="bg-green-500/20 text-green-500 border-green-500/30">Ready</Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-muted-foreground">Waiting</Badge>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="bg-panel/10 backdrop-blur-xl border-white/5 rounded-[2.5rem] overflow-hidden p-8 space-y-4">
+                 <div className="flex items-center gap-3 text-primary">
+                    <Zap className="w-5 h-5 fill-current" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">Tactical Briefing</span>
+                 </div>
+                 <p className="text-xs font-medium italic text-muted-foreground leading-relaxed">
+                    Focus on consistency. In multiplayer engagements, a single error can compromise your velocity flow.
+                 </p>
+              </Card>
+            </div>
 
           </div>
         </div>

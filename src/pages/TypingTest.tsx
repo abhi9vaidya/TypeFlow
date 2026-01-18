@@ -306,7 +306,7 @@ export default function TypingTest() {
         }
 
         if (accuracy >= 100 && !hasAchievement("Perfect!")) {
-          unlockAchievement("Perfect!", "100% accuracy on a test", "✨");
+          unlockAchievement("Perfect!", "100% accuracy on a test", "🔥");
           toast({
             title: "🏆 Achievement Unlocked!",
             description: "Perfect! - 100% accuracy",

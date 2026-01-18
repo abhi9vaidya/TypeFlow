@@ -2,7 +2,7 @@
 import { useGoalsStore } from "@/store/useGoalsStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Award, Star } from "lucide-react";
+import { Trophy, Award, Zap } from "lucide-react";
 
 export function AchievementsPanel() {
   const { achievements } = useGoalsStore();
@@ -41,7 +41,7 @@ export function AchievementsPanel() {
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold">{achievement.title}</h4>
                       <Badge variant="secondary" className="gap-1">
-                        <Star className="w-3 h-3" />
+                        <Zap className="w-3 h-3" />
                         New
                       </Badge>
                     </div>

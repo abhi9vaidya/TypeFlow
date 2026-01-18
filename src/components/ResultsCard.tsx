@@ -9,7 +9,7 @@ import {
   RotateCcw,
   Trophy,
   Download,
-  Sparkles,
+  Flame,
   Target,
   Zap,
   Activity,
@@ -235,7 +235,7 @@ export function ResultsCard({ result }: ResultsCardProps) {
           onClick={handleNextTest}
           className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 h-14 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] group"
         >
-          <Sparkles className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+          <Flame className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
           Start New Race
         </Button>
       </motion.div>

@@ -28,7 +28,7 @@ export const achievements: Achievement[] = [
     id: "flawless",
     name: "Flawless",
     description: "Achieve 98%+ accuracy",
-    icon: "✨",
+    icon: "🔥",
     condition: (result) => result.accuracy >= 98
   },
   {

@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   ReferenceDot,
 } from "recharts";
-import { Star } from "lucide-react";
+import { Flame } from "lucide-react";
 
 interface ResultsChartProps {
   samples: LiveSample[];
