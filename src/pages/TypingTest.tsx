@@ -32,6 +32,21 @@ import { useShallow } from "zustand/react/shallow";
 export default function TypingTest() {
   // const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+  const [activeCapsLockMessage, setActiveCapsLockMessage] = useState("");
+  
+  const capsLockMessages = [
+    "HULK SMASH CAPS LOCK!",
+    "KEYBOARD AGGRESSION DETECTED!",
+    "WHOA, CALM DOWN COWBOY!",
+    "ARE WE WRITING A MANIFESTO?",
+    "CAPS LOCK? IN THIS ECONOMY?!",
+    "YOUR PINKY IS TOO POWERFUL!",
+    "STOP SHOUTING, YOU'RE SCARING THE CLOUDS!",
+    "ERROR: EXCESSIVE DOMINANCE DETECTED.",
+    "DID THE SHIFT KEY TICK YOU OFF?",
+    "POWERRRRRR! (BUT ALSO, TURN IT OFF)."
+  ];
 
   const {
     words,
@@ -306,6 +321,17 @@ export default function TypingTest() {
   // Keyboard handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // Track Caps Lock state
+      if (e.getModifierState) {
+        const capsOn = e.getModifierState("CapsLock");
+        if (capsOn && !isCapsLockOn) {
+          // Just turned on, pick a random message
+          const randomMsg = capsLockMessages[Math.floor(Math.random() * capsLockMessages.length)];
+          setActiveCapsLockMessage(randomMsg);
+        }
+        setIsCapsLockOn(capsOn);
+      }
+
       // Prevent spacebar from scrolling on results page
       if (isFinished && e.key === " ") {
         e.preventDefault();
@@ -449,7 +475,25 @@ export default function TypingTest() {
                   setInputValue(val);
                 }}
               />
-              <WordStream elapsedTime={elapsedTime} />
+              <div className={`transition-all duration-300 ${isCapsLockOn ? "blur-[2px] opacity-20 scale-[0.98] pointer-events-none" : ""}`}>
+                <WordStream elapsedTime={elapsedTime} />
+              </div>
+
+              {/* Caps Lock Warning Overlay */}
+              {isCapsLockOn && (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200">
+                  <div className="bg-background/80 backdrop-blur-md px-6 py-4 rounded-xl border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)] flex flex-col items-center gap-2 text-center animate-bounce-subtle">
+                    <div className="bg-primary/20 p-3 rounded-full mb-1 border border-primary/50 shadow-inner">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary animate-pulse"><path d="M15 6v6h4l-7 7-7-7h4V6h6z" transform="rotate(180 12 12)"/><rect width="12" height="4" x="6" y="16" rx="1"/></svg>
+                    </div>
+                    <h3 className="text-2xl font-black text-primary italic uppercase tracking-tight drop-shadow-sm">{activeCapsLockMessage}</h3>
+                    <p className="text-sm text-muted-foreground font-bold uppercase tracking-widest opacity-80">
+                      Chill out bro, no need to shout.<br/>
+                      <span className="text-[10px] font-mono mt-2 block border-t border-primary/10 pt-2">(Tap the key to end the madness)</span>
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Ambient glow effect when typing perfectly */}
               {isRunning && showPerfectGlow && (
