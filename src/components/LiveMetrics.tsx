@@ -36,7 +36,7 @@ export function LiveMetrics() {
 
     setWpm(currentWpm);
     setAccuracy(currentAccuracy);
-  }, [isRunning, startTime, correctChars, incorrectChars, extraChars, totalErrors]);
+  }, [isRunning, startTime, correctChars, totalErrors]);
 
   useEffect(() => {
     if (!isRunning || !startTime) return;

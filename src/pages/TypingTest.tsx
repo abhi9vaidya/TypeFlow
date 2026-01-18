@@ -29,25 +29,25 @@ import { useShallow } from "zustand/react/shallow";
 
 // ... other imports
 
+const capsLockMessages = [
+  "HULK SMASH CAPS LOCK!",
+  "KEYBOARD AGGRESSION DETECTED!",
+  "WHOA, CALM DOWN COWBOY!",
+  "ARE WE WRITING A MANIFESTO?",
+  "CAPS LOCK? IN THIS ECONOMY?!",
+  "YOUR PINKY IS TOO POWERFUL!",
+  "STOP SHOUTING, YOU'RE SCARING THE CLOUDS!",
+  "ERROR: EXCESSIVE DOMINANCE DETECTED.",
+  "DID THE SHIFT KEY TICK YOU OFF?",
+  "POWERRRRRR! (BUT ALSO, TURN IT OFF).",
+];
+
 export default function TypingTest() {
   // const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [activeCapsLockMessage, setActiveCapsLockMessage] = useState("");
   
-  const capsLockMessages = [
-    "HULK SMASH CAPS LOCK!",
-    "KEYBOARD AGGRESSION DETECTED!",
-    "WHOA, CALM DOWN COWBOY!",
-    "ARE WE WRITING A MANIFESTO?",
-    "CAPS LOCK? IN THIS ECONOMY?!",
-    "YOUR PINKY IS TOO POWERFUL!",
-    "STOP SHOUTING, YOU'RE SCARING THE CLOUDS!",
-    "ERROR: EXCESSIVE DOMINANCE DETECTED.",
-    "DID THE SHIFT KEY TICK YOU OFF?",
-    "POWERRRRRR! (BUT ALSO, TURN IT OFF)."
-  ];
-
   const {
     words,
     isRunning,
@@ -393,7 +393,7 @@ export default function TypingTest() {
         handleTyping(e.key);
       }
     },
-    [isFinished, currentWordIndex, words, mode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest]
+    [isFinished, currentWordIndex, words, mode, wordCount, includePunctuation, includeNumbers, setWords, resetTest, handleTyping, deleteChar, nextWord, isRunning, duration, startTest, isCapsLockOn]
   );
   // Scroll to top when results page is shown
   useEffect(() => {
@@ -498,12 +498,20 @@ export default function TypingTest() {
               {/* Ambient glow effect when typing perfectly */}
               {isRunning && showPerfectGlow && (
                 <div
-                  className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg transition-opacity duration-1000"
+                  className="absolute -inset-4 pointer-events-none overflow-hidden rounded-3xl transition-opacity duration-1000 z-0"
                   style={{
-                    opacity: correctChars > 20 && incorrectChars === 0 ? 0.4 : 0
+                    opacity: correctChars > 10 && incorrectChars === 0 ? 1 : 0
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-radial from-primary/40 via-primary/10 to-transparent animate-pulse-glow" />
+                  {/* Primary soft aura */}
+                  <div className="absolute inset-0 bg-gradient-radial from-primary/20 via-primary/5 to-transparent animate-pulse-glow" />
+                  
+                  {/* Secondary shifting highlights */}
+                  <div className="absolute inset-0 bg-gradient-radial from-secondary/10 via-transparent to-transparent animate-aura opacity-50" 
+                       style={{ transform: "translate(-10%, -10%)" }} />
+                  
+                  {/* Edge highlights */}
+                  <div className="absolute inset-0 opacity-30 shadow-[inset_0_0_50px_hsl(var(--primary)/0.2)] rounded-2xl" />
                 </div>
               )}
             </div>

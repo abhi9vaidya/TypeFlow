@@ -74,9 +74,9 @@ const Word = memo(({
             data-char-index={charIdx}
             className={cn(
               "relative inline-block transition-all duration-125 will-change-colors",
-              isCorrect && showCharacterGlow && "text-primary font-medium drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]",
+              isCorrect && showCharacterGlow && "text-primary font-bold animate-text-glow",
               isCorrect && !showCharacterGlow && "text-primary/90 font-medium",
-              isIncorrect && "text-destructive/90 animate-shake font-medium",
+              isIncorrect && "text-destructive/90 animate-shake font-medium drop-shadow-[0_0_8px_hsl(var(--destructive)/0.3)]",
               !isTyped && isCurrent && "text-foreground/70",
               !isTyped && isFuture && "text-muted-foreground/40",
               !isTyped && !isCurrent && "text-muted-foreground/35",
@@ -89,9 +89,9 @@ const Word = memo(({
             }}
           >
             {char}
-            {/* Subtle glow on correct chars */}
+            {/* Ultra-soft background glow for the active correct char */}
             {isCorrect && isCurrent && showCharacterGlow && (
-              <span className="absolute inset-0 bg-primary/30 blur-sm animate-pulse-glow pointer-events-none" />
+              <span className="absolute inset-0 bg-primary/20 blur-md rounded-full animate-pulse pointer-events-none" />
             )}
             
             {isIncorrect && (
