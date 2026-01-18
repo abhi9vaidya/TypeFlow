@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { TestResult } from "@/utils/metrics";
-import { Trophy, Timer, FileType2 } from "lucide-react";
+import { Trophy, Timer, FileType2, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 
 interface PersonalBestsProps {
   history: TestResult[];
@@ -20,95 +21,107 @@ export function PersonalBests({ history }: PersonalBestsProps) {
 
     return [
       {
-        label: "Time 15s",
+        label: "15s Time",
         icon: Timer,
+        group: "Time",
         result: getPB(r => r.mode === 'time' && r.duration === 15)
       },
       {
-        label: "Time 30s",
+        label: "30s Time",
         icon: Timer,
+        group: "Time",
         result: getPB(r => r.mode === 'time' && r.duration === 30)
       },
       {
-        label: "Time 60s",
+        label: "60s Time",
         icon: Timer,
+        group: "Time",
         result: getPB(r => r.mode === 'time' && r.duration === 60)
       },
       {
-          label: "Time 120s",
-          icon: Timer,
-          result: getPB(r => r.mode === 'time' && r.duration === 120)
-      },
-      {
-        label: "Words 10",
+        label: "10 Words",
         icon: FileType2,
+        group: "Words",
         result: getPB(r => r.mode === 'words' && r.wordCount === 10)
       },
       {
-        label: "Words 25",
+        label: "25 Words",
         icon: FileType2,
+        group: "Words",
         result: getPB(r => r.mode === 'words' && r.wordCount === 25)
       },
       {
-        label: "Words 50",
+        label: "50 Words",
         icon: FileType2,
+        group: "Words",
         result: getPB(r => r.mode === 'words' && r.wordCount === 50)
-      },
-      {
-        label: "Words 100",
-        icon: FileType2,
-        result: getPB(r => r.mode === 'words' && r.wordCount === 100)
       },
     ];
   }, [history]);
 
   return (
-    <Card className="col-span-1 lg:col-span-2 bg-gradient-to-br from-panel/50 to-panel/30 border-border/50">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-gold" />
-          Personal Bests
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {categories.map((cat, idx) => (
-            <div 
-              key={idx}
-              className={cn(
-                "p-3 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all",
-                cat.result 
-                  ? "bg-primary/5 border-primary/20 hover:bg-primary/10 hover:border-primary/40" 
-                  : "bg-muted/10 border-border/30 opacity-60"
-              )}
-            >
-              <div className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1.5 mb-1">
-                <cat.icon className="w-3 h-3" />
-                {cat.label}
-              </div>
-              
-              {cat.result ? (
-                <>
-                  <div className="text-2xl font-black text-foreground tabular-nums leading-none">
-                    {Math.round(cat.result.wpm)}
-                  </div>
-                  <div className={cn(
-                    "text-[10px] font-medium px-1.5 py-0.5 rounded-full mt-1",
-                    cat.result.accuracy >= 98 ? "bg-emerald-500/10 text-emerald-500" :
-                    cat.result.accuracy >= 95 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                  )}>
-                    {cat.result.accuracy}% Acc
-                  </div>
-                </>
-              ) : (
-                <div className="text-lg font-bold text-muted-foreground/30 py-1">
-                  —
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <Crown className="w-5 h-5 text-amber-500" />
+          <h3 className="text-xl font-black italic tracking-tight">HALL OF FAME</h3>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        {categories.map((cat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
+            <Card className={cn(
+              "relative overflow-hidden border-border/50 transition-all duration-300 group h-full",
+              cat.result ? "bg-panel/30 hover:border-amber-500/50" : "bg-panel/5 opacity-50"
+            )}>
+              {cat.result && (
+                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Trophy className="w-12 h-12" />
                 </div>
               )}
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+              <CardContent className="p-4 pt-5">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      "p-1.5 rounded-lg",
+                      cat.result ? "bg-amber-500/10 text-amber-500" : "bg-muted text-muted-foreground"
+                    )}>
+                      <cat.icon className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      {cat.label}
+                    </span>
+                  </div>
+
+                  {cat.result ? (
+                    <div className="space-y-1">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-black italic tracking-tighter text-foreground leading-none">
+                          {Math.round(cat.result.wpm)}
+                        </span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">WPM</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] font-bold">
+                        <span className="text-emerald-500">{Math.round(cat.result.accuracy)}% ACC</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-2">
+                      <div className="text-sm font-bold text-muted-foreground/30 italic">Not set yet</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 }
+
