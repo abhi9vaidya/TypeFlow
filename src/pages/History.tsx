@@ -63,7 +63,7 @@ export default function History() {
             </div>
           </div>
           <div className="space-y-3">
-            <h1 className="text-3xl font-black italic tracking-tighter uppercase">NO HISTORY DATA</h1>
+            <h1 className="text-3xl font-black italic tracking-tighter uppercase pr-2 pb-1">NO HISTORY DATA</h1>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Your mechanical prowess hasn't been recorded yet. Launch a session to begin your journey.
             </p>
@@ -105,7 +105,7 @@ export default function History() {
                   <Flame className="w-3 h-3 mr-1" /> Archive Overview
                 </Badge>
               </div>
-              <h1 className="text-5xl font-black bg-gradient-to-r from-foreground to-foreground/50 bg-clip-text text-transparent italic tracking-tight">
+              <h1 className="text-5xl font-black bg-gradient-to-r from-foreground to-foreground/50 bg-clip-text text-transparent italic tracking-tight pb-2 pr-4">
                 TEST HISTORY
               </h1>
               <p className="text-muted-foreground font-medium">

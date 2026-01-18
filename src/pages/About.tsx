@@ -50,7 +50,7 @@ export default function About() {
                         <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1 px-4 text-xs font-black uppercase tracking-[0.2em] italic">
                             System Manifest v1.0
                         </Badge>
-                        <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none">
+                        <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none pb-4 pr-6">
                             TYPEFLOW<br/>NEXUS
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium italic">

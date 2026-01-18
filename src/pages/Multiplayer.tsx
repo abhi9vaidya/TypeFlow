@@ -87,7 +87,7 @@ export default function Multiplayer() {
               <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 py-1.5 px-4 rounded-full font-black italic tracking-widest uppercase">
                 <Sword className="w-3.5 h-3.5 mr-2" /> Realtime Combat
               </Badge>
-              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent italic tracking-tighter uppercase leading-tight">
+              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent italic tracking-tighter uppercase leading-tight pb-2 pr-4">
                 MULTIPLAYER <br /> ARCHITECTURE
               </h1>
               <p className="text-muted-foreground text-lg font-medium max-w-2xl mx-auto opacity-70">

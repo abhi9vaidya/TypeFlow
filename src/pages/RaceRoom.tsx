@@ -472,8 +472,8 @@ export default function RaceRoom() {
                   </Badge>
                 )}
               </div>
-              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none">
-                RACE<br/>COMMAND
+              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tighter uppercase leading-none pb-2 pr-4">
+                GLADIATOR<br/>ARENA
               </h1>
             </div>
 
@@ -527,7 +527,7 @@ export default function RaceRoom() {
                    <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center border border-primary/20 mb-8 group-hover:scale-110 transition-transform">
                       <Users className="w-10 h-10 text-primary" />
                    </div>
-                   <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-4">WAITING FOR PILOTS</h3>
+                   <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-4 pr-2 pb-1">WAITING FOR PILOTS</h3>
                    <p className="text-muted-foreground italic font-medium max-w-md mx-auto mb-8">
                      Broadcast your coordinate to invite challengers. A minimum of two pilots is required for deployment.
                    </p>
@@ -714,7 +714,7 @@ export default function RaceRoom() {
                           {(room.status === 'finished' || raceFinished) && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[2.5rem] z-10 animate-in fade-in zoom-in-95 duration-500">
                               <Badge className="bg-primary text-primary-foreground font-black italic uppercase py-1 px-4 mb-4 tracking-widest">CIRCUIT CLOSED</Badge>
-                              <h2 className="text-6xl font-black text-primary italic uppercase tracking-tighter drop-shadow-2xl">RACE FINISHED</h2>
+                              <h2 className="text-6xl font-black text-primary italic uppercase tracking-tighter drop-shadow-2xl pr-4 pb-2">RACE FINISHED</h2>
                             </div>
                           )}
                         </div>

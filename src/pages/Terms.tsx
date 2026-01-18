@@ -43,7 +43,7 @@ export default function Terms() {
                                 Legal Framework v1.4
                             </Badge>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tighter uppercase">
+                        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tighter uppercase pb-2 pr-4">
                             TERMS OF<br/>ENGAGEMENT
                         </h1>
                         <p className="text-muted-foreground font-medium italic">

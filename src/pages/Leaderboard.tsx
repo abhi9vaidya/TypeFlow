@@ -131,7 +131,7 @@ export default function Leaderboard() {
                   <Trophy className="w-3 h-3 mr-1" /> Global Rankings
                 </Badge>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight uppercase">
+              <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight uppercase pr-4 pb-2">
                 Hall of Speed
               </h1>
               <p className="text-muted-foreground font-medium max-w-xl mx-auto">

@@ -40,7 +40,7 @@ const NotFound = () => {
           <Badge variant="outline" className="bg-rose-500/10 text-rose-500 border-rose-500/20 py-1 px-4 font-black italic uppercase tracking-[0.3em]">
              CRITICAL ERROR 404
           </Badge>
-          <h1 className="text-7xl md:text-9xl font-black italic tracking-tighter uppercase leading-none bg-gradient-to-b from-foreground to-foreground/20 bg-clip-text text-transparent">
+          <h1 className="text-7xl md:text-9xl font-black italic tracking-tighter uppercase leading-none bg-gradient-to-b from-foreground to-foreground/20 bg-clip-text text-transparent pr-8 pb-4">
              SECTOR<br/>UNKNOWN
           </h1>
           <p className="text-xl text-muted-foreground font-medium italic max-w-md mx-auto">

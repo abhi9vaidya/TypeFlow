@@ -147,7 +147,7 @@ export default function Statistics() {
                     <Flame className="w-3 h-3 mr-1" /> Performance Dashboard
                   </Badge>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight">
+                <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent italic tracking-tight pb-2 pr-4">
                   STATISTICS
                 </h1>
                 <p className="text-muted-foreground text-sm md:text-base font-medium">
