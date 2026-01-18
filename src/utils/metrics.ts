@@ -51,6 +51,8 @@ export function calculateConsistency(wpmSamples: number[]): number {
   if (wpmSamples.length < 2) return 100;
   
   const mean = wpmSamples.reduce((a, b) => a + b, 0) / wpmSamples.length;
+  if (mean === 0) return 0;
+  
   const variance = wpmSamples.reduce((sum, wpm) => sum + Math.pow(wpm - mean, 2), 0) / wpmSamples.length;
   const stdDev = Math.sqrt(variance);
   

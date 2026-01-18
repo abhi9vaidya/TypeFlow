@@ -212,9 +212,13 @@ export const useTypingStore = create<TypingState>()(
       nextWord: () => {
         const state = get();
         if (state.currentWordIndex < state.words.length - 1) {
-          // Check if current word was typed correctly (no errors)
           const currentWord = state.words[state.currentWordIndex];
           const typedWord = state.typedChars[state.currentWordIndex];
+          
+          // Calculate missed characters (if word finished early)
+          const missedChars = Math.max(0, currentWord.length - typedWord.length);
+          
+          // Check if word was correct (before space)
           const isWordCorrect = 
             typedWord.length === currentWord.length &&
             typedWord.every((char, idx) => char === currentWord[idx]);
@@ -227,6 +231,11 @@ export const useTypingStore = create<TypingState>()(
             currentCharIndex: 0,
             currentStreak: newStreak,
             maxStreak: newMaxStreak,
+            totalTyped: state.totalTyped + 1, // Spacebar counts as a keystroke
+            incorrectChars: state.incorrectChars + missedChars,
+            totalErrors: state.totalErrors + missedChars,
+            // Space counts as 1 correct point for WPM if word was correct
+            correctChars: isWordCorrect ? state.correctChars + 1 : state.correctChars,
           });
         }
       },
